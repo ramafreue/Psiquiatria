@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro Psiquiátrico — Htal. Sanguinetti</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --azul: #1a3a6b;
+  --azul-mid: #2756a8;
+  --azul-light: #e8eef7;
+  --azul-dark: #0f2347;
+  --rojo: #c0392b;
+  --oro: #c9993a;
+  --bg: #f0f3fa;
+  --white: #ffffff;
+  --border: #d0d8e8;
+  --text: #1a1f2e;
+  --muted: #6b7280;
+  --success: #15803d;
+  --success-bg: #dcfce7;
+  --warning: #92400e;
+  --warning-bg: #fef3c7;
+  --radius: 12px;
+  --shadow: 0 2px 12px rgba(26,58,107,0.10);
+  --shadow-lg: 0 8px 32px rgba(26,58,107,0.18);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ── LOGIN SCREEN ── */
+#login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: linear-gradient(160deg, #0f2347 0%, #1a3a6b 50%, #2756a8 100%);
+}
+.login-card {
+  background: white;
+  border-radius: 20px;
+  padding: 36px 28px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: var(--shadow-lg);
+}
+.login-logo {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.login-logo .escudo-wrap {
+  width: 64px; height: 64px;
+  background: var(--azul);
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  color: white;
+  letter-spacing: 0;
+}
+.login-logo h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  color: var(--azul);
+  font-weight: 400;
+}
+.login-logo p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.login-sep {
+  display: flex; align-items: center; gap: 10px;
+  color: var(--muted); font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  margin: 20px 0 16px;
+}
+.login-sep::before, .login-sep::after { content:''; flex:1; height:1px; background: var(--border); }
+.login-field { margin-bottom: 14px; }
+.login-field label { display: block; font-size: 11px; font-weight: 600; color: var(--azul); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+.login-field input {
+  width: 100%; padding: 11px 14px;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px;
+  background: #fafbff; outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.login-field input:focus { border-color: var(--azul-mid); box-shadow: 0 0 0 3px rgba(39,86,168,0.12); }
+.login-error { font-size: 12px; color: var(--rojo); margin-top: 8px; min-height: 16px; text-align: center; }
+.btn-login {
+  width: 100%; padding: 13px;
+  background: var(--azul); color: white;
+  border: none; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
+  cursor: pointer; margin-top: 4px;
+  transition: background 0.2s, transform 0.1s;
+}
+.btn-login:hover { background: var(--azul-mid); }
+.btn-login:active { transform: scale(0.98); }
+.btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
+.login-register-link {
+  text-align: center; margin-top: 16px;
+  font-size: 13px; color: var(--muted);
+}
+.login-register-link a { color: var(--azul-mid); cursor: pointer; text-decoration: underline; }
+
+/* ── MAIN APP ── */
+#app-screen { display: none; }
+
+/* HEADER */
+.header {
+  background: var(--azul);
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 16px rgba(26,58,107,0.30);
+}
+.header-inner {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+}
+.escudo-sm {
+  width: 42px; height: 42px; flex-shrink: 0;
+  background: rgba(255,255,255,0.15);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px; color: white;
+}
+.header-text { flex: 1; }
+.header-text h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 16px; font-weight: 400; color: white; line-height: 1.2;
+}
+.header-text p { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 1px; letter-spacing: 0.04em; text-transform: uppercase; }
+.user-chip {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 20px; padding: 5px 10px 5px 6px;
+  cursor: pointer; transition: background 0.2s;
+  border: none;
+}
+.user-chip:hover { background: rgba(255,255,255,0.2); }
+.user-avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--oro);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: white;
+}
+.user-chip span { font-size: 12px; color: white; font-weight: 500; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* TABS */
+.tabs { display: flex; background: rgba(0,0,0,0.22); }
+.tab {
+  flex: 1; padding: 10px 6px;
+  font-size: 12px; font-weight: 500;
+  color: rgba(255,255,255,0.6);
+  border: none; background: transparent; cursor: pointer;
+  transition: all 0.2s; border-bottom: 3px solid transparent;
+  font-family: 'DM Sans', sans-serif;
+}
+.tab.active { color: white; border-bottom: 3px solid var(--oro); background: rgba(255,255,255,0.07); }
+.tab:hover:not(.active) { color: rgba(255,255,255,0.85); }
+
+/* MAIN */
+.main { padding: 16px 14px 80px; max-width: 620px; margin: 0 auto; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* CARD */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 18px; margin-bottom: 14px;
+}
+.card-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 15px; color: var(--azul);
+  margin-bottom: 14px; padding-bottom: 10px;
+  border-bottom: 2px solid var(--azul-light);
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* FORM */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.form-row.full { grid-template-columns: 1fr; }
+.field label { display: block; font-size: 11px; font-weight: 600; color: var(--azul); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 10px 12px;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text);
+  background: #fafbff; outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--azul-mid); box-shadow: 0 0 0 3px rgba(39,86,168,0.12); background: white;
+}
+.field textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+.field textarea.large { min-height: 120px; }
+
+/* BOTONES */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+.btn-primary { background: var(--azul); color: white; width: 100%; justify-content: center; margin-top: 6px; font-size: 15px; padding: 13px; }
+.btn-primary:hover { background: var(--azul-mid); transform: translateY(-1px); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-danger { background: #fee2e2; color: var(--rojo); padding: 6px 12px; font-size: 12px; border-radius: 6px; }
+.btn-danger:hover { background: #fecaca; }
+.btn-sm { background: var(--azul-light); color: var(--azul); padding: 6px 12px; font-size: 12px; border-radius: 6px; }
+.btn-sm:hover { background: #d0daf0; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--azul); color: white;
+  padding: 12px 24px; border-radius: 50px;
+  font-size: 14px; font-weight: 500; z-index: 9999;
+  transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+  white-space: nowrap; box-shadow: 0 4px 20px rgba(26,58,107,0.3);
+  pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.ok { background: var(--success); }
+.toast.err { background: var(--rojo); }
+
+/* LOADING */
+.loading { text-align: center; padding: 32px; color: var(--muted); font-size: 14px; }
+.spinner {
+  width: 28px; height: 28px; border: 3px solid var(--border);
+  border-top-color: var(--azul-mid); border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 0 auto 10px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* SEARCH */
+.search-box { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 16px; margin-bottom: 14px; }
+.search-box h3 { font-family: 'DM Serif Display', serif; color: var(--azul); font-size: 15px; margin-bottom: 12px; }
+.search-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.search-row input { flex: 1; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; background: #fafbff; outline: none; transition: border-color 0.2s; }
+.search-row input:focus { border-color: var(--azul-mid); }
+.search-row button { background: var(--azul); color: white; border: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: 'DM Sans', sans-serif; }
+.search-row button:hover { background: var(--azul-mid); }
+.date-range { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: end; }
+.date-range label { font-size: 11px; font-weight: 600; color: var(--azul); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px; }
+.date-range input { width: 100%; padding: 9px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; background: #fafbff; outline: none; }
+.date-range input:focus { border-color: var(--azul-mid); }
+.date-range button { background: var(--azul-light); color: var(--azul); border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 14px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.date-range button:hover { background: #d0daf0; }
+
+/* RESULTS */
+.results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.results-count { font-size: 13px; color: var(--muted); }
+.results-count strong { color: var(--azul); }
+
+/* REG CARD */
+.reg-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 12px; overflow: hidden; transition: box-shadow 0.2s; }
+.reg-card:hover { box-shadow: 0 4px 20px rgba(26,58,107,0.13); }
+.reg-header { background: var(--azul); color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: flex-start; }
+.pac-name { font-family: 'DM Serif Display', serif; font-size: 16px; }
+.pac-meta { display: flex; gap: 12px; font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 3px; flex-wrap: wrap; }
+.fecha-badge { background: rgba(255,255,255,0.18); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.autor-badge { font-size: 10px; color: rgba(255,255,255,0.55); margin-top: 4px; font-style: italic; }
+.reg-body { padding: 12px 16px; }
+.reg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.reg-field { margin-bottom: 8px; }
+.reg-field-label { font-size: 10px; font-weight: 700; color: var(--azul-mid); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
+.reg-field-value { font-size: 13px; color: var(--text); line-height: 1.55; white-space: pre-wrap; }
+.reg-field-value.empty { color: var(--muted); font-style: italic; }
+.reg-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+.reg-actions { display: flex; gap: 8px; justify-content: flex-end; padding: 10px 16px; border-top: 1px solid var(--border); background: #fafbff; }
+.own-indicator { font-size: 10px; color: var(--success); background: var(--success-bg); padding: 2px 8px; border-radius: 10px; align-self: center; margin-right: auto; font-weight: 600; }
+.readonly-indicator { font-size: 10px; color: var(--muted); background: #f3f4f6; padding: 2px 8px; border-radius: 10px; align-self: center; margin-right: auto; }
+
+/* BADGES */
+.diag-badge { display: inline-block; background: var(--azul-light); color: var(--azul); padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.ubic-badge { display: inline-flex; align-items: center; gap: 4px; background: #f0fdf4; color: #166534; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1px solid #bbf7d0; }
+
+/* STATS */
+.stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.stat-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 14px 10px; text-align: center; }
+.stat-num { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--azul); line-height: 1; margin-bottom: 4px; }
+.stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* EMPTY */
+.empty-state { text-align: center; padding: 36px 20px; color: var(--muted); }
+.empty-state p { font-size: 14px; }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(10,20,50,0.6); z-index: 200; display: none; align-items: flex-start; justify-content: center; padding: 16px; overflow-y: auto; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--white); border-radius: 16px; width: 100%; max-width: 540px; margin: auto; overflow: hidden; box-shadow: var(--shadow-lg); }
+.modal-header { background: var(--azul); color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; font-family: 'DM Serif Display', serif; font-size: 17px; }
+.modal-close { background: none; border: none; color: white; font-size: 22px; cursor: pointer; opacity: 0.7; line-height: 1; padding: 2px 6px; }
+.modal-close:hover { opacity: 1; }
+.modal-body { padding: 20px; max-height: 75vh; overflow-y: auto; }
+
+/* SECTION SEP */
+.section-sep { display: flex; align-items: center; gap: 10px; margin: 4px 0 12px; color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; }
+.section-sep::before, .section-sep::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* SYNC INDICATOR */
+.sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; display: inline-block; margin-right: 6px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN ══════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="escudo-wrap">✚</div>
+      <h1>Registro Psiquiátrico</h1>
+      <p>Hospital Sanguinetti · Sistema clínico</p>
+    </div>
+
+    <div id="form-login">
+      <div class="login-sep">Iniciar sesión</div>
+      <div class="login-field">
+        <label>Correo electrónico</label>
+        <input type="email" id="l-email" placeholder="medico@hospital.com" autocomplete="email">
+      </div>
+      <div class="login-field">
+        <label>Contraseña</label>
+        <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div class="login-error" id="l-error"></div>
+      <button class="btn-login" id="btn-login" onclick="doLogin()">Ingresar</button>
+      <div class="login-register-link">
+        ¿Primera vez? <a onclick="showRegister()">Crear cuenta</a>
+      </div>
+    </div>
+
+    <div id="form-register" style="display:none">
+      <div class="login-sep">Crear cuenta</div>
+      <div class="login-field">
+        <label>Nombre completo</label>
+        <input type="text" id="r-nombre" placeholder="Dr. Juan García">
+      </div>
+      <div class="login-field">
+        <label>Correo electrónico</label>
+        <input type="email" id="r-email" placeholder="medico@hospital.com">
+      </div>
+      <div class="login-field">
+        <label>Contraseña</label>
+        <input type="password" id="r-pass" placeholder="Mínimo 6 caracteres">
+      </div>
+      <div class="login-error" id="r-error"></div>
+      <button class="btn-login" id="btn-register" onclick="doRegister()">Crear cuenta</button>
+      <div class="login-register-link">
+        ¿Ya tenés cuenta? <a onclick="showLogin()">Iniciar sesión</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ APP ══════════════ -->
+<div id="app-screen">
+  <header class="header">
+    <div class="header-inner">
+      <div class="escudo-sm">✚</div>
+      <div class="header-text">
+        <h1>Htal. Sanguinetti</h1>
+        <p><span class="sync-dot"></span>Base compartida en tiempo real</p>
+      </div>
+      <button class="user-chip" onclick="doLogout()">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <span id="user-name-chip">...</span>
+      </button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('nuevo',this)">✚ Nuevo</button>
+      <button class="tab" onclick="switchTab('buscar',this)">⌕ Buscar</button>
+      <button class="tab" onclick="switchTab('hoy',this)">◎ Hoy</button>
+      <button class="tab" onclick="switchTab('todos',this)">≡ Todos</button>
+    </div>
+  </header>
+
+  <div class="main">
+
+    <!-- NUEVO -->
+    <div class="panel active" id="panel-nuevo">
+      <div class="card">
+        <div class="card-title">
+          <svg width="16" height="16" fill="none" stroke="#1a3a6b" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Datos del paciente
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Apellido *</label><input type="text" id="apellido" placeholder="García" autocomplete="off"></div>
+          <div class="field"><label>Nombre *</label><input type="text" id="nombre" placeholder="Juan"></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>DNI</label><input type="text" id="dni" placeholder="12.345.678" inputmode="numeric"></div>
+          <div class="field"><label>Fecha</label><input type="date" id="fecha"></div>
+        </div>
+        <div class="form-row full">
+          <div class="field"><label>Ubicación / Sala</label><input type="text" id="ubicacion" placeholder="ej: Sala 3, Guardia, Consultorio 2..."></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <svg width="16" height="16" fill="none" stroke="#1a3a6b" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Evaluación clínica
+        </div>
+        <div class="form-row full">
+          <div class="field"><label>Diagnóstico</label><input type="text" id="diagnostico" placeholder="ej: Trastorno depresivo mayor..."></div>
+        </div>
+        <div class="form-row full">
+          <div class="field"><label>Tratamiento</label><textarea id="tratamiento" class="large" placeholder="Indicaciones farmacológicas, dosis, frecuencia, indicaciones no farmacológicas..."></textarea></div>
+        </div>
+        <div class="form-row full">
+          <div class="field"><label>Pendientes</label><textarea id="pendientes" class="large" placeholder="Estudios a solicitar, interconsultas, seguimiento, alertas, próxima cita..."></textarea></div>
+        </div>
+        <button class="btn btn-primary" id="btn-guardar" onclick="guardarRegistro()">
+          <svg width="15" height="15" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Guardar registro
+        </button>
+      </div>
+    </div>
+
+    <!-- BUSCAR -->
+    <div class="panel" id="panel-buscar">
+      <div class="search-box">
+        <h3>Buscar registros</h3>
+        <div class="search-row">
+          <input type="text" id="q-texto" placeholder="Apellido, nombre o DNI..." oninput="buscarTexto()">
+          <button onclick="limpiarBusqueda()">Limpiar</button>
+        </div>
+        <div class="section-sep">Por fecha exacta</div>
+        <div class="search-row">
+          <input type="date" id="q-fecha-exacta" style="flex:1" onchange="buscarFechaExacta()">
+          <button onclick="buscarFechaExacta()">Buscar</button>
+        </div>
+        <div class="section-sep">Rango de fechas</div>
+        <div class="date-range">
+          <div><label>Desde</label><input type="date" id="q-desde"></div>
+          <div><label>Hasta</label><input type="date" id="q-hasta"></div>
+          <button onclick="buscarRango()">Buscar</button>
+        </div>
+      </div>
+      <div id="resultados-container">
+        <div class="empty-state"><p>Usá el buscador para encontrar registros</p></div>
+      </div>
+    </div>
+
+    <!-- HOY -->
+    <div class="panel" id="panel-hoy">
+      <div id="hoy-stats"></div>
+      <div id="hoy-lista"></div>
+    </div>
+
+    <!-- TODOS -->
+    <div class="panel" id="panel-todos">
+      <div id="todos-lista"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span>Editar registro</span>
+      <button class="modal-close" onclick="cerrarModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="field"><label>Apellido *</label><input type="text" id="e-apellido"></div>
+        <div class="field"><label>Nombre *</label><input type="text" id="e-nombre"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>DNI</label><input type="text" id="e-dni" inputmode="numeric"></div>
+        <div class="field"><label>Fecha</label><input type="date" id="e-fecha"></div>
+      </div>
+      <div class="form-row full">
+        <div class="field"><label>Ubicación / Sala</label><input type="text" id="e-ubicacion"></div>
+      </div>
+      <div class="form-row full">
+        <div class="field"><label>Diagnóstico</label><input type="text" id="e-diagnostico"></div>
+      </div>
+      <div class="form-row full">
+        <div class="field"><label>Tratamiento</label><textarea id="e-tratamiento" class="large"></textarea></div>
+      </div>
+      <div class="form-row full">
+        <div class="field"><label>Pendientes</label><textarea id="e-pendientes" class="large"></textarea></div>
+      </div>
+      <button class="btn btn-primary" onclick="guardarEdicion()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════ FIREBASE ══════════════ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBg0v--VTJC4jALAnx1jxsSK7VuKzcOoAU",
+  authDomain: "psiquiatria-dc3ce.firebaseapp.com",
+  projectId: "psiquiatria-dc3ce",
+  storageBucket: "psiquiatria-dc3ce.firebasestorage.app",
+  messagingSenderId: "763707482361",
+  appId: "1:763707482361:web:99a66f3276762122bd0228"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ── ESTADO GLOBAL ──
+let currentUser = null;
+let todosRegistros = [];
+let editandoId = null;
+let unsubscribe = null;
+
+// ── UTILS ──
+function hoy() { return new Date().toISOString().split('T')[0]; }
+function formatFecha(iso) { if (!iso) return '—'; const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; }
+function initials(name) { return (name||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
+
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type?' '+type:'');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── AUTH UI ──
+window.showRegister = () => {
+  document.getElementById('form-login').style.display = 'none';
+  document.getElementById('form-register').style.display = 'block';
+};
+window.showLogin = () => {
+  document.getElementById('form-register').style.display = 'none';
+  document.getElementById('form-login').style.display = 'block';
+};
+
+window.doLogin = async () => {
+  const email = document.getElementById('l-email').value.trim();
+  const pass = document.getElementById('l-pass').value;
+  const btn = document.getElementById('btn-login');
+  document.getElementById('l-error').textContent = '';
+  btn.disabled = true; btn.textContent = 'Ingresando...';
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    let msg = 'Error al ingresar. Verificá tus datos.';
+    if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') msg = 'Email o contraseña incorrectos.';
+    if (e.code === 'auth/invalid-email') msg = 'Email inválido.';
+    document.getElementById('l-error').textContent = msg;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Ingresar';
+  }
+};
+
+window.doRegister = async () => {
+  const nombre = document.getElementById('r-nombre').value.trim();
+  const email = document.getElementById('r-email').value.trim();
+  const pass = document.getElementById('r-pass').value;
+  const btn = document.getElementById('btn-register');
+  document.getElementById('r-error').textContent = '';
+  if (!nombre) { document.getElementById('r-error').textContent = 'Ingresá tu nombre completo.'; return; }
+  btn.disabled = true; btn.textContent = 'Creando cuenta...';
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: nombre });
+    showToast('¡Cuenta creada correctamente!', 'ok');
+  } catch(e) {
+    let msg = 'Error al crear la cuenta.';
+    if (e.code === 'auth/email-already-in-use') msg = 'Ese email ya está registrado.';
+    if (e.code === 'auth/weak-password') msg = 'La contraseña debe tener al menos 6 caracteres.';
+    if (e.code === 'auth/invalid-email') msg = 'Email inválido.';
+    document.getElementById('r-error').textContent = msg;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Crear cuenta';
+  }
+};
+
+window.doLogout = async () => {
+  if (!confirm('¿Cerrar sesión?')) return;
+  if (unsubscribe) unsubscribe();
+  await signOut(auth);
+};
+
+// ── AUTH STATE ──
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+    const nombre = user.displayName || user.email.split('@')[0];
+    document.getElementById('user-name-chip').textContent = nombre.split(' ')[0];
+    document.getElementById('user-avatar').textContent = initials(nombre);
+    document.getElementById('fecha').value = hoy();
+    suscribirRegistros();
+  } else {
+    currentUser = null;
+    todosRegistros = [];
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app-screen').style.display = 'none';
+  }
+});
+
+// ── FIRESTORE LISTENER ──
+function suscribirRegistros() {
+  if (unsubscribe) unsubscribe();
+  const q = query(collection(db, 'registros'), orderBy('creadoEn', 'desc'));
+  unsubscribe = onSnapshot(q, (snapshot) => {
+    todosRegistros = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    refrescarVistaActiva();
+  }, (err) => {
+    console.error(err);
+    showToast('Error de conexión con la base de datos', 'err');
+  });
+}
+
+function refrescarVistaActiva() {
+  const activePanel = document.querySelector('.panel.active')?.id;
+  if (activePanel === 'panel-hoy') cargarHoy();
+  else if (activePanel === 'panel-todos') cargarTodos();
+  else if (activePanel === 'panel-buscar') {
+    const q = document.getElementById('q-texto').value;
+    if (q) buscarTexto();
+  }
+}
+
+// ── TABS ──
+window.switchTab = (tab, el) => {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  el.classList.add('active');
+  if (tab === 'hoy') cargarHoy();
+  if (tab === 'todos') cargarTodos();
+};
+
+// ── NUEVO REGISTRO ──
+window.guardarRegistro = async () => {
+  const apellido = document.getElementById('apellido').value.trim();
+  const nombre = document.getElementById('nombre').value.trim();
+  if (!apellido || !nombre) { showToast('Completá al menos apellido y nombre'); return; }
+  const btn = document.getElementById('btn-guardar');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+  try {
+    await addDoc(collection(db, 'registros'), {
+      apellido, nombre,
+      dni: document.getElementById('dni').value.trim(),
+      fecha: document.getElementById('fecha').value,
+      ubicacion: document.getElementById('ubicacion').value.trim(),
+      diagnostico: document.getElementById('diagnostico').value.trim(),
+      tratamiento: document.getElementById('tratamiento').value.trim(),
+      pendientes: document.getElementById('pendientes').value.trim(),
+      autorUid: currentUser.uid,
+      autorNombre: currentUser.displayName || currentUser.email,
+      creadoEn: serverTimestamp()
+    });
+    ['apellido','nombre','dni','ubicacion','diagnostico','tratamiento','pendientes'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fecha').value = hoy();
+    showToast('✓ Registro guardado', 'ok');
+  } catch(e) {
+    showToast('Error al guardar. Verificá la conexión.', 'err');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Guardar registro';
+  }
+};
+
+// ── RENDER CARD ──
+function esPropio(reg) { return currentUser && reg.autorUid === currentUser.uid; }
+
+function renderCard(reg) {
+  const propio = esPropio(reg);
+  return `
+  <div class="reg-card" id="card-${reg.id}">
+    <div class="reg-header">
+      <div style="flex:1">
+        <div class="pac-name">${reg.apellido}, ${reg.nombre}</div>
+        <div class="pac-meta">
+          ${reg.dni ? `<span>DNI ${reg.dni}</span>` : ''}
+          ${reg.ubicacion ? `<span>📍 ${reg.ubicacion}</span>` : ''}
+        </div>
+        <div class="autor-badge">Registrado por: ${reg.autorNombre || 'Desconocido'}</div>
+      </div>
+      <div class="fecha-badge">${formatFecha(reg.fecha)}</div>
+    </div>
+    <div class="reg-body">
+      <div class="reg-grid">
+        <div class="reg-field">
+          <div class="reg-field-label">Diagnóstico</div>
+          <div class="reg-field-value">${reg.diagnostico ? `<span class="diag-badge">${reg.diagnostico}</span>` : '<span class="empty">Sin especificar</span>'}</div>
+        </div>
+        <div class="reg-field">
+          <div class="reg-field-label">Ubicación</div>
+          <div class="reg-field-value">${reg.ubicacion ? `<span class="ubic-badge">📍 ${reg.ubicacion}</span>` : '<span class="empty">—</span>'}</div>
+        </div>
+      </div>
+      <hr class="reg-divider">
+      <div class="reg-field">
+        <div class="reg-field-label">Tratamiento</div>
+        <div class="reg-field-value ${!reg.tratamiento?'empty':''}">${reg.tratamiento || 'Sin registrar'}</div>
+      </div>
+      ${reg.pendientes ? `<hr class="reg-divider"><div class="reg-field"><div class="reg-field-label">⚑ Pendientes</div><div class="reg-field-value">${reg.pendientes}</div></div>` : ''}
+    </div>
+    <div class="reg-actions">
+      ${propio
+        ? `<span class="own-indicator">✓ Tuyo</span>
+           <button class="btn btn-sm" onclick="abrirEdicion('${reg.id}')">✎ Editar</button>
+           <button class="btn btn-danger" onclick="eliminarRegistro('${reg.id}')">✕</button>`
+        : `<span class="readonly-indicator">Solo lectura</span>`
+      }
+    </div>
+  </div>`;
+}
+
+function renderLista(lista, containerId) {
+  const el = document.getElementById(containerId);
+  if (!lista.length) {
+    el.innerHTML = `<div class="empty-state"><p>No se encontraron registros</p></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="results-header"><div class="results-count"><strong>${lista.length}</strong> registro${lista.length!==1?'s':''}</div></div>` + lista.map(renderCard).join('');
+}
+
+// ── HOY ──
+function cargarHoy() {
+  const fechaHoy = hoy();
+  const deHoy = todosRegistros.filter(r => r.fecha === fechaHoy);
+  const unicos = new Set(todosRegistros.map(r => r.dni || (r.apellido+r.nombre))).size;
+  document.getElementById('hoy-stats').innerHTML = `
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num">${deHoy.length}</div><div class="stat-label">Hoy</div></div>
+    <div class="stat-card"><div class="stat-num">${unicos}</div><div class="stat-label">Pacientes</div></div>
+    <div class="stat-card"><div class="stat-num">${todosRegistros.length}</div><div class="stat-label">Total</div></div>
+  </div>`;
+  if (!deHoy.length) {
+    document.getElementById('hoy-lista').innerHTML = `<div class="empty-state"><p>Sin registros para hoy (${formatFecha(fechaHoy)})</p></div>`;
+    return;
+  }
+  document.getElementById('hoy-lista').innerHTML = `<div class="results-header"><div class="results-count">Registros de hoy <strong>${formatFecha(fechaHoy)}</strong></div></div>` + deHoy.map(renderCard).join('');
+}
+
+// ── TODOS ──
+function cargarTodos() {
+  renderLista(todosRegistros, 'todos-lista');
+}
+
+// ── BUSCAR ──
+window.buscarTexto = () => {
+  const q = (document.getElementById('q-texto').value || '').trim().toLowerCase();
+  if (!q) { document.getElementById('resultados-container').innerHTML = `<div class="empty-state"><p>Ingresá un apellido, nombre o DNI</p></div>`; return; }
+  const res = todosRegistros.filter(r =>
+    r.apellido?.toLowerCase().includes(q) ||
+    r.nombre?.toLowerCase().includes(q) ||
+    (r.dni && r.dni.replace(/\D/g,'').includes(q.replace(/\D/g,'')))
+  );
+  renderLista(res, 'resultados-container');
+};
+
+window.buscarFechaExacta = () => {
+  const f = document.getElementById('q-fecha-exacta').value;
+  if (!f) return;
+  document.getElementById('q-texto').value = '';
+  renderLista(todosRegistros.filter(r => r.fecha === f), 'resultados-container');
+};
+
+window.buscarRango = () => {
+  const desde = document.getElementById('q-desde').value;
+  const hasta = document.getElementById('q-hasta').value;
+  if (!desde || !hasta) { showToast('Seleccioná fecha desde y hasta'); return; }
+  document.getElementById('q-texto').value = '';
+  renderLista(todosRegistros.filter(r => r.fecha >= desde && r.fecha <= hasta), 'resultados-container');
+};
+
+window.limpiarBusqueda = () => {
+  ['q-texto','q-fecha-exacta','q-desde','q-hasta'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('resultados-container').innerHTML = `<div class="empty-state"><p>Usá el buscador para encontrar registros</p></div>`;
+};
+
+// ── ELIMINAR ──
+window.eliminarRegistro = async (id) => {
+  if (!confirm('¿Eliminar este registro? Esta acción no se puede deshacer.')) return;
+  try {
+    await deleteDoc(doc(db, 'registros', id));
+    showToast('Registro eliminado');
+  } catch(e) { showToast('Error al eliminar', 'err'); }
+};
+
+// ── EDITAR ──
+window.abrirEdicion = (id) => {
+  const reg = todosRegistros.find(r => r.id === id);
+  if (!reg || !esPropio(reg)) return;
+  editandoId = id;
+  document.getElementById('e-apellido').value = reg.apellido || '';
+  document.getElementById('e-nombre').value = reg.nombre || '';
+  document.getElementById('e-dni').value = reg.dni || '';
+  document.getElementById('e-fecha').value = reg.fecha || '';
+  document.getElementById('e-ubicacion').value = reg.ubicacion || '';
+  document.getElementById('e-diagnostico').value = reg.diagnostico || '';
+  document.getElementById('e-tratamiento').value = reg.tratamiento || '';
+  document.getElementById('e-pendientes').value = reg.pendientes || '';
+  document.getElementById('modal-overlay').classList.add('open');
+};
+
+window.cerrarModal = () => {
+  document.getElementById('modal-overlay').classList.remove('open');
+  editandoId = null;
+};
+
+window.guardarEdicion = async () => {
+  if (!editandoId) return;
+  try {
+    await updateDoc(doc(db, 'registros', editandoId), {
+      apellido: document.getElementById('e-apellido').value.trim(),
+      nombre: document.getElementById('e-nombre').value.trim(),
+      dni: document.getElementById('e-dni').value.trim(),
+      fecha: document.getElementById('e-fecha').value,
+      ubicacion: document.getElementById('e-ubicacion').value.trim(),
+      diagnostico: document.getElementById('e-diagnostico').value.trim(),
+      tratamiento: document.getElementById('e-tratamiento').value.trim(),
+      pendientes: document.getElementById('e-pendientes').value.trim(),
+    });
+    cerrarModal();
+    showToast('✓ Cambios guardados', 'ok');
+  } catch(e) { showToast('Error al guardar cambios', 'err'); }
+};
+
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) cerrarModal();
+});
+
+// Enter para login
+document.getElementById('l-pass').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
+document.getElementById('l-email').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
+</script>
+</body>
+</html>
