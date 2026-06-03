@@ -10,7 +10,6 @@
   --azul: #1a3a6b;
   --azul-mid: #2756a8;
   --azul-light: #e8eef7;
-  --azul-dark: #0f2347;
   --rojo: #c0392b;
   --oro: #c9993a;
   --bg: #f0f3fa;
@@ -20,8 +19,6 @@
   --muted: #6b7280;
   --success: #15803d;
   --success-bg: #dcfce7;
-  --warning: #92400e;
-  --warning-bg: #fef3c7;
   --radius: 12px;
   --shadow: 0 2px 12px rgba(26,58,107,0.10);
   --shadow-lg: 0 8px 32px rgba(26,58,107,0.18);
@@ -29,135 +26,43 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-/* ── LOGIN SCREEN ── */
-#login-screen {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 16px;
-  background: linear-gradient(160deg, #0f2347 0%, #1a3a6b 50%, #2756a8 100%);
-}
-.login-card {
-  background: white;
-  border-radius: 20px;
-  padding: 36px 28px;
-  width: 100%;
-  max-width: 380px;
-  box-shadow: var(--shadow-lg);
-}
-.login-logo {
-  text-align: center;
-  margin-bottom: 24px;
-}
-.login-logo .escudo-wrap {
-  width: 64px; height: 64px;
-  background: var(--azul);
-  border-radius: 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 12px;
-  font-family: 'DM Serif Display', serif;
-  font-size: 28px;
-  color: white;
-  letter-spacing: 0;
-}
-.login-logo h1 {
-  font-family: 'DM Serif Display', serif;
-  font-size: 20px;
-  color: var(--azul);
-  font-weight: 400;
-}
+/* LOGIN */
+#login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; background: linear-gradient(160deg, #0f2347 0%, #1a3a6b 50%, #2756a8 100%); }
+.login-card { background: white; border-radius: 20px; padding: 36px 28px; width: 100%; max-width: 380px; box-shadow: var(--shadow-lg); }
+.login-logo { text-align: center; margin-bottom: 24px; }
+.login-logo .escudo-wrap { width: 64px; height: 64px; background: var(--azul); border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; font-family: 'DM Serif Display', serif; font-size: 28px; color: white; }
+.login-logo h1 { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--azul); font-weight: 400; }
 .login-logo p { font-size: 13px; color: var(--muted); margin-top: 4px; }
-.login-sep {
-  display: flex; align-items: center; gap: 10px;
-  color: var(--muted); font-size: 11px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.07em;
-  margin: 20px 0 16px;
-}
+.login-sep { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; margin: 20px 0 16px; }
 .login-sep::before, .login-sep::after { content:''; flex:1; height:1px; background: var(--border); }
 .login-field { margin-bottom: 14px; }
 .login-field label { display: block; font-size: 11px; font-weight: 600; color: var(--azul); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
-.login-field input {
-  width: 100%; padding: 11px 14px;
-  border: 1.5px solid var(--border); border-radius: 8px;
-  font-family: 'DM Sans', sans-serif; font-size: 14px;
-  background: #fafbff; outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
+.login-field input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; background: #fafbff; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
 .login-field input:focus { border-color: var(--azul-mid); box-shadow: 0 0 0 3px rgba(39,86,168,0.12); }
 .login-error { font-size: 12px; color: var(--rojo); margin-top: 8px; min-height: 16px; text-align: center; }
-.btn-login {
-  width: 100%; padding: 13px;
-  background: var(--azul); color: white;
-  border: none; border-radius: 8px;
-  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
-  cursor: pointer; margin-top: 4px;
-  transition: background 0.2s, transform 0.1s;
-}
+.btn-login { width: 100%; padding: 13px; background: var(--azul); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 4px; transition: background 0.2s, transform 0.1s; }
 .btn-login:hover { background: var(--azul-mid); }
 .btn-login:active { transform: scale(0.98); }
 .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
-.login-register-link {
-  text-align: center; margin-top: 16px;
-  font-size: 13px; color: var(--muted);
-}
+.login-register-link { text-align: center; margin-top: 16px; font-size: 13px; color: var(--muted); }
 .login-register-link a { color: var(--azul-mid); cursor: pointer; text-decoration: underline; }
 
-/* ── MAIN APP ── */
+/* APP */
 #app-screen { display: none; }
 
 /* HEADER */
-.header {
-  background: var(--azul);
-  position: sticky; top: 0; z-index: 100;
-  box-shadow: 0 2px 16px rgba(26,58,107,0.30);
-}
-.header-inner {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 16px;
-}
-.escudo-sm {
-  width: 42px; height: 42px; flex-shrink: 0;
-  background: rgba(255,255,255,0.15);
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'DM Serif Display', serif;
-  font-size: 20px; color: white;
-}
+.header { background: var(--azul); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 16px rgba(26,58,107,0.30); }
+.header-inner { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+.escudo-sm { width: 42px; height: 42px; flex-shrink: 0; background: rgba(255,255,255,0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 20px; color: white; }
 .header-text { flex: 1; }
-.header-text h1 {
-  font-family: 'DM Serif Display', serif;
-  font-size: 16px; font-weight: 400; color: white; line-height: 1.2;
-}
+.header-text h1 { font-family: 'DM Serif Display', serif; font-size: 16px; font-weight: 400; color: white; line-height: 1.2; }
 .header-text p { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 1px; letter-spacing: 0.04em; text-transform: uppercase; }
-.user-chip {
-  display: flex; align-items: center; gap: 8px;
-  background: rgba(255,255,255,0.12);
-  border-radius: 20px; padding: 5px 10px 5px 6px;
-  cursor: pointer; transition: background 0.2s;
-  border: none;
-}
+.user-chip { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.12); border-radius: 20px; padding: 5px 10px 5px 6px; cursor: pointer; transition: background 0.2s; border: none; }
 .user-chip:hover { background: rgba(255,255,255,0.2); }
-.user-avatar {
-  width: 26px; height: 26px; border-radius: 50%;
-  background: var(--oro);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 600; color: white;
-}
+.user-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--oro); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; }
 .user-chip span { font-size: 12px; color: white; font-weight: 500; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* TABS */
 .tabs { display: flex; background: rgba(0,0,0,0.22); }
-.tab {
-  flex: 1; padding: 10px 6px;
-  font-size: 12px; font-weight: 500;
-  color: rgba(255,255,255,0.6);
-  border: none; background: transparent; cursor: pointer;
-  transition: all 0.2s; border-bottom: 3px solid transparent;
-  font-family: 'DM Sans', sans-serif;
-}
+.tab { flex: 1; padding: 10px 6px; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.6); border: none; background: transparent; cursor: pointer; transition: all 0.2s; border-bottom: 3px solid transparent; font-family: 'DM Sans', sans-serif; }
 .tab.active { color: white; border-bottom: 3px solid var(--oro); background: rgba(255,255,255,0.07); }
 .tab:hover:not(.active) { color: rgba(255,255,255,0.85); }
 
@@ -167,38 +72,19 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .panel.active { display: block; }
 
 /* CARD */
-.card {
-  background: var(--white);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  padding: 18px; margin-bottom: 14px;
-}
-.card-title {
-  font-family: 'DM Serif Display', serif;
-  font-size: 15px; color: var(--azul);
-  margin-bottom: 14px; padding-bottom: 10px;
-  border-bottom: 2px solid var(--azul-light);
-  display: flex; align-items: center; gap: 8px;
-}
+.card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 18px; margin-bottom: 14px; }
+.card-title { font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--azul); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid var(--azul-light); display: flex; align-items: center; gap: 8px; }
 
 /* FORM */
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
 .form-row.full { grid-template-columns: 1fr; }
+.form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
 .field label { display: block; font-size: 11px; font-weight: 600; color: var(--azul); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
-.field input, .field select, .field textarea {
-  width: 100%; padding: 10px 12px;
-  border: 1.5px solid var(--border); border-radius: 8px;
-  font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text);
-  background: #fafbff; outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  -webkit-appearance: none;
-}
-.field input:focus, .field select:focus, .field textarea:focus {
-  border-color: var(--azul-mid); box-shadow: 0 0 0 3px rgba(39,86,168,0.12); background: white;
-}
+.field input, .field select, .field textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: #fafbff; outline: none; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; appearance: none; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--azul-mid); box-shadow: 0 0 0 3px rgba(39,86,168,0.12); background: white; }
 .field textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
 .field textarea.large { min-height: 120px; }
+.field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
 
 /* BOTONES */
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
@@ -212,29 +98,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .btn-sm:hover { background: #d0daf0; }
 
 /* TOAST */
-.toast {
-  position: fixed; bottom: 24px; left: 50%;
-  transform: translateX(-50%) translateY(80px);
-  background: var(--azul); color: white;
-  padding: 12px 24px; border-radius: 50px;
-  font-size: 14px; font-weight: 500; z-index: 9999;
-  transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
-  white-space: nowrap; box-shadow: 0 4px 20px rgba(26,58,107,0.3);
-  pointer-events: none;
-}
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--azul); color: white; padding: 12px 24px; border-radius: 50px; font-size: 14px; font-weight: 500; z-index: 9999; transition: transform 0.3s cubic-bezier(.34,1.56,.64,1); white-space: nowrap; box-shadow: 0 4px 20px rgba(26,58,107,0.3); pointer-events: none; }
 .toast.show { transform: translateX(-50%) translateY(0); }
 .toast.ok { background: var(--success); }
 .toast.err { background: var(--rojo); }
-
-/* LOADING */
-.loading { text-align: center; padding: 32px; color: var(--muted); font-size: 14px; }
-.spinner {
-  width: 28px; height: 28px; border: 3px solid var(--border);
-  border-top-color: var(--azul-mid); border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  margin: 0 auto 10px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
 
 /* SEARCH */
 .search-box { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 16px; margin-bottom: 14px; }
@@ -244,6 +111,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .search-row input:focus { border-color: var(--azul-mid); }
 .search-row button { background: var(--azul); color: white; border: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: 'DM Sans', sans-serif; }
 .search-row button:hover { background: var(--azul-mid); }
+.search-row button.secondary { background: var(--azul-light); color: var(--azul); border: 1.5px solid var(--border); }
+.search-row button.secondary:hover { background: #d0daf0; }
 .date-range { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: end; }
 .date-range label { font-size: 11px; font-weight: 600; color: var(--azul); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px; }
 .date-range input { width: 100%; padding: 9px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; background: #fafbff; outline: none; }
@@ -261,21 +130,25 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .reg-card:hover { box-shadow: 0 4px 20px rgba(26,58,107,0.13); }
 .reg-header { background: var(--azul); color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: flex-start; }
 .pac-name { font-family: 'DM Serif Display', serif; font-size: 16px; }
-.pac-meta { display: flex; gap: 12px; font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 3px; flex-wrap: wrap; }
+.pac-meta { display: flex; gap: 10px; font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 3px; flex-wrap: wrap; }
 .fecha-badge { background: rgba(255,255,255,0.18); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
 .autor-badge { font-size: 10px; color: rgba(255,255,255,0.55); margin-top: 4px; font-style: italic; }
 .reg-body { padding: 12px 16px; }
 .reg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-.reg-field { margin-bottom: 8px; }
+.reg-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.reg-field { margin-bottom: 6px; }
 .reg-field-label { font-size: 10px; font-weight: 700; color: var(--azul-mid); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
 .reg-field-value { font-size: 13px; color: var(--text); line-height: 1.55; white-space: pre-wrap; }
 .reg-field-value.empty { color: var(--muted); font-style: italic; }
 .reg-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
-.reg-actions { display: flex; gap: 8px; justify-content: flex-end; padding: 10px 16px; border-top: 1px solid var(--border); background: #fafbff; }
-.own-indicator { font-size: 10px; color: var(--success); background: var(--success-bg); padding: 2px 8px; border-radius: 10px; align-self: center; margin-right: auto; font-weight: 600; }
-.readonly-indicator { font-size: 10px; color: var(--muted); background: #f3f4f6; padding: 2px 8px; border-radius: 10px; align-self: center; margin-right: auto; }
+.reg-actions { display: flex; gap: 8px; align-items: center; padding: 10px 16px; border-top: 1px solid var(--border); background: #fafbff; flex-wrap: wrap; }
 
-/* BADGES */
+/* STATUS BADGES */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+.badge-azul { background: var(--azul-light); color: var(--azul); border: 1.5px solid #b0c4e8; }
+.badge-rojo { background: #fee2e2; color: #991b1b; border: 1.5px solid #fca5a5; }
+.badge-verde { background: var(--success-bg); color: var(--success); border: 1.5px solid #86efac; }
+.badge-dias { background: #fef3c7; color: #92400e; border: 1.5px solid #fcd34d; font-size: 10px; }
 .diag-badge { display: inline-block; background: var(--azul-light); color: var(--azul); padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
 .ubic-badge { display: inline-flex; align-items: center; gap: 4px; background: #f0fdf4; color: #166534; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1px solid #bbf7d0; }
 
@@ -292,24 +165,27 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 /* MODAL */
 .modal-overlay { position: fixed; inset: 0; background: rgba(10,20,50,0.6); z-index: 200; display: none; align-items: flex-start; justify-content: center; padding: 16px; overflow-y: auto; }
 .modal-overlay.open { display: flex; }
-.modal { background: var(--white); border-radius: 16px; width: 100%; max-width: 540px; margin: auto; overflow: hidden; box-shadow: var(--shadow-lg); }
+.modal { background: var(--white); border-radius: 16px; width: 100%; max-width: 560px; margin: auto; overflow: hidden; box-shadow: var(--shadow-lg); }
 .modal-header { background: var(--azul); color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; font-family: 'DM Serif Display', serif; font-size: 17px; }
 .modal-close { background: none; border: none; color: white; font-size: 22px; cursor: pointer; opacity: 0.7; line-height: 1; padding: 2px 6px; }
 .modal-close:hover { opacity: 1; }
-.modal-body { padding: 20px; max-height: 75vh; overflow-y: auto; }
+.modal-body { padding: 20px; max-height: 80vh; overflow-y: auto; }
 
 /* SECTION SEP */
 .section-sep { display: flex; align-items: center; gap: 10px; margin: 4px 0 12px; color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; }
 .section-sep::before, .section-sep::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-/* SYNC INDICATOR */
+/* SYNC */
 .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; display: inline-block; margin-right: 6px; animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* OTRO field */
+#otro-wrap, #e-otro-wrap { margin-top: 8px; }
 </style>
 </head>
 <body>
 
-<!-- ══════════════ LOGIN ══════════════ -->
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">
@@ -317,48 +193,27 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       <h1>Registro Psiquiátrico</h1>
       <p>Hospital Sanguinetti · Sistema clínico</p>
     </div>
-
     <div id="form-login">
       <div class="login-sep">Iniciar sesión</div>
-      <div class="login-field">
-        <label>Correo electrónico</label>
-        <input type="email" id="l-email" placeholder="medico@hospital.com" autocomplete="email">
-      </div>
-      <div class="login-field">
-        <label>Contraseña</label>
-        <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password">
-      </div>
+      <div class="login-field"><label>Correo electrónico</label><input type="email" id="l-email" placeholder="medico@hospital.com" autocomplete="email"></div>
+      <div class="login-field"><label>Contraseña</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"></div>
       <div class="login-error" id="l-error"></div>
       <button class="btn-login" id="btn-login" onclick="doLogin()">Ingresar</button>
-      <div class="login-register-link">
-        ¿Primera vez? <a onclick="showRegister()">Crear cuenta</a>
-      </div>
+      <div class="login-register-link">¿Primera vez? <a onclick="showRegister()">Crear cuenta</a></div>
     </div>
-
     <div id="form-register" style="display:none">
       <div class="login-sep">Crear cuenta</div>
-      <div class="login-field">
-        <label>Nombre completo</label>
-        <input type="text" id="r-nombre" placeholder="Dr. Juan García">
-      </div>
-      <div class="login-field">
-        <label>Correo electrónico</label>
-        <input type="email" id="r-email" placeholder="medico@hospital.com">
-      </div>
-      <div class="login-field">
-        <label>Contraseña</label>
-        <input type="password" id="r-pass" placeholder="Mínimo 6 caracteres">
-      </div>
+      <div class="login-field"><label>Nombre completo</label><input type="text" id="r-nombre" placeholder="Dr. Juan García"></div>
+      <div class="login-field"><label>Correo electrónico</label><input type="email" id="r-email" placeholder="medico@hospital.com"></div>
+      <div class="login-field"><label>Contraseña</label><input type="password" id="r-pass" placeholder="Mínimo 6 caracteres"></div>
       <div class="login-error" id="r-error"></div>
       <button class="btn-login" id="btn-register" onclick="doRegister()">Crear cuenta</button>
-      <div class="login-register-link">
-        ¿Ya tenés cuenta? <a onclick="showLogin()">Iniciar sesión</a>
-      </div>
+      <div class="login-register-link">¿Ya tenés cuenta? <a onclick="showLogin()">Iniciar sesión</a></div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════ APP ══════════════ -->
+<!-- APP -->
 <div id="app-screen">
   <header class="header">
     <div class="header-inner">
@@ -375,7 +230,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
     <div class="tabs">
       <button class="tab active" onclick="switchTab('nuevo',this)">✚ Nuevo</button>
       <button class="tab" onclick="switchTab('buscar',this)">⌕ Buscar</button>
-      <button class="tab" onclick="switchTab('hoy',this)">◎ Hoy</button>
+      <button class="tab" onclick="switchTab('internados',this)">🛏 Internados</button>
       <button class="tab" onclick="switchTab('todos',this)">≡ Todos</button>
     </div>
   </header>
@@ -393,14 +248,35 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <div class="field"><label>Apellido *</label><input type="text" id="apellido" placeholder="García" autocomplete="off"></div>
           <div class="field"><label>Nombre *</label><input type="text" id="nombre" placeholder="Juan"></div>
         </div>
-        <div class="form-row">
+        <div class="form-row triple">
           <div class="field"><label>DNI</label><input type="text" id="dni" placeholder="12.345.678" inputmode="numeric"></div>
-          <div class="field"><label>Fecha</label><input type="date" id="fecha"></div>
+          <div class="field"><label>Edad</label><input type="number" id="edad" placeholder="45" min="0" max="120" inputmode="numeric"></div>
+          <div class="field"><label>Fecha de hoy</label><input type="date" id="fecha"></div>
         </div>
         <div class="form-row full">
-          <div class="field"><label>Ubicación / Sala</label><input type="text" id="ubicacion" placeholder="ej: Sala 3, Guardia, Consultorio 2..."></div>
+          <div class="field"><label>Dirección</label><input type="text" id="direccion" placeholder="Calle 123, Piso 2..."></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Fecha de ingreso</label><input type="date" id="fecha_ingreso"></div>
+          <div class="field"><label>Fecha de egreso</label><input type="date" id="fecha_egreso"></div>
+        </div>
+        <div class="form-row full">
+          <div class="field">
+            <label>Ubicación / Sala</label>
+            <select id="ubicacion" onchange="toggleOtro('ubicacion','otro-wrap')">
+              <option value="">— Seleccionar —</option>
+              <option value="EMERGENCIA">EMERGENCIA</option>
+              <option value="INTERNACION">INTERNACION</option>
+              <option value="CONSULTORIOS">CONSULTORIOS</option>
+              <option value="OTRO">OTRO</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row full" id="otro-wrap" style="display:none">
+          <div class="field"><label>Especificar ubicación</label><input type="text" id="ubicacion_otro" placeholder="Escribí la ubicación..."></div>
         </div>
       </div>
+
       <div class="card">
         <div class="card-title">
           <svg width="16" height="16" fill="none" stroke="#1a3a6b" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
@@ -427,13 +303,14 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       <div class="search-box">
         <h3>Buscar registros</h3>
         <div class="search-row">
-          <input type="text" id="q-texto" placeholder="Apellido, nombre o DNI..." oninput="buscarTexto()">
-          <button onclick="limpiarBusqueda()">Limpiar</button>
+          <input type="text" id="q-texto" placeholder="Apellido, nombre o DNI..." onkeydown="if(event.key==='Enter') ejecutarBusqueda()">
+          <button onclick="ejecutarBusqueda()">Buscar</button>
+          <button class="secondary" onclick="limpiarBusqueda()">Limpiar</button>
         </div>
         <div class="section-sep">Por fecha exacta</div>
         <div class="search-row">
-          <input type="date" id="q-fecha-exacta" style="flex:1" onchange="buscarFechaExacta()">
-          <button onclick="buscarFechaExacta()">Buscar</button>
+          <input type="date" id="q-fecha-exacta" style="flex:1">
+          <button onclick="buscarFechaExacta()">Buscar fecha</button>
         </div>
         <div class="section-sep">Rango de fechas</div>
         <div class="date-range">
@@ -447,10 +324,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       </div>
     </div>
 
-    <!-- HOY -->
-    <div class="panel" id="panel-hoy">
-      <div id="hoy-stats"></div>
-      <div id="hoy-lista"></div>
+    <!-- INTERNADOS -->
+    <div class="panel" id="panel-internados">
+      <div id="internados-stats"></div>
+      <div id="internados-lista"></div>
     </div>
 
     <!-- TODOS -->
@@ -473,12 +350,32 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
         <div class="field"><label>Apellido *</label><input type="text" id="e-apellido"></div>
         <div class="field"><label>Nombre *</label><input type="text" id="e-nombre"></div>
       </div>
-      <div class="form-row">
+      <div class="form-row triple">
         <div class="field"><label>DNI</label><input type="text" id="e-dni" inputmode="numeric"></div>
-        <div class="field"><label>Fecha</label><input type="date" id="e-fecha"></div>
+        <div class="field"><label>Edad</label><input type="number" id="e-edad" min="0" max="120" inputmode="numeric"></div>
+        <div class="field"><label>Fecha de hoy</label><input type="date" id="e-fecha"></div>
       </div>
       <div class="form-row full">
-        <div class="field"><label>Ubicación / Sala</label><input type="text" id="e-ubicacion"></div>
+        <div class="field"><label>Dirección</label><input type="text" id="e-direccion"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Fecha de ingreso</label><input type="date" id="e-fecha_ingreso"></div>
+        <div class="field"><label>Fecha de egreso</label><input type="date" id="e-fecha_egreso"></div>
+      </div>
+      <div class="form-row full">
+        <div class="field">
+          <label>Ubicación / Sala</label>
+          <select id="e-ubicacion" onchange="toggleOtro('e-ubicacion','e-otro-wrap')">
+            <option value="">— Seleccionar —</option>
+            <option value="EMERGENCIA">EMERGENCIA</option>
+            <option value="INTERNACION">INTERNACION</option>
+            <option value="CONSULTORIOS">CONSULTORIOS</option>
+            <option value="OTRO">OTRO</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row full" id="e-otro-wrap" style="display:none">
+        <div class="field"><label>Especificar ubicación</label><input type="text" id="e-ubicacion_otro" placeholder="Escribí la ubicación..."></div>
       </div>
       <div class="form-row full">
         <div class="field"><label>Diagnóstico</label><input type="text" id="e-diagnostico"></div>
@@ -496,11 +393,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 <div class="toast" id="toast"></div>
 
-<!-- ══════════════ FIREBASE ══════════════ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBg0v--VTJC4jALAnx1jxsSK7VuKzcOoAU",
@@ -515,7 +411,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ── ESTADO GLOBAL ──
 let currentUser = null;
 let todosRegistros = [];
 let editandoId = null;
@@ -525,6 +420,21 @@ let unsubscribe = null;
 function hoy() { return new Date().toISOString().split('T')[0]; }
 function formatFecha(iso) { if (!iso) return '—'; const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; }
 function initials(name) { return (name||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
+function diasInternacion(ingreso, egreso) {
+  if (!ingreso || !egreso) return null;
+  const d1 = new Date(ingreso), d2 = new Date(egreso);
+  return Math.round((d2 - d1) / (1000*60*60*24));
+}
+function esInternado(reg) {
+  // Sin fecha de egreso = internado. Si fecha egreso > hoy = internado todavía
+  if (!reg.fecha_egreso) return true;
+  return reg.fecha_egreso > hoy();
+}
+function getUbicacionDisplay(reg) {
+  if (!reg.ubicacion) return '';
+  if (reg.ubicacion === 'OTRO') return reg.ubicacion_otro || 'OTRO';
+  return reg.ubicacion;
+}
 
 function showToast(msg, type='') {
   const t = document.getElementById('toast');
@@ -534,15 +444,15 @@ function showToast(msg, type='') {
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
+// ── TOGGLE OTRO ──
+window.toggleOtro = (selectId, wrapId) => {
+  const val = document.getElementById(selectId).value;
+  document.getElementById(wrapId).style.display = val === 'OTRO' ? 'grid' : 'none';
+};
+
 // ── AUTH UI ──
-window.showRegister = () => {
-  document.getElementById('form-login').style.display = 'none';
-  document.getElementById('form-register').style.display = 'block';
-};
-window.showLogin = () => {
-  document.getElementById('form-register').style.display = 'none';
-  document.getElementById('form-login').style.display = 'block';
-};
+window.showRegister = () => { document.getElementById('form-login').style.display='none'; document.getElementById('form-register').style.display='block'; };
+window.showLogin = () => { document.getElementById('form-register').style.display='none'; document.getElementById('form-login').style.display='block'; };
 
 window.doLogin = async () => {
   const email = document.getElementById('l-email').value.trim();
@@ -550,16 +460,13 @@ window.doLogin = async () => {
   const btn = document.getElementById('btn-login');
   document.getElementById('l-error').textContent = '';
   btn.disabled = true; btn.textContent = 'Ingresando...';
-  try {
-    await signInWithEmailAndPassword(auth, email, pass);
-  } catch(e) {
+  try { await signInWithEmailAndPassword(auth, email, pass); }
+  catch(e) {
     let msg = 'Error al ingresar. Verificá tus datos.';
-    if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') msg = 'Email o contraseña incorrectos.';
+    if (['auth/user-not-found','auth/wrong-password','auth/invalid-credential'].includes(e.code)) msg = 'Email o contraseña incorrectos.';
     if (e.code === 'auth/invalid-email') msg = 'Email inválido.';
     document.getElementById('l-error').textContent = msg;
-  } finally {
-    btn.disabled = false; btn.textContent = 'Ingresar';
-  }
+  } finally { btn.disabled=false; btn.textContent='Ingresar'; }
 };
 
 window.doRegister = async () => {
@@ -568,21 +475,19 @@ window.doRegister = async () => {
   const pass = document.getElementById('r-pass').value;
   const btn = document.getElementById('btn-register');
   document.getElementById('r-error').textContent = '';
-  if (!nombre) { document.getElementById('r-error').textContent = 'Ingresá tu nombre completo.'; return; }
-  btn.disabled = true; btn.textContent = 'Creando cuenta...';
+  if (!nombre) { document.getElementById('r-error').textContent='Ingresá tu nombre completo.'; return; }
+  btn.disabled=true; btn.textContent='Creando cuenta...';
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await updateProfile(cred.user, { displayName: nombre });
-    showToast('¡Cuenta creada correctamente!', 'ok');
+    showToast('¡Cuenta creada!', 'ok');
   } catch(e) {
     let msg = 'Error al crear la cuenta.';
-    if (e.code === 'auth/email-already-in-use') msg = 'Ese email ya está registrado.';
-    if (e.code === 'auth/weak-password') msg = 'La contraseña debe tener al menos 6 caracteres.';
-    if (e.code === 'auth/invalid-email') msg = 'Email inválido.';
+    if (e.code==='auth/email-already-in-use') msg='Ese email ya está registrado.';
+    if (e.code==='auth/weak-password') msg='La contraseña debe tener al menos 6 caracteres.';
+    if (e.code==='auth/invalid-email') msg='Email inválido.';
     document.getElementById('r-error').textContent = msg;
-  } finally {
-    btn.disabled = false; btn.textContent = 'Crear cuenta';
-  }
+  } finally { btn.disabled=false; btn.textContent='Crear cuenta'; }
 };
 
 window.doLogout = async () => {
@@ -603,59 +508,56 @@ onAuthStateChanged(auth, (user) => {
     document.getElementById('fecha').value = hoy();
     suscribirRegistros();
   } else {
-    currentUser = null;
-    todosRegistros = [];
+    currentUser = null; todosRegistros = [];
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('app-screen').style.display = 'none';
   }
 });
 
-// ── FIRESTORE LISTENER ──
 function suscribirRegistros() {
   if (unsubscribe) unsubscribe();
   const q = query(collection(db, 'registros'), orderBy('creadoEn', 'desc'));
   unsubscribe = onSnapshot(q, (snapshot) => {
     todosRegistros = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     refrescarVistaActiva();
-  }, (err) => {
-    console.error(err);
-    showToast('Error de conexión con la base de datos', 'err');
-  });
+  }, () => showToast('Error de conexión', 'err'));
 }
 
 function refrescarVistaActiva() {
-  const activePanel = document.querySelector('.panel.active')?.id;
-  if (activePanel === 'panel-hoy') cargarHoy();
-  else if (activePanel === 'panel-todos') cargarTodos();
-  else if (activePanel === 'panel-buscar') {
-    const q = document.getElementById('q-texto').value;
-    if (q) buscarTexto();
-  }
+  const p = document.querySelector('.panel.active')?.id;
+  if (p === 'panel-internados') cargarInternados();
+  else if (p === 'panel-todos') cargarTodos();
 }
 
 // ── TABS ──
 window.switchTab = (tab, el) => {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('panel-' + tab).classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
   el.classList.add('active');
-  if (tab === 'hoy') cargarHoy();
-  if (tab === 'todos') cargarTodos();
+  if (tab==='internados') cargarInternados();
+  if (tab==='todos') cargarTodos();
 };
 
-// ── NUEVO REGISTRO ──
+// ── GUARDAR ──
 window.guardarRegistro = async () => {
   const apellido = document.getElementById('apellido').value.trim();
   const nombre = document.getElementById('nombre').value.trim();
-  if (!apellido || !nombre) { showToast('Completá al menos apellido y nombre'); return; }
+  if (!apellido || !nombre) { showToast('Completá apellido y nombre'); return; }
   const btn = document.getElementById('btn-guardar');
-  btn.disabled = true; btn.textContent = 'Guardando...';
+  btn.disabled=true; btn.textContent='Guardando...';
+  const ubicVal = document.getElementById('ubicacion').value;
   try {
     await addDoc(collection(db, 'registros'), {
       apellido, nombre,
       dni: document.getElementById('dni').value.trim(),
+      edad: document.getElementById('edad').value.trim(),
       fecha: document.getElementById('fecha').value,
-      ubicacion: document.getElementById('ubicacion').value.trim(),
+      direccion: document.getElementById('direccion').value.trim(),
+      fecha_ingreso: document.getElementById('fecha_ingreso').value,
+      fecha_egreso: document.getElementById('fecha_egreso').value,
+      ubicacion: ubicVal,
+      ubicacion_otro: ubicVal==='OTRO' ? document.getElementById('ubicacion_otro').value.trim() : '',
       diagnostico: document.getElementById('diagnostico').value.trim(),
       tratamiento: document.getElementById('tratamiento').value.trim(),
       pendientes: document.getElementById('pendientes').value.trim(),
@@ -663,14 +565,13 @@ window.guardarRegistro = async () => {
       autorNombre: currentUser.displayName || currentUser.email,
       creadoEn: serverTimestamp()
     });
-    ['apellido','nombre','dni','ubicacion','diagnostico','tratamiento','pendientes'].forEach(id => document.getElementById(id).value = '');
+    ['apellido','nombre','dni','edad','direccion','fecha_ingreso','fecha_egreso','diagnostico','tratamiento','pendientes','ubicacion_otro'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+    document.getElementById('ubicacion').value='';
+    document.getElementById('otro-wrap').style.display='none';
     document.getElementById('fecha').value = hoy();
     showToast('✓ Registro guardado', 'ok');
-  } catch(e) {
-    showToast('Error al guardar. Verificá la conexión.', 'err');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Guardar registro';
-  }
+  } catch(e) { showToast('Error al guardar', 'err'); }
+  finally { btn.disabled=false; btn.innerHTML='<svg width="15" height="15" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar registro'; }
 };
 
 // ── RENDER CARD ──
@@ -678,6 +579,16 @@ function esPropio(reg) { return currentUser && reg.autorUid === currentUser.uid;
 
 function renderCard(reg) {
   const propio = esPropio(reg);
+  const internado = esInternado(reg);
+  const ubicDisplay = getUbicacionDisplay(reg);
+  const dias = diasInternacion(reg.fecha_ingreso, reg.fecha_egreso);
+
+  const statusBadges = `
+    ${propio ? '<span class="badge badge-azul">✓ Tuyo</span>' : ''}
+    ${internado ? '<span class="badge badge-rojo">✓ Internado</span>' : '<span class="badge badge-verde">✓ Alta</span>'}
+    ${!internado && dias !== null ? `<span class="badge badge-dias">⏱ ${dias} día${dias!==1?'s':''} internado</span>` : ''}
+  `;
+
   return `
   <div class="reg-card" id="card-${reg.id}">
     <div class="reg-header">
@@ -685,7 +596,8 @@ function renderCard(reg) {
         <div class="pac-name">${reg.apellido}, ${reg.nombre}</div>
         <div class="pac-meta">
           ${reg.dni ? `<span>DNI ${reg.dni}</span>` : ''}
-          ${reg.ubicacion ? `<span>📍 ${reg.ubicacion}</span>` : ''}
+          ${reg.edad ? `<span>${reg.edad} años</span>` : ''}
+          ${ubicDisplay ? `<span>📍 ${ubicDisplay}</span>` : ''}
         </div>
         <div class="autor-badge">Registrado por: ${reg.autorNombre || 'Desconocido'}</div>
       </div>
@@ -694,12 +606,22 @@ function renderCard(reg) {
     <div class="reg-body">
       <div class="reg-grid">
         <div class="reg-field">
+          <div class="reg-field-label">Fecha de ingreso</div>
+          <div class="reg-field-value">${formatFecha(reg.fecha_ingreso)}</div>
+        </div>
+        <div class="reg-field">
+          <div class="reg-field-label">Fecha de egreso</div>
+          <div class="reg-field-value">${reg.fecha_egreso ? formatFecha(reg.fecha_egreso) : '<span class="empty">Sin alta</span>'}</div>
+        </div>
+      </div>
+      <div class="reg-grid">
+        <div class="reg-field">
           <div class="reg-field-label">Diagnóstico</div>
           <div class="reg-field-value">${reg.diagnostico ? `<span class="diag-badge">${reg.diagnostico}</span>` : '<span class="empty">Sin especificar</span>'}</div>
         </div>
         <div class="reg-field">
-          <div class="reg-field-label">Ubicación</div>
-          <div class="reg-field-value">${reg.ubicacion ? `<span class="ubic-badge">📍 ${reg.ubicacion}</span>` : '<span class="empty">—</span>'}</div>
+          <div class="reg-field-label">Dirección</div>
+          <div class="reg-field-value ${!reg.direccion?'empty':''}">${reg.direccion || '—'}</div>
         </div>
       </div>
       <hr class="reg-divider">
@@ -710,52 +632,40 @@ function renderCard(reg) {
       ${reg.pendientes ? `<hr class="reg-divider"><div class="reg-field"><div class="reg-field-label">⚑ Pendientes</div><div class="reg-field-value">${reg.pendientes}</div></div>` : ''}
     </div>
     <div class="reg-actions">
-      ${propio
-        ? `<span class="own-indicator">✓ Tuyo</span>
-           <button class="btn btn-sm" onclick="abrirEdicion('${reg.id}')">✎ Editar</button>
-           <button class="btn btn-danger" onclick="eliminarRegistro('${reg.id}')">✕</button>`
-        : `<span class="readonly-indicator">Solo lectura</span>`
-      }
+      ${statusBadges}
+      <div style="margin-left:auto;display:flex;gap:6px">
+        ${propio ? `<button class="btn btn-sm" onclick="abrirEdicion('${reg.id}')">✎ Editar</button><button class="btn btn-danger" onclick="eliminarRegistro('${reg.id}')">✕</button>` : ''}
+      </div>
     </div>
   </div>`;
 }
 
-function renderLista(lista, containerId) {
+function renderLista(lista, containerId, emptyMsg='No se encontraron registros') {
   const el = document.getElementById(containerId);
-  if (!lista.length) {
-    el.innerHTML = `<div class="empty-state"><p>No se encontraron registros</p></div>`;
-    return;
-  }
+  if (!lista.length) { el.innerHTML=`<div class="empty-state"><p>${emptyMsg}</p></div>`; return; }
   el.innerHTML = `<div class="results-header"><div class="results-count"><strong>${lista.length}</strong> registro${lista.length!==1?'s':''}</div></div>` + lista.map(renderCard).join('');
 }
 
-// ── HOY ──
-function cargarHoy() {
-  const fechaHoy = hoy();
-  const deHoy = todosRegistros.filter(r => r.fecha === fechaHoy);
-  const unicos = new Set(todosRegistros.map(r => r.dni || (r.apellido+r.nombre))).size;
-  document.getElementById('hoy-stats').innerHTML = `
+// ── INTERNADOS ──
+function cargarInternados() {
+  const internados = todosRegistros.filter(r => esInternado(r));
+  const altas = todosRegistros.filter(r => !esInternado(r));
+  document.getElementById('internados-stats').innerHTML = `
   <div class="stats-row">
-    <div class="stat-card"><div class="stat-num">${deHoy.length}</div><div class="stat-label">Hoy</div></div>
-    <div class="stat-card"><div class="stat-num">${unicos}</div><div class="stat-label">Pacientes</div></div>
-    <div class="stat-card"><div class="stat-num">${todosRegistros.length}</div><div class="stat-label">Total</div></div>
+    <div class="stat-card"><div class="stat-num">${internados.length}</div><div class="stat-label">Internados</div></div>
+    <div class="stat-card"><div class="stat-num">${altas.length}</div><div class="stat-label">Con alta</div></div>
+    <div class="stat-card"><div class="stat-num">${todosRegistros.length}</div><div class="stat-label">Total reg.</div></div>
   </div>`;
-  if (!deHoy.length) {
-    document.getElementById('hoy-lista').innerHTML = `<div class="empty-state"><p>Sin registros para hoy (${formatFecha(fechaHoy)})</p></div>`;
-    return;
-  }
-  document.getElementById('hoy-lista').innerHTML = `<div class="results-header"><div class="results-count">Registros de hoy <strong>${formatFecha(fechaHoy)}</strong></div></div>` + deHoy.map(renderCard).join('');
+  renderLista(internados, 'internados-lista', 'No hay pacientes internados actualmente');
 }
 
 // ── TODOS ──
-function cargarTodos() {
-  renderLista(todosRegistros, 'todos-lista');
-}
+function cargarTodos() { renderLista(todosRegistros, 'todos-lista'); }
 
 // ── BUSCAR ──
-window.buscarTexto = () => {
+window.ejecutarBusqueda = () => {
   const q = (document.getElementById('q-texto').value || '').trim().toLowerCase();
-  if (!q) { document.getElementById('resultados-container').innerHTML = `<div class="empty-state"><p>Ingresá un apellido, nombre o DNI</p></div>`; return; }
+  if (!q) { showToast('Ingresá un apellido, nombre o DNI'); return; }
   const res = todosRegistros.filter(r =>
     r.apellido?.toLowerCase().includes(q) ||
     r.nombre?.toLowerCase().includes(q) ||
@@ -767,78 +677,79 @@ window.buscarTexto = () => {
 window.buscarFechaExacta = () => {
   const f = document.getElementById('q-fecha-exacta').value;
   if (!f) return;
-  document.getElementById('q-texto').value = '';
-  renderLista(todosRegistros.filter(r => r.fecha === f), 'resultados-container');
+  renderLista(todosRegistros.filter(r => r.fecha===f || r.fecha_ingreso===f), 'resultados-container');
 };
 
 window.buscarRango = () => {
   const desde = document.getElementById('q-desde').value;
   const hasta = document.getElementById('q-hasta').value;
-  if (!desde || !hasta) { showToast('Seleccioná fecha desde y hasta'); return; }
-  document.getElementById('q-texto').value = '';
-  renderLista(todosRegistros.filter(r => r.fecha >= desde && r.fecha <= hasta), 'resultados-container');
+  if (!desde||!hasta) { showToast('Seleccioná fecha desde y hasta'); return; }
+  renderLista(todosRegistros.filter(r => r.fecha>=desde && r.fecha<=hasta), 'resultados-container');
 };
 
 window.limpiarBusqueda = () => {
-  ['q-texto','q-fecha-exacta','q-desde','q-hasta'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('resultados-container').innerHTML = `<div class="empty-state"><p>Usá el buscador para encontrar registros</p></div>`;
+  ['q-texto','q-fecha-exacta','q-desde','q-hasta'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('resultados-container').innerHTML=`<div class="empty-state"><p>Usá el buscador para encontrar registros</p></div>`;
 };
 
 // ── ELIMINAR ──
 window.eliminarRegistro = async (id) => {
   if (!confirm('¿Eliminar este registro? Esta acción no se puede deshacer.')) return;
-  try {
-    await deleteDoc(doc(db, 'registros', id));
-    showToast('Registro eliminado');
-  } catch(e) { showToast('Error al eliminar', 'err'); }
+  try { await deleteDoc(doc(db,'registros',id)); showToast('Registro eliminado'); }
+  catch(e) { showToast('Error al eliminar','err'); }
 };
 
 // ── EDITAR ──
 window.abrirEdicion = (id) => {
-  const reg = todosRegistros.find(r => r.id === id);
-  if (!reg || !esPropio(reg)) return;
+  const reg = todosRegistros.find(r=>r.id===id);
+  if (!reg||!esPropio(reg)) return;
   editandoId = id;
-  document.getElementById('e-apellido').value = reg.apellido || '';
-  document.getElementById('e-nombre').value = reg.nombre || '';
-  document.getElementById('e-dni').value = reg.dni || '';
-  document.getElementById('e-fecha').value = reg.fecha || '';
-  document.getElementById('e-ubicacion').value = reg.ubicacion || '';
-  document.getElementById('e-diagnostico').value = reg.diagnostico || '';
-  document.getElementById('e-tratamiento').value = reg.tratamiento || '';
-  document.getElementById('e-pendientes').value = reg.pendientes || '';
+  document.getElementById('e-apellido').value = reg.apellido||'';
+  document.getElementById('e-nombre').value = reg.nombre||'';
+  document.getElementById('e-dni').value = reg.dni||'';
+  document.getElementById('e-edad').value = reg.edad||'';
+  document.getElementById('e-fecha').value = reg.fecha||'';
+  document.getElementById('e-direccion').value = reg.direccion||'';
+  document.getElementById('e-fecha_ingreso').value = reg.fecha_ingreso||'';
+  document.getElementById('e-fecha_egreso').value = reg.fecha_egreso||'';
+  document.getElementById('e-ubicacion').value = reg.ubicacion||'';
+  document.getElementById('e-ubicacion_otro').value = reg.ubicacion_otro||'';
+  document.getElementById('e-otro-wrap').style.display = reg.ubicacion==='OTRO' ? 'grid':'none';
+  document.getElementById('e-diagnostico').value = reg.diagnostico||'';
+  document.getElementById('e-tratamiento').value = reg.tratamiento||'';
+  document.getElementById('e-pendientes').value = reg.pendientes||'';
   document.getElementById('modal-overlay').classList.add('open');
 };
 
-window.cerrarModal = () => {
-  document.getElementById('modal-overlay').classList.remove('open');
-  editandoId = null;
-};
+window.cerrarModal = () => { document.getElementById('modal-overlay').classList.remove('open'); editandoId=null; };
 
 window.guardarEdicion = async () => {
   if (!editandoId) return;
+  const ubicVal = document.getElementById('e-ubicacion').value;
   try {
-    await updateDoc(doc(db, 'registros', editandoId), {
+    await updateDoc(doc(db,'registros',editandoId), {
       apellido: document.getElementById('e-apellido').value.trim(),
       nombre: document.getElementById('e-nombre').value.trim(),
       dni: document.getElementById('e-dni').value.trim(),
+      edad: document.getElementById('e-edad').value.trim(),
       fecha: document.getElementById('e-fecha').value,
-      ubicacion: document.getElementById('e-ubicacion').value.trim(),
+      direccion: document.getElementById('e-direccion').value.trim(),
+      fecha_ingreso: document.getElementById('e-fecha_ingreso').value,
+      fecha_egreso: document.getElementById('e-fecha_egreso').value,
+      ubicacion: ubicVal,
+      ubicacion_otro: ubicVal==='OTRO' ? document.getElementById('e-ubicacion_otro').value.trim() : '',
       diagnostico: document.getElementById('e-diagnostico').value.trim(),
       tratamiento: document.getElementById('e-tratamiento').value.trim(),
       pendientes: document.getElementById('e-pendientes').value.trim(),
     });
     cerrarModal();
-    showToast('✓ Cambios guardados', 'ok');
-  } catch(e) { showToast('Error al guardar cambios', 'err'); }
+    showToast('✓ Cambios guardados','ok');
+  } catch(e) { showToast('Error al guardar cambios','err'); }
 };
 
-document.getElementById('modal-overlay').addEventListener('click', function(e) {
-  if (e.target === this) cerrarModal();
-});
-
-// Enter para login
-document.getElementById('l-pass').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
-document.getElementById('l-email').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
+document.getElementById('modal-overlay').addEventListener('click', function(e){ if(e.target===this) cerrarModal(); });
+document.getElementById('l-pass').addEventListener('keydown', e=>{ if(e.key==='Enter') window.doLogin(); });
+document.getElementById('l-email').addEventListener('keydown', e=>{ if(e.key==='Enter') window.doLogin(); });
 </script>
 </body>
 </html>
