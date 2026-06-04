@@ -948,6 +948,7 @@ window.switchTab = (tab, el) => {
   el.classList.add('active');
   if(tab==='internados') cargarInternados();
   if(tab==='todos') cargarTodos();
+  if(tab==='impresion') cargarImpresion();
 };
 
 // ── GUARDAR ──
@@ -1496,7 +1497,7 @@ window.toggleEvolEdit = () => {
 
 
 // ── IMPRESIÓN ──
-const PROF_DATA = {
+window.PROF_DATA = {
   nombre: 'M. Soledad Alban y Caballero',
   anio: '2do Año',
   lugar: 'Hospital Sanguinetti',
@@ -1505,9 +1506,9 @@ const PROF_DATA = {
   supervisor: 'Dr. Rotman, Manuel'
 };
 
-const MESES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+window.MESES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
-function getMesAnioOptions() {
+window.getMesAnioOptions = function() {
   // Collect unique mes/año from registros of this user
   const set = new Set();
   todosRegistros.forEach(r => {
@@ -1521,7 +1522,7 @@ function getMesAnioOptions() {
   return [...set].sort().reverse();
 }
 
-function cargarImpresion() {
+window.cargarImpresion = function() {
   const opts = getMesAnioOptions();
   const optsHtml = opts.map(v => {
     const [y,m] = v.split('-');
@@ -1560,7 +1561,7 @@ function cargarImpresion() {
   }
 }
 
-function getRegistrosParaImpresion(mesAnio) {
+window.getRegistrosParaImpresion = function(mesAnio) {
   return todosRegistros.filter(r => {
     if(r.autorUid !== currentUser.uid) return false;
     if(!mesAnio) return true;
@@ -1575,7 +1576,7 @@ function getRegistrosParaImpresion(mesAnio) {
   });
 }
 
-function previewImpresion() {
+window.previewImpresion = function() {
   const mesAnio = document.getElementById('print-mes-select')?.value || '';
   const regs = getRegistrosParaImpresion(mesAnio);
   const preview = document.getElementById('print-preview');
