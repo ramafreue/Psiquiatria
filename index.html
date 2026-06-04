@@ -52,11 +52,66 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .user-chip:hover { background:rgba(255,255,255,.2); }
 .user-avatar { width:26px; height:26px; border-radius:50%; background:var(--oro); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:white; }
 .user-chip span { font-size:12px; color:white; font-weight:500; max-width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.tabs { display:flex; background:rgba(0,0,0,.22); overflow-x:auto; }
-.tab { flex:1; min-width:60px; padding:10px 4px; font-size:11px; font-weight:500; color:rgba(255,255,255,.6); border:none; background:transparent; cursor:pointer; transition:all .2s; border-bottom:3px solid transparent; font-family:'DM Sans',sans-serif; white-space:nowrap; }
-.tab.active { color:white; border-bottom:3px solid var(--oro); background:rgba(255,255,255,.07); }
+/* SIDEBAR */
+.hamburger-btn {
+  background:none; border:none; cursor:pointer; padding:6px 8px;
+  display:flex; flex-direction:column; gap:5px; flex-shrink:0;
+}
+.hamburger-btn span {
+  display:block; width:22px; height:2px; background:white; border-radius:2px;
+  transition:all .3s;
+}
+.sidebar-overlay {
+  position:fixed; inset:0; background:rgba(10,20,50,.55);
+  z-index:300; opacity:0; pointer-events:none; transition:opacity .25s;
+}
+.sidebar-overlay.open { opacity:1; pointer-events:all; }
+.sidebar {
+  position:fixed; top:0; left:0; bottom:0; width:260px;
+  background:var(--azul-dark,#0f2347); z-index:400;
+  transform:translateX(-100%); transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:flex; flex-direction:column; overflow:hidden;
+  box-shadow:4px 0 24px rgba(0,0,0,.35);
+}
+.sidebar.open { transform:translateX(0); }
+.sidebar-head {
+  padding:20px 20px 16px;
+  background:rgba(0,0,0,.2);
+  display:flex; align-items:center; gap:12px; flex-shrink:0;
+}
+.sidebar-head .escudo-sm { width:40px; height:40px; font-size:18px; }
+.sidebar-head-text h2 {
+  font-family:'DM Serif Display',serif; font-size:15px; color:white; font-weight:400;
+}
+.sidebar-head-text p { font-size:10px; color:rgba(255,255,255,.5); margin-top:2px; text-transform:uppercase; letter-spacing:.04em; }
+.sidebar-nav { flex:1; overflow-y:auto; padding:12px 0; }
+.sidebar-item {
+  display:flex; align-items:center; gap:12px;
+  padding:13px 20px; cursor:pointer;
+  font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500;
+  color:rgba(255,255,255,.65); border:none; background:none; width:100%;
+  text-align:left; transition:all .15s; border-left:3px solid transparent;
+}
+.sidebar-item:hover { background:rgba(255,255,255,.07); color:white; }
+.sidebar-item.active { background:rgba(255,255,255,.1); color:white; border-left-color:var(--oro); }
+.sidebar-item .si-icon { font-size:17px; width:24px; text-align:center; flex-shrink:0; }
+.sidebar-item .si-label { flex:1; }
+.sidebar-divider { height:1px; background:rgba(255,255,255,.08); margin:8px 16px; }
+.sidebar-foot {
+  padding:16px 20px; border-top:1px solid rgba(255,255,255,.08);
+  flex-shrink:0;
+}
+.sidebar-user {
+  display:flex; align-items:center; gap:10px; cursor:pointer;
+  padding:8px 10px; border-radius:8px; transition:background .15s;
+}
+.sidebar-user:hover { background:rgba(255,255,255,.08); }
+.sidebar-user .user-avatar { width:32px; height:32px; font-size:13px; }
+.sidebar-user-info { flex:1; }
+.sidebar-user-info .su-name { font-size:13px; font-weight:600; color:white; }
+.sidebar-user-info .su-logout { font-size:11px; color:rgba(255,255,255,.45); }
 
-.main { padding:16px 14px 80px; max-width:620px; margin:0 auto; }
+.main { padding:16px 14px 80px; max-width:620px; margin:0 auto; width:100%; overflow-x:hidden; }
 .panel { display:none; }
 .panel.active { display:block; }
 
@@ -213,7 +268,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .evol-body {
   display:none; border:1.5px solid var(--border); border-top:none;
   border-radius:0 0 8px 8px; background:white;
+  width:100%; box-sizing:border-box; overflow:hidden;
 }
+.evol-item textarea { box-sizing:border-box; }
 .evol-body.open { display:block; }
 .evol-item {
   padding:14px 16px;
@@ -230,6 +287,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   margin-bottom:10px; background:#f8faff;
   border-radius:6px; padding:8px 10px;
   border-left:3px solid var(--azul-light);
+  word-wrap:break-word; overflow-wrap:break-word; max-width:100%;
 }
 .evol-item-options em { display:block; margin-top:6px; font-size:11px; color:#999; }
 .evol-item textarea {
@@ -307,6 +365,33 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .diag-add-btn:hover { background:#d0daf0; }
 .diag-add-btn:disabled { opacity:.4; cursor:not-allowed; }
 
+
+/* RESPONSIVE */
+@media (max-width:480px) {
+  .main { padding:12px 10px 80px; }
+  .card { padding:14px; }
+  .form-row { grid-template-columns:1fr; }
+  .form-row.triple { grid-template-columns:1fr 1fr; }
+  .stats-row { grid-template-columns:1fr 1fr 1fr; gap:6px; }
+  .stat-num { font-size:22px; }
+  .reg-grid { grid-template-columns:1fr; }
+  .est-filters { grid-template-columns:1fr 1fr; }
+  .est-filters button { grid-column:span 2; }
+  .print-filter-row { grid-template-columns:1fr; }
+  .date-range { grid-template-columns:1fr 1fr; }
+  .date-range button { grid-column:span 2; }
+  .search-row { flex-wrap:wrap; }
+}
+@media (min-width:481px) and (max-width:900px) {
+  .main { max-width:100%; padding:16px 18px 80px; }
+  .form-row.triple { grid-template-columns:1fr 1fr 1fr; }
+  .reg-grid { grid-template-columns:1fr 1fr; }
+}
+@media (min-width:900px) {
+  .main { max-width:700px; }
+  .sidebar { width:280px; }
+}
+
 </style>
 </head>
 <body>
@@ -348,25 +433,59 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 <!-- APP -->
 <div id="app-screen">
-  <header class="header">
-    <div class="header-inner">
+  <!-- SIDEBAR OVERLAY -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-head">
       <div class="escudo-sm">✚</div>
-      <div class="header-text">
-        <h1>Htal. Sanguinetti</h1>
+      <div class="sidebar-head-text">
+        <h2>Htal. Sanguinetti</h2>
         <p><span class="sync-dot"></span>Tiempo real</p>
       </div>
-      <button class="user-chip" onclick="doLogout()">
-        <div class="user-avatar" id="user-avatar">?</div>
-        <span id="user-name-chip">...</span>
+    </div>
+    <div class="sidebar-nav">
+      <button class="sidebar-item active" id="si-nuevo" onclick="switchTab('nuevo',this);closeSidebar()">
+        <span class="si-icon">✚</span><span class="si-label">Nuevo registro</span>
+      </button>
+      <button class="sidebar-item" id="si-buscar" onclick="switchTab('buscar',this);closeSidebar()">
+        <span class="si-icon">⌕</span><span class="si-label">Buscar</span>
+      </button>
+      <button class="sidebar-item" id="si-internados" onclick="switchTab('internados',this);closeSidebar()">
+        <span class="si-icon">🛏</span><span class="si-label">Internados</span>
+      </button>
+      <button class="sidebar-item" id="si-todos" onclick="switchTab('todos',this);closeSidebar()">
+        <span class="si-icon">≡</span><span class="si-label">Todos los registros</span>
+      </button>
+      <div class="sidebar-divider"></div>
+      <button class="sidebar-item" id="si-estadistica" onclick="switchTab('estadistica',this);closeSidebar()">
+        <span class="si-icon">📊</span><span class="si-label">Estadística</span>
+      </button>
+      <button class="sidebar-item" id="si-impresion" style="display:none" onclick="switchTab('impresion',this);closeSidebar()">
+        <span class="si-icon">🖨</span><span class="si-label">Imprimir / PDF</span>
       </button>
     </div>
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('nuevo',this)">✚ Nuevo</button>
-      <button class="tab" onclick="switchTab('buscar',this)">⌕ Buscar</button>
-      <button class="tab" onclick="switchTab('internados',this)">🛏 Internados</button>
-      <button class="tab" onclick="switchTab('todos',this)">≡ Todos</button>
-      <button class="tab" onclick="switchTab('estadistica',this)">📊 Estadística</button>
-      <button class="tab" id="tab-impresion" style="display:none" onclick="switchTab('impresion',this)">🖨 Imprimir</button>
+    <div class="sidebar-foot">
+      <div class="sidebar-user" onclick="doLogout()">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <div class="sidebar-user-info">
+          <div class="su-name" id="user-name-chip">...</div>
+          <div class="su-logout">Cerrar sesión</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- TOP BAR -->
+  <header class="header" style="display:flex;align-items:center;gap:12px;padding:12px 16px;position:sticky;top:0;z-index:100;background:var(--azul);box-shadow:0 2px 16px rgba(26,58,107,.30);">
+    <button class="hamburger-btn" onclick="openSidebar()" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="escudo-sm" style="width:36px;height:36px;font-size:16px">✚</div>
+    <div class="header-text" style="flex:1">
+      <h1 id="page-title" style="font-family:'DM Serif Display',serif;font-size:15px;font-weight:400;color:white;line-height:1.2">Nuevo registro</h1>
+      <p style="font-size:10px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.04em"><span class="sync-dot"></span>Base compartida</p>
     </div>
   </header>
 
@@ -421,10 +540,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <label>Diagnóstico (CIE-10)</label>
             <div class="diag-multi-wrap" id="cie10-multi">
           <div class="diag-slot" id="cie10-slot-1" >
-            <div class="diag-slot-header">
-              <span class="diag-slot-num">Diagnóstico 1</span>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',1)" title="Quitar">✕</button>
-            </div>
+            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',1)" title="Quitar">✕</button></div>
             <div class="ac-wrap">
               <input type="text" id="ac-cie10-1" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
               <div class="ac-dropdown" id="drop-cie10-1"></div>
@@ -433,10 +549,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <input type="hidden" id="diag-cie10-1">
           </div>
           <div class="diag-slot" id="cie10-slot-2" style='display:none'>
-            <div class="diag-slot-header">
-              <span class="diag-slot-num">Diagnóstico 2</span>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',2)" title="Quitar">✕</button>
-            </div>
+            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',2)" title="Quitar">✕</button></div>
             <div class="ac-wrap">
               <input type="text" id="ac-cie10-2" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
               <div class="ac-dropdown" id="drop-cie10-2"></div>
@@ -445,10 +558,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <input type="hidden" id="diag-cie10-2">
           </div>
           <div class="diag-slot" id="cie10-slot-3" style='display:none'>
-            <div class="diag-slot-header">
-              <span class="diag-slot-num">Diagnóstico 3</span>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',3)" title="Quitar">✕</button>
-            </div>
+            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',3)" title="Quitar">✕</button></div>
             <div class="ac-wrap">
               <input type="text" id="ac-cie10-3" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
               <div class="ac-dropdown" id="drop-cie10-3"></div>
@@ -457,10 +567,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <input type="hidden" id="diag-cie10-3">
           </div>
           <div class="diag-slot" id="cie10-slot-4" style='display:none'>
-            <div class="diag-slot-header">
-              <span class="diag-slot-num">Diagnóstico 4</span>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',4)" title="Quitar">✕</button>
-            </div>
+            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',4)" title="Quitar">✕</button></div>
             <div class="ac-wrap">
               <input type="text" id="ac-cie10-4" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
               <div class="ac-dropdown" id="drop-cie10-4"></div>
@@ -469,10 +576,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <input type="hidden" id="diag-cie10-4">
           </div>
           <div class="diag-slot" id="cie10-slot-5" style='display:none'>
-            <div class="diag-slot-header">
-              <span class="diag-slot-num">Diagnóstico 5</span>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',5)" title="Quitar">✕</button>
-            </div>
+            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',5)" title="Quitar">✕</button></div>
             <div class="ac-wrap">
               <input type="text" id="ac-cie10-5" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
               <div class="ac-dropdown" id="drop-cie10-5"></div>
@@ -491,10 +595,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <label>Diagnóstico (CIE-11)</label>
             <div class="diag-multi-wrap" id="cie11-multi">
           <div class="diag-slot" id="cie11-slot-1" >
-            <div class="diag-slot-header">
-              <span class="diag-slot-num">Diagnóstico 1</span>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',1)" title="Quitar">✕</button>
-            </div>
+            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',1)" title="Quitar">✕</button></div>
             <div class="ac-wrap">
               <input type="text" id="ac-cie11-1" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
               <div class="ac-dropdown" id="drop-cie11-1"></div>
@@ -503,10 +604,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <input type="hidden" id="diag-cie11-1">
           </div>
           <div class="diag-slot" id="cie11-slot-2" style='display:none'>
-            <div class="diag-slot-header">
-              <span class="diag-slot-num">Diagnóstico 2</span>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',2)" title="Quitar">✕</button>
-            </div>
+            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',2)" title="Quitar">✕</button></div>
             <div class="ac-wrap">
               <input type="text" id="ac-cie11-2" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
               <div class="ac-dropdown" id="drop-cie11-2"></div>
@@ -515,10 +613,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <input type="hidden" id="diag-cie11-2">
           </div>
           <div class="diag-slot" id="cie11-slot-3" style='display:none'>
-            <div class="diag-slot-header">
-              <span class="diag-slot-num">Diagnóstico 3</span>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',3)" title="Quitar">✕</button>
-            </div>
+            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',3)" title="Quitar">✕</button></div>
             <div class="ac-wrap">
               <input type="text" id="ac-cie11-3" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
               <div class="ac-dropdown" id="drop-cie11-3"></div>
@@ -527,10 +622,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <input type="hidden" id="diag-cie11-3">
           </div>
           <div class="diag-slot" id="cie11-slot-4" style='display:none'>
-            <div class="diag-slot-header">
-              <span class="diag-slot-num">Diagnóstico 4</span>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',4)" title="Quitar">✕</button>
-            </div>
+            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',4)" title="Quitar">✕</button></div>
             <div class="ac-wrap">
               <input type="text" id="ac-cie11-4" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
               <div class="ac-dropdown" id="drop-cie11-4"></div>
@@ -539,10 +631,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <input type="hidden" id="diag-cie11-4">
           </div>
           <div class="diag-slot" id="cie11-slot-5" style='display:none'>
-            <div class="diag-slot-header">
-              <span class="diag-slot-num">Diagnóstico 5</span>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',5)" title="Quitar">✕</button>
-            </div>
+            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',5)" title="Quitar">✕</button></div>
             <div class="ac-wrap">
               <input type="text" id="ac-cie11-5" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
               <div class="ac-dropdown" id="drop-cie11-5"></div>
@@ -770,10 +859,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <label>Diagnóstico (CIE-10)</label>
           <div class="diag-multi-wrap" id="e-cie10-multi">
         <div class="diag-slot" id="e-cie10-slot-1" >
-          <div class="diag-slot-header">
-            <span class="diag-slot-num">Diagnóstico 1</span>
-            <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',1)" title="Quitar">✕</button>
-          </div>
+          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',1)" title="Quitar">✕</button></div>
           <div class="ac-wrap">
             <input type="text" id="ac-e-cie10-1" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
             <div class="ac-dropdown" id="drop-e-cie10-1"></div>
@@ -782,10 +868,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <input type="hidden" id="diag-e-cie10-1">
         </div>
         <div class="diag-slot" id="e-cie10-slot-2" style='display:none'>
-          <div class="diag-slot-header">
-            <span class="diag-slot-num">Diagnóstico 2</span>
-            <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',2)" title="Quitar">✕</button>
-          </div>
+          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',2)" title="Quitar">✕</button></div>
           <div class="ac-wrap">
             <input type="text" id="ac-e-cie10-2" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
             <div class="ac-dropdown" id="drop-e-cie10-2"></div>
@@ -794,10 +877,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <input type="hidden" id="diag-e-cie10-2">
         </div>
         <div class="diag-slot" id="e-cie10-slot-3" style='display:none'>
-          <div class="diag-slot-header">
-            <span class="diag-slot-num">Diagnóstico 3</span>
-            <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',3)" title="Quitar">✕</button>
-          </div>
+          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',3)" title="Quitar">✕</button></div>
           <div class="ac-wrap">
             <input type="text" id="ac-e-cie10-3" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
             <div class="ac-dropdown" id="drop-e-cie10-3"></div>
@@ -806,10 +886,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <input type="hidden" id="diag-e-cie10-3">
         </div>
         <div class="diag-slot" id="e-cie10-slot-4" style='display:none'>
-          <div class="diag-slot-header">
-            <span class="diag-slot-num">Diagnóstico 4</span>
-            <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',4)" title="Quitar">✕</button>
-          </div>
+          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',4)" title="Quitar">✕</button></div>
           <div class="ac-wrap">
             <input type="text" id="ac-e-cie10-4" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
             <div class="ac-dropdown" id="drop-e-cie10-4"></div>
@@ -818,10 +895,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <input type="hidden" id="diag-e-cie10-4">
         </div>
         <div class="diag-slot" id="e-cie10-slot-5" style='display:none'>
-          <div class="diag-slot-header">
-            <span class="diag-slot-num">Diagnóstico 5</span>
-            <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',5)" title="Quitar">✕</button>
-          </div>
+          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',5)" title="Quitar">✕</button></div>
           <div class="ac-wrap">
             <input type="text" id="ac-e-cie10-5" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
             <div class="ac-dropdown" id="drop-e-cie10-5"></div>
@@ -838,10 +912,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <label>Diagnóstico (CIE-11)</label>
           <div class="diag-multi-wrap" id="e-cie11-multi">
         <div class="diag-slot" id="e-cie11-slot-1" >
-          <div class="diag-slot-header">
-            <span class="diag-slot-num">Diagnóstico 1</span>
-            <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',1)" title="Quitar">✕</button>
-          </div>
+          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',1)" title="Quitar">✕</button></div>
           <div class="ac-wrap">
             <input type="text" id="ac-e-cie11-1" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
             <div class="ac-dropdown" id="drop-e-cie11-1"></div>
@@ -850,10 +921,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <input type="hidden" id="diag-e-cie11-1">
         </div>
         <div class="diag-slot" id="e-cie11-slot-2" style='display:none'>
-          <div class="diag-slot-header">
-            <span class="diag-slot-num">Diagnóstico 2</span>
-            <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',2)" title="Quitar">✕</button>
-          </div>
+          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',2)" title="Quitar">✕</button></div>
           <div class="ac-wrap">
             <input type="text" id="ac-e-cie11-2" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
             <div class="ac-dropdown" id="drop-e-cie11-2"></div>
@@ -862,10 +930,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <input type="hidden" id="diag-e-cie11-2">
         </div>
         <div class="diag-slot" id="e-cie11-slot-3" style='display:none'>
-          <div class="diag-slot-header">
-            <span class="diag-slot-num">Diagnóstico 3</span>
-            <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',3)" title="Quitar">✕</button>
-          </div>
+          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',3)" title="Quitar">✕</button></div>
           <div class="ac-wrap">
             <input type="text" id="ac-e-cie11-3" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
             <div class="ac-dropdown" id="drop-e-cie11-3"></div>
@@ -874,10 +939,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <input type="hidden" id="diag-e-cie11-3">
         </div>
         <div class="diag-slot" id="e-cie11-slot-4" style='display:none'>
-          <div class="diag-slot-header">
-            <span class="diag-slot-num">Diagnóstico 4</span>
-            <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',4)" title="Quitar">✕</button>
-          </div>
+          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',4)" title="Quitar">✕</button></div>
           <div class="ac-wrap">
             <input type="text" id="ac-e-cie11-4" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
             <div class="ac-dropdown" id="drop-e-cie11-4"></div>
@@ -886,10 +948,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <input type="hidden" id="diag-e-cie11-4">
         </div>
         <div class="diag-slot" id="e-cie11-slot-5" style='display:none'>
-          <div class="diag-slot-header">
-            <span class="diag-slot-num">Diagnóstico 5</span>
-            <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',5)" title="Quitar">✕</button>
-          </div>
+          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',5)" title="Quitar">✕</button></div>
           <div class="ac-wrap">
             <input type="text" id="ac-e-cie11-5" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
             <div class="ac-dropdown" id="drop-e-cie11-5"></div>
@@ -1174,8 +1233,8 @@ onAuthStateChanged(auth, user => {
     const showEvol = user.email === EVOL_USER;
     document.getElementById('evol-section').style.display = showEvol ? 'grid' : 'none';
     // Mostrar tab de impresión solo para usuario específico
-    const tabImp = document.getElementById('tab-impresion');
-    if(tabImp) tabImp.style.display = showEvol ? 'flex' : 'none';
+    const siImp = document.getElementById('si-impresion');
+    if(siImp) siImp.style.display = showEvol ? 'flex' : 'none';
     suscribirRegistros();
   } else {
     currentUser=null; todosRegistros=[];
@@ -1199,14 +1258,29 @@ function refrescarVistaActiva() {
   else if(p==='panel-todos') cargarTodos();
 }
 
+const TAB_TITLES = {
+  'nuevo':'Nuevo registro', 'buscar':'Buscar', 'internados':'Internados',
+  'todos':'Todos los registros', 'estadistica':'Estadística', 'impresion':'Imprimir / PDF'
+};
 window.switchTab = (tab, el) => {
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+tab).classList.add('active');
-  el.classList.add('active');
+  const si = document.getElementById('si-'+tab);
+  if(si) si.classList.add('active');
+  const title = document.getElementById('page-title');
+  if(title) title.textContent = TAB_TITLES[tab]||tab;
   if(tab==='internados') cargarInternados();
   if(tab==='todos') cargarTodos();
-  if(tab==='impresion') cargarImpresion();
+  if(tab==='impresion') window.cargarImpresion();
+};
+window.openSidebar = () => {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebar-overlay').classList.add('open');
+};
+window.closeSidebar = () => {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
 };
 
 // ── GUARDAR ──
