@@ -593,6 +593,107 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <input type="hidden" id="e-diagnostico_cie11">
         </div>
       </div>
+      <div class="form-row full" id="e-evol-section" style="display:none">
+        <div class="field">
+          <label>Evolución</label>
+          <button type="button" class="evol-toggle-btn" id="e-evol-toggle-btn" onclick="toggleEvolEdit()">
+            <span>Completar examen psicopatológico</span>
+            <span class="evol-arrow">▼</span>
+          </button>
+          <div class="evol-body" id="e-evol-body">
+              <div class="evol-item">
+                <div class="evol-item-title">Presentación y Aspecto</div>
+                <div class="evol-item-options">Saludable / Enfermizo / Incómodo / Avejentado / Juvenil / Infantil / Extravagante / Otro Aseado / No aseado / Aliñado / Desaliñado / Vestido acorde/desacorde a clima/situación</div>
+                <textarea id="e-evol_presentacion" placeholder="Escribí tu observación sobre presentación y aspecto..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Actitud</div>
+                <div class="evol-item-options">Colaboradora activa/pasiva / Amigable / Serena / Interesada / Franca / Defensiva / Seductora / Halagadora / Despectiva / Perpleja / Apática / Hostil / Amenazante / Reticente / Evasiva / Precavida / Suspicaz / Agitada / Melancólica / Oposicionista</div>
+                <textarea id="e-evol_actitud" placeholder="Escribí tu observación sobre actitud..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Conciencia</div>
+                <div class="evol-item-options">Lucidez / Alerta / Hipervigilancia / Somnolencia / Obnubilación / Estupor / Coma</div>
+                <textarea id="e-evol_conciencia" placeholder="Escribí tu observación sobre conciencia..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Orientación</div>
+                <div class="evol-item-options">Global / Parcial / En tiempo / espacio / persona</div>
+                <textarea id="e-evol_orientacion" placeholder="Escribí tu observación sobre orientación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Atención y Concentración</div>
+                <div class="evol-item-options">Euprosexia / Aprosexia / Hipopresexia / Hiperprosexia / Paraprosexia (Hiperprosexia autorreflexiva - hipermetamorfosis) / Estable / Fluctuante</div>
+                <textarea id="e-evol_atencion" placeholder="Escribí tu observación sobre atención y concentración..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Memoria</div>
+                <div class="evol-item-options">Eumnesia / Amnesia (retrógrada – anterógrada – retroanterógrada – lacunar) / Hipomnesia / Hipermnesia (memoria panorámica - ecmnesia) / Paramnesias (alucinación de la memoria – ilusión de la memoria – paramnesia replicadora de Pick – falsos reconocimientos – ya visto – jamás visto – fabulación de relleno) / Olvidos benignos</div>
+                <textarea id="e-evol_memoria" placeholder="Escribí tu observación sobre memoria..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Senso-percepción</div>
+                <div class="evol-item-options">Acelerada / Retardada / Abolida / Ilusiones / Alucinaciones verdaderas / Pseudoalucinaciones / Alucinaciones simples/complejas / visual/auditiva/olfativa/gustativa/táctil/cenestésica/hipnagógica/hinapómpica / Despersonalización / Desrealización / Onirismo / Alucinosis</div>
+                <textarea id="e-evol_senso" placeholder="Escribí tu observación sobre senso-percepción..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Imaginación</div>
+                <div class="evol-item-options">Aumentada / Disminuida / Fabulación / Mentira / Conservada</div>
+                <textarea id="e-evol_imaginacion" placeholder="Escribí tu observación sobre imaginación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Inteligencia e Información</div>
+                <div class="evol-item-options">Inferior / Normal / Superior / CI:</div>
+                <textarea id="e-evol_inteligencia" placeholder="Escribí tu observación sobre inteligencia e información..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Pensamiento</div>
+                <div class="evol-item-options">Ritmo normal / alterado leve, moderado, grave / Taquipsiquia (mentismo-fuga de ideas) / Bradipsiquia (inhibición / estupor / inercia) / Viscosidad / Minuciosidad / Interceptación / Rigidez / Perseveración / Estereotipia / Disgregación / Asociaciones laxas / Incoherencia/Neologismos / Tangencialidad / Circunstancialidad / Abstracto / Concreto</div>
+                <textarea id="e-evol_pensamiento" placeholder="Escribí tu observación sobre pensamiento..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Ideación</div>
+                <div class="evol-item-options">Sin particularidades / Idea delirante (erotomaníaco-grandeza-celotípico-persecutorio-somático) / Idea obsesiva / Idea sobrevalorada / Idea fija / No presenta / presenta ideación de muerte / de suicidio / de que la vida no vale la pena ser vivida — Escala de Suicidalidad (Okasha, 1981): 1. ¿Has pensado alguna vez que la vida no vale la pena? 2. ¿Has deseado alguna vez estar muerto? 3. ¿Has pensado alguna vez terminar con tu vida? 4. ¿Has intentado suicidarte?</div>
+                <textarea id="e-evol_ideacion" placeholder="Escribí tu observación sobre ideación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Esquema Corporal</div>
+                <div class="evol-item-options">Miembro fantasma / Hemisomatognosia / Anosognosia / Distorsiones de forma / Distorsiones de tamaño / Reduplicación</div>
+                <textarea id="e-evol_esquema" placeholder="Escribí tu observación sobre esquema corporal..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Juicio</div>
+                <div class="evol-item-options">Conservado / Insuficiente / Debilitado / Suspendido / Desviado / Condicionado catatímicamente / Condicionado por ideación obsesiva / Condicionado por craving — Insuficiencia psíquica: 1) leve, moderada o grave; 2) permanentes o transitorias; 3) global o parcial; 4) génico, congénito o adquirido; 5) tipo y grado de incapacidad que genera</div>
+                <textarea id="e-evol_juicio" placeholder="Escribí tu observación sobre juicio..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Lenguaje</div>
+                <div class="evol-item-options">Sin particularidades / Microfonía / Macrofonía / Disartria / Disprosodia / Tartamudeo / Afasia / Tics vocales / Ecolalia / Neologismos / Discurso pobre / Verborrea / Mutismo / Estereotipia verbal</div>
+                <textarea id="e-evol_lenguaje" placeholder="Escribí tu observación sobre lenguaje..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Afectividad</div>
+                <div class="evol-item-options">Eutimia / Hipertimia (pacentera-displacentera) / Hipotimia / Irritabilidad / Aplanamiento / Embotamiento / Anhedonia / Ansiedad / Disforia / Miedo / Labilidad / Euforia / Tristeza / Perplejidad / Moria / Inadecuado / Culpa / Neotimia</div>
+                <textarea id="e-evol_afectividad" placeholder="Escribí tu observación sobre afectividad..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Actividad Psicomotriz</div>
+                <div class="evol-item-options">Agitación / Enlentecimiento / Tics / Estereotipias / Ecopraxia / Catalepsia / Cataplejía / Bloqueo / Estupor / Negativismo / Impulsión / Compulsión / Disquinesia / Acatisia / Distonía / Amaneramiento / Ritual / Automutilación / Temblor / Inquietud / Excitación / Apraxia / Hipocinesia / Disquinesia / Bruxismo / Ambitendencia</div>
+                <textarea id="e-evol_psicomotriz" placeholder="Escribí tu observación sobre actividad psicomotriz..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Voluntad</div>
+                <div class="evol-item-options">Eubulia / Abulia / Hipobulia / Hiperbulia (productiva-improductiva)</div>
+                <textarea id="e-evol_voluntad" placeholder="Escribí tu observación sobre voluntad..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Hábitos</div>
+                <div class="evol-item-options">Insomnio / Hipersomnia / Parasomnia / Sueñoinvertido / Eyaculación precoz / Hiporexia / Hiperexia / Atracón / Ingesta inadecuada / Eyaculación retardada / Vaginismo / Anorgasmia / Dispareunia / Hipersexualidad / Impotencia / Piernas inquietas</div>
+                <textarea id="e-evol_habitos" placeholder="Escribí tu observación sobre hábitos..."></textarea>
+              </div>
+          </div>
+        </div>
+      </div>
       <div class="form-row full"><div class="field"><label>Tratamiento</label><textarea id="e-tratamiento" class="large"></textarea></div></div>
       <div class="form-row full"><div class="field"><label>Pendientes</label><textarea id="e-pendientes" class="large"></textarea></div></div>
       <button class="btn btn-primary" onclick="guardarEdicion()">Guardar cambios</button>
@@ -1109,31 +1210,47 @@ window.abrirEdicion = (id) => {
   setAcValue('e-ac-cie10','e-badge-cie10','e-diagnostico_cie10', reg.diagnostico_cie10||'');
   setAcValue('e-ac-cie11','e-badge-cie11','e-diagnostico_cie11', reg.diagnostico_cie11||'');
   if(currentUser && currentUser.email === 'solealbanycaballero@gmail.com') {
-  document.getElementById('evol_presentacion').value = reg.evol_presentacion||'';
-  document.getElementById('evol_actitud').value = reg.evol_actitud||'';
-  document.getElementById('evol_conciencia').value = reg.evol_conciencia||'';
-  document.getElementById('evol_orientacion').value = reg.evol_orientacion||'';
-  document.getElementById('evol_atencion').value = reg.evol_atencion||'';
-  document.getElementById('evol_memoria').value = reg.evol_memoria||'';
-  document.getElementById('evol_senso').value = reg.evol_senso||'';
-  document.getElementById('evol_imaginacion').value = reg.evol_imaginacion||'';
-  document.getElementById('evol_inteligencia').value = reg.evol_inteligencia||'';
-  document.getElementById('evol_pensamiento').value = reg.evol_pensamiento||'';
-  document.getElementById('evol_ideacion').value = reg.evol_ideacion||'';
-  document.getElementById('evol_esquema').value = reg.evol_esquema||'';
-  document.getElementById('evol_juicio').value = reg.evol_juicio||'';
-  document.getElementById('evol_lenguaje').value = reg.evol_lenguaje||'';
-  document.getElementById('evol_afectividad').value = reg.evol_afectividad||'';
-  document.getElementById('evol_psicomotriz').value = reg.evol_psicomotriz||'';
-  document.getElementById('evol_voluntad').value = reg.evol_voluntad||'';
-  document.getElementById('evol_habitos').value = reg.evol_habitos||'';
+  document.getElementById('e-evol-section').style.display = 'grid';
+  document.getElementById('e-evol_presentacion').value = reg.evol_presentacion||'';
+  document.getElementById('e-evol_actitud').value = reg.evol_actitud||'';
+  document.getElementById('e-evol_conciencia').value = reg.evol_conciencia||'';
+  document.getElementById('e-evol_orientacion').value = reg.evol_orientacion||'';
+  document.getElementById('e-evol_atencion').value = reg.evol_atencion||'';
+  document.getElementById('e-evol_memoria').value = reg.evol_memoria||'';
+  document.getElementById('e-evol_senso').value = reg.evol_senso||'';
+  document.getElementById('e-evol_imaginacion').value = reg.evol_imaginacion||'';
+  document.getElementById('e-evol_inteligencia').value = reg.evol_inteligencia||'';
+  document.getElementById('e-evol_pensamiento').value = reg.evol_pensamiento||'';
+  document.getElementById('e-evol_ideacion').value = reg.evol_ideacion||'';
+  document.getElementById('e-evol_esquema').value = reg.evol_esquema||'';
+  document.getElementById('e-evol_juicio').value = reg.evol_juicio||'';
+  document.getElementById('e-evol_lenguaje').value = reg.evol_lenguaje||'';
+  document.getElementById('e-evol_afectividad').value = reg.evol_afectividad||'';
+  document.getElementById('e-evol_psicomotriz').value = reg.evol_psicomotriz||'';
+  document.getElementById('e-evol_voluntad').value = reg.evol_voluntad||'';
+  document.getElementById('e-evol_habitos').value = reg.evol_habitos||'';
+  } else {
+  document.getElementById('e-evol-section').style.display = 'none';
   }
   document.getElementById('e-tratamiento').value=reg.tratamiento||'';
   document.getElementById('e-pendientes').value=reg.pendientes||'';
   document.getElementById('modal-overlay').classList.add('open');
 };
 
-window.cerrarModal = () => { document.getElementById('modal-overlay').classList.remove('open'); editandoId=null; };
+window.cerrarModal = () => {
+  document.getElementById('modal-overlay').classList.remove('open');
+  editandoId=null;
+  // reset evol edit fields
+  ['e-evol_presentacion','e-evol_actitud','e-evol_conciencia','e-evol_orientacion',
+   'e-evol_atencion','e-evol_memoria','e-evol_senso','e-evol_imaginacion',
+   'e-evol_inteligencia','e-evol_pensamiento','e-evol_ideacion','e-evol_esquema',
+   'e-evol_juicio','e-evol_lenguaje','e-evol_afectividad','e-evol_psicomotriz',
+   'e-evol_voluntad','e-evol_habitos'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const ebtn=document.getElementById('e-evol-toggle-btn');
+  const ebody=document.getElementById('e-evol-body');
+  if(ebtn) ebtn.classList.remove('open');
+  if(ebody) ebody.classList.remove('open');
+};
 
 window.guardarEdicion = async () => {
   if(!editandoId) return;
@@ -1152,24 +1269,24 @@ window.guardarEdicion = async () => {
       ubicacion_otro:ubicVal==='OTRO'?document.getElementById('e-ubicacion_otro').value.trim():'',
       diagnostico_cie10:document.getElementById('e-diagnostico_cie10').value.trim(),
       diagnostico_cie11:document.getElementById('e-diagnostico_cie11').value.trim(),
-      evol_presentacion:document.getElementById('evol_presentacion').value.trim(),
-      evol_actitud:document.getElementById('evol_actitud').value.trim(),
-      evol_conciencia:document.getElementById('evol_conciencia').value.trim(),
-      evol_orientacion:document.getElementById('evol_orientacion').value.trim(),
-      evol_atencion:document.getElementById('evol_atencion').value.trim(),
-      evol_memoria:document.getElementById('evol_memoria').value.trim(),
-      evol_senso:document.getElementById('evol_senso').value.trim(),
-      evol_imaginacion:document.getElementById('evol_imaginacion').value.trim(),
-      evol_inteligencia:document.getElementById('evol_inteligencia').value.trim(),
-      evol_pensamiento:document.getElementById('evol_pensamiento').value.trim(),
-      evol_ideacion:document.getElementById('evol_ideacion').value.trim(),
-      evol_esquema:document.getElementById('evol_esquema').value.trim(),
-      evol_juicio:document.getElementById('evol_juicio').value.trim(),
-      evol_lenguaje:document.getElementById('evol_lenguaje').value.trim(),
-      evol_afectividad:document.getElementById('evol_afectividad').value.trim(),
-      evol_psicomotriz:document.getElementById('evol_psicomotriz').value.trim(),
-      evol_voluntad:document.getElementById('evol_voluntad').value.trim(),
-      evol_habitos:document.getElementById('evol_habitos').value.trim(),
+      evol_presentacion:document.getElementById('e-evol_presentacion').value.trim(),
+      evol_actitud:document.getElementById('e-evol_actitud').value.trim(),
+      evol_conciencia:document.getElementById('e-evol_conciencia').value.trim(),
+      evol_orientacion:document.getElementById('e-evol_orientacion').value.trim(),
+      evol_atencion:document.getElementById('e-evol_atencion').value.trim(),
+      evol_memoria:document.getElementById('e-evol_memoria').value.trim(),
+      evol_senso:document.getElementById('e-evol_senso').value.trim(),
+      evol_imaginacion:document.getElementById('e-evol_imaginacion').value.trim(),
+      evol_inteligencia:document.getElementById('e-evol_inteligencia').value.trim(),
+      evol_pensamiento:document.getElementById('e-evol_pensamiento').value.trim(),
+      evol_ideacion:document.getElementById('e-evol_ideacion').value.trim(),
+      evol_esquema:document.getElementById('e-evol_esquema').value.trim(),
+      evol_juicio:document.getElementById('e-evol_juicio').value.trim(),
+      evol_lenguaje:document.getElementById('e-evol_lenguaje').value.trim(),
+      evol_afectividad:document.getElementById('e-evol_afectividad').value.trim(),
+      evol_psicomotriz:document.getElementById('e-evol_psicomotriz').value.trim(),
+      evol_voluntad:document.getElementById('e-evol_voluntad').value.trim(),
+      evol_habitos:document.getElementById('e-evol_habitos').value.trim(),
       tratamiento:document.getElementById('e-tratamiento').value.trim(),
       pendientes:document.getElementById('e-pendientes').value.trim(),
     });
@@ -1291,6 +1408,12 @@ buildAutocomplete('e-ac-cie11','e-drop-cie11','e-badge-cie11',CIE11_DATA,'e-diag
 window.toggleEvol = () => {
   const btn = document.getElementById('evol-toggle-btn');
   const body = document.getElementById('evol-body');
+  btn.classList.toggle('open');
+  body.classList.toggle('open');
+};
+window.toggleEvolEdit = () => {
+  const btn = document.getElementById('e-evol-toggle-btn');
+  const body = document.getElementById('e-evol-body');
   btn.classList.toggle('open');
   body.classList.toggle('open');
 };
