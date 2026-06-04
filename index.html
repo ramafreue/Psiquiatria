@@ -6,6 +6,7 @@
 <title>Registro Psiquiátrico — Htal. Sanguinetti</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root {
   --azul: #1a3a6b; --azul-mid: #2756a8; --azul-light: #e8eef7;
@@ -292,27 +293,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .btn-export:hover { background:var(--azul-mid); }
 .btn-export:disabled { opacity:.5; cursor:not-allowed; }
 
-/* PDF PRINT STYLES */
-@media print {
-  body > *:not(#pdf-print-area) { display:none !important; }
-  #pdf-print-area {
-    display:block !important;
-    position:fixed; inset:0; background:white;
-    z-index:99999; padding:20mm 15mm;
-    font-family:Arial,sans-serif; font-size:10pt; color:#000;
-  }
-  #pdf-print-area .pdf-title {
-    text-align:center; font-size:12pt; font-weight:bold;
-    border:2px solid #000; padding:6px 20px; display:inline-block;
-    margin:0 auto 16px; display:table; margin:0 auto 16px;
-  }
-  #pdf-print-area .pdf-meta { margin-bottom:14px; line-height:2; font-size:10pt; }
-  #pdf-print-area .pdf-meta-row { display:flex; gap:40px; }
-  #pdf-print-area table { width:100%; border-collapse:collapse; font-size:9pt; }
-  #pdf-print-area th { border:1px solid #000; padding:5px 6px; text-align:center; font-weight:bold; font-size:9pt; }
-  #pdf-print-area td { border:1px solid #000; padding:4px 6px; vertical-align:top; font-size:9pt; }
-  #pdf-print-area .pdf-footer { margin-top:12px; font-size:9pt; }
-}
+
 
 </style>
 </head>
@@ -1628,67 +1609,202 @@ window.previewImpresion = function() {
 }
 
 window.generarPDF = (mesAnio, mesNum, anioNum) => {
-  const regs = getRegistrosParaImpresion(mesAnio);
+  const regs = window.getRegistrosParaImpresion(mesAnio);
   if(!regs.length) { showToast('No hay registros para exportar','err'); return; }
 
-  // Build or update hidden print area
-  let area = document.getElementById('pdf-print-area');
-  if(!area) {
-    area = document.createElement('div');
-    area.id = 'pdf-print-area';
-    document.body.appendChild(area);
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+
+  const PW = 210, PH = 297;
+  const ML = 15, MR = 15, MT = 15, MB = 20;
+  const contentW = PW - ML - MR;
+
+  // Header data
+  const profData = window.PROF_DATA;
+  const mesLabel = mesNum || '—';
+  const anioLabel = anioNum || '—';
+
+  // Column widths
+  const cols = [28, 45, 18, 52, 52];
+  const colHeaders = ['PACIENTES\nN° HC/DNI','DIAGNÓSTICO\nDSM 5-CIE 11','ADMISIÓN','CONTROL\nMEDICACIÓN','PSICOTERAPIA Y\nCONTROL MÉDIC.'];
+
+  function drawPageHeader(doc, y) {
+    // Title box
+    doc.setFontSize(11);
+    doc.setFont('helvetica','bold');
+    const titleW = 90;
+    const titleX = (PW - titleW) / 2;
+    doc.rect(titleX, y, titleW, 8);
+    doc.text('REGISTRO MENSUAL DE PRÁCTICAS', PW/2, y+5.5, {align:'center'});
+    y += 12;
+
+    // Meta info
+    doc.setFontSize(9);
+    doc.setFont('helvetica','normal');
+    const lineH = 5.5;
+    doc.setFont('helvetica','bold'); doc.text('NOMBRE Y APELLIDO DEL PROFESIONAL: ', ML, y); 
+    doc.setFont('helvetica','normal'); doc.text(profData.nombre, ML + doc.getTextWidth('NOMBRE Y APELLIDO DEL PROFESIONAL: '), y);
+    y += lineH;
+    doc.setFont('helvetica','bold'); doc.text('AÑO QUE CURSA: ', ML, y);
+    doc.setFont('helvetica','normal'); doc.text(profData.anio, ML + doc.getTextWidth('AÑO QUE CURSA: '), y);
+    y += lineH;
+    doc.setFont('helvetica','bold'); doc.text('LUGAR DE PRÁCTICAS: ', ML, y);
+    doc.setFont('helvetica','normal'); doc.text(profData.lugar, ML + doc.getTextWidth('LUGAR DE PRÁCTICAS: '), y);
+    doc.setFont('helvetica','bold'); doc.text('  SECTOR: ', ML + doc.getTextWidth('LUGAR DE PRÁCTICAS: ' + profData.lugar), y);
+    doc.setFont('helvetica','normal'); doc.text(profData.sector, ML + doc.getTextWidth('LUGAR DE PRÁCTICAS: ' + profData.lugar + '  SECTOR: '), y);
+    y += lineH;
+    doc.setFont('helvetica','bold'); doc.text('DÍAS QUE CONCURRE: ', ML, y);
+    doc.setFont('helvetica','normal'); doc.text(profData.dias, ML + doc.getTextWidth('DÍAS QUE CONCURRE: '), y);
+    y += lineH;
+    doc.setFont('helvetica','bold'); doc.text('SUPERVISOR DE PRÁCTICAS: ', ML, y);
+    doc.setFont('helvetica','normal'); doc.text(profData.supervisor, ML + doc.getTextWidth('SUPERVISOR DE PRÁCTICAS: '), y);
+    y += lineH;
+    doc.setFont('helvetica','bold'); doc.text('MES: ', ML, y);
+    doc.setFont('helvetica','normal'); doc.text(mesLabel, ML + doc.getTextWidth('MES: '), y);
+    doc.setFont('helvetica','bold'); doc.text('   AÑO: ', ML + doc.getTextWidth('MES: ' + mesLabel), y);
+    doc.setFont('helvetica','normal'); doc.text(anioLabel, ML + doc.getTextWidth('MES: ' + mesLabel + '   AÑO: '), y);
+    y += 8;
+    return y;
   }
 
-  const rowsPdf = regs.map(r => `
-    <tr>
-      <td>${r.dni||'—'}<br><small style="color:#555">${r.apellido||''}, ${r.nombre||''}</small></td>
-      <td>${r.diagnostico_cie11||r.diagnostico_cie10||r.diagnostico||'—'}</td>
-      <td style="text-align:center">SI</td>
-      <td>${r.tratamiento||'—'}</td>
-      <td>${r.pendientes||'—'}</td>
-    </tr>`).join('');
+  function drawTableHeader(doc, y) {
+    doc.setFillColor(26, 58, 107);
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(8);
+    doc.setFont('helvetica','bold');
+    let x = ML;
+    const hdrH = 10;
+    cols.forEach((w, i) => {
+      doc.rect(x, y, w, hdrH, 'FD');
+      const lines = colHeaders[i].split('\n');
+      lines.forEach((line, li) => {
+        doc.text(line, x + w/2, y + 3.5 + li*4, {align:'center'});
+      });
+      x += w;
+    });
+    doc.setTextColor(0,0,0);
+    return y + hdrH;
+  }
 
-  // Generate empty rows to fill page (min 20 rows)
-  const emptyRows = Math.max(0, 20 - regs.length);
-  const emptyRowsHtml = Array(emptyRows).fill('<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>').join('');
+  function calcRowHeight(doc, reg) {
+    doc.setFontSize(8);
+    doc.setFont('helvetica','normal');
+    // DNI + name
+    const dniText = reg.dni || '—';
+    const nameText = (reg.apellido||'') + ', ' + (reg.nombre||'');
+    const diagText = reg.diagnostico_cie11 || reg.diagnostico_cie10 || reg.diagnostico || '—';
+    const tratText = reg.tratamiento || '—';
+    const pendText = reg.pendientes || '—';
 
-  area.innerHTML = `
-    <div style="text-align:center;margin-bottom:16px">
-      <span class="pdf-title">REGISTRO MENSUAL DE PRÁCTICAS</span>
-    </div>
-    <div class="pdf-meta">
-      <div><strong>NOMBRE Y APELLIDO DEL PROFESIONAL:</strong> ${PROF_DATA.nombre}</div>
-      <div><strong>AÑO QUE CURSA:</strong> ${PROF_DATA.anio}</div>
-      <div class="pdf-meta-row">
-        <div><strong>LUGAR DE PRÁCTICAS:</strong> ${PROF_DATA.lugar}</div>
-        <div><strong>SECTOR:</strong> ${PROF_DATA.sector}</div>
-      </div>
-      <div><strong>DÍAS QUE CONCURRE:</strong> ${PROF_DATA.dias}</div>
-      <div><strong>SUPERVISOR DE PRÁCTICAS:</strong> ${PROF_DATA.supervisor}</div>
-      <div class="pdf-meta-row">
-        <div><strong>MES:</strong> ${mesNum||'—'}</div>
-        <div><strong>AÑO:</strong> ${anioNum||'—'}</div>
-      </div>
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th style="width:15%">PACIENTES<br>N° HC/DNI</th>
-          <th style="width:25%">DIAGNÓSTICO<br>DSM 5-CIE 11</th>
-          <th style="width:10%">ADMISIÓN</th>
-          <th style="width:25%">CONTROL<br>MEDICACIÓN</th>
-          <th style="width:25%">PSICOTERAPIA Y<br>CONTROL MÉDIC.</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rowsPdf}
-        ${emptyRowsHtml}
-      </tbody>
-    </table>
-    <div class="pdf-footer"><strong>Firma y sello del supervisor:</strong></div>`;
+    const lineH = 4;
+    const pad = 3;
 
-  setTimeout(() => { window.print(); }, 200);
+    const dniLines = doc.splitTextToSize(dniText, cols[0]-4).length;
+    const nameLines = doc.splitTextToSize(nameText, cols[0]-4).length;
+    const diagLines = doc.splitTextToSize(diagText, cols[1]-4).length;
+    const tratLines = doc.splitTextToSize(tratText, cols[3]-4).length;
+    const pendLines = doc.splitTextToSize(pendText, cols[4]-4).length;
+
+    const maxLines = Math.max(dniLines + nameLines, diagLines, tratLines, pendLines, 2);
+    return Math.max(maxLines * lineH + pad*2, 12);
+  }
+
+  function drawRow(doc, reg, y, rowH, shade) {
+    doc.setFontSize(8);
+    doc.setFont('helvetica','normal');
+    if(shade) { doc.setFillColor(245,248,255); doc.rect(ML, y, contentW, rowH, 'F'); }
+
+    let x = ML;
+    const lineH = 4;
+    const pad = 3;
+
+    // Draw cell borders
+    cols.forEach(w => { doc.rect(x, y, w, rowH); x += w; });
+
+    // Cell content
+    x = ML;
+    // Col 0: DNI + name
+    const dniText = reg.dni || '—';
+    const nameText = (reg.apellido||'') + ', ' + (reg.nombre||'');
+    doc.setFont('helvetica','bold');
+    doc.text(doc.splitTextToSize(dniText, cols[0]-4), x+2, y+pad+lineH*0);
+    doc.setFont('helvetica','normal');
+    const dniLines = doc.splitTextToSize(dniText, cols[0]-4).length;
+    doc.text(doc.splitTextToSize(nameText, cols[0]-4), x+2, y+pad+lineH*dniLines);
+    x += cols[0];
+
+    // Col 1: Diagnostico
+    const diagText = reg.diagnostico_cie11 || reg.diagnostico_cie10 || reg.diagnostico || '—';
+    doc.text(doc.splitTextToSize(diagText, cols[1]-4), x+2, y+pad);
+    x += cols[1];
+
+    // Col 2: Admision
+    doc.setFont('helvetica','bold');
+    doc.text('SI', x + cols[2]/2, y + rowH/2, {align:'center', baseline:'middle'});
+    doc.setFont('helvetica','normal');
+    x += cols[2];
+
+    // Col 3: Tratamiento
+    const tratText = reg.tratamiento || '—';
+    doc.text(doc.splitTextToSize(tratText, cols[3]-4), x+2, y+pad);
+    x += cols[3];
+
+    // Col 4: Pendientes
+    const pendText = reg.pendientes || '—';
+    doc.text(doc.splitTextToSize(pendText, cols[4]-4), x+2, y+pad);
+  }
+
+  function drawFooter(doc, y) {
+    y = Math.max(y, PH - MB - 12);
+    doc.setFontSize(9);
+    doc.setFont('helvetica','bold');
+    doc.text('Firma y sello del supervisor:', ML, y);
+    // Line for signature
+    doc.line(ML + 55, y, ML + 130, y);
+  }
+
+  // ── BUILD PAGES ──
+  const FOOTER_H = 15;
+  const HEADER_H = 58; // estimated header height
+  const TABLE_HDR_H = 10;
+
+  let currentY = MT;
+  let pageNum = 0;
+
+  function startPage(isFirst) {
+    if(pageNum > 0) doc.addPage();
+    pageNum++;
+    currentY = MT;
+    currentY = drawPageHeader(doc, currentY);
+    currentY = drawTableHeader(doc, currentY);
+  }
+
+  startPage(true);
+
+  regs.forEach((reg, idx) => {
+    const rowH = calcRowHeight(doc, reg);
+    const spaceNeeded = rowH + FOOTER_H;
+    const spaceLeft = PH - currentY - FOOTER_H;
+
+    if(spaceLeft < rowH) {
+      // Draw footer on current page then start new page
+      drawFooter(doc, currentY + 5);
+      startPage(false);
+    }
+
+    drawRow(doc, reg, currentY, rowH, idx % 2 === 1);
+    currentY += rowH;
+  });
+
+  // Footer on last page
+  drawFooter(doc, currentY + 5);
+
+  // Save
+  const filename = 'Registro_Practicas_' + (mesNum||'todos') + '_' + (anioNum||'') + '.pdf';
+  doc.save(filename);
+  showToast('✓ PDF generado correctamente', 'ok');
 };
+
 
 </script>
 </body>
