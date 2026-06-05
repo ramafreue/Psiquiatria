@@ -260,7 +260,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   background:var(--azul-light); border:1.5px solid var(--border); width:100%;
   padding:11px 14px; border-radius:8px; cursor:pointer;
   font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600;
-  color:var(--azul); margin-bottom:0;
+  color:var(--azul); margin-bottom:0; box-sizing:border-box;
 }
 .evol-toggle-btn .evol-arrow { transition:transform .2s; font-size:11px; }
 .evol-toggle-btn.open { border-radius:8px 8px 0 0; border-bottom-color:transparent; }
@@ -268,13 +268,21 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .evol-body {
   display:none; border:1.5px solid var(--border); border-top:none;
   border-radius:0 0 8px 8px; background:white;
-  width:100%; box-sizing:border-box; overflow:hidden;
+  width:100%; box-sizing:border-box; overflow:hidden; max-width:100%;
 }
-.evol-item textarea { box-sizing:border-box; }
+.evol-item textarea {
+  box-sizing:border-box; max-width:100%; width:100%;
+}
+.evol-item-options {
+  word-break:break-word; overflow-wrap:break-word;
+}
 .evol-body.open { display:block; }
 .evol-item {
-  padding:14px 16px;
+  padding:12px 14px;
   border-bottom:1px solid var(--border);
+  width:100%;
+  box-sizing:border-box;
+  overflow:hidden;
 }
 .evol-item:last-child { border-bottom:none; }
 .evol-item-title {
@@ -355,15 +363,23 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 
 /* MULTI DIAGNÓSTICO */
-.diag-multi-wrap { display:flex; flex-direction:column; gap:8px; }
-.diag-slot { background:#fafbff; border:1.5px solid var(--border); border-radius:8px; padding:10px 12px; }
-.diag-slot-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
-.diag-slot-num { font-size:10px; font-weight:700; color:var(--azul); text-transform:uppercase; letter-spacing:.06em; }
-.diag-slot-clear { background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; padding:0; line-height:1; }
+.diag-multi-wrap { display:flex; flex-direction:column; gap:0; border:1.5px solid var(--border); border-radius:8px; overflow:hidden; background:#fafbff; }
+.diag-slot { padding:0; border-bottom:1px solid var(--border); background:#fafbff; }
+.diag-slot:last-of-type { border-bottom:none; }
+.diag-slot-inner { display:flex; align-items:center; gap:6px; padding:4px 6px 4px 10px; }
+.diag-slot-inner .ac-wrap { flex:1; }
+.diag-slot-inner .ac-input { border:none; background:transparent; padding:8px 4px; font-size:14px; border-radius:0; box-shadow:none !important; }
+.diag-slot-inner .ac-input:focus { background:white; }
+.diag-slot-inner .ac-dropdown { top:calc(100% + 2px); }
+.diag-slot-clear { background:none; border:none; color:var(--muted); cursor:pointer; font-size:16px; padding:4px 6px; line-height:1; flex-shrink:0; }
 .diag-slot-clear:hover { color:var(--rojo); }
-.diag-add-btn { display:flex; align-items:center; gap:6px; background:var(--azul-light); border:1.5px dashed var(--border); border-radius:8px; padding:9px 14px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; color:var(--azul); cursor:pointer; width:100%; justify-content:center; transition:background .2s; }
-.diag-add-btn:hover { background:#d0daf0; }
-.diag-add-btn:disabled { opacity:.4; cursor:not-allowed; }
+.diag-selected-row { padding:6px 10px; border-top:1px solid var(--border); background:var(--azul-light); display:none; align-items:center; gap:6px; }
+.diag-selected-row .ac-sel-code { font-size:10px; font-weight:700; color:var(--azul); }
+.diag-selected-row .ac-sel-label { font-size:12px; color:var(--text); flex:1; line-height:1.4; }
+.diag-selected-row .ac-clear { background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; padding:0; }
+.diag-add-btn { display:flex; align-items:center; gap:6px; background:white; border:none; border-top:1px dashed var(--border); padding:10px 14px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; color:var(--azul-mid); cursor:pointer; width:100%; justify-content:center; transition:background .2s; }
+.diag-add-btn:hover { background:var(--azul-light); }
+.diag-add-btn:disabled { opacity:.35; cursor:not-allowed; }
 
 
 /* RESPONSIVE */
@@ -536,224 +552,174 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           Evaluación clínica
         </div>
         <div class="form-row full">
-          <div class="field">
-            <label>Diagnóstico (CIE-10)</label>
-            <div class="diag-multi-wrap" id="cie10-multi">
-          <div class="diag-slot" id="cie10-slot-1" >
-            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',1)" title="Quitar">✕</button></div>
-            <div class="ac-wrap">
-              <input type="text" id="ac-cie10-1" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-              <div class="ac-dropdown" id="drop-cie10-1"></div>
+        <div class="field">
+          <label>Diagnóstico (CIE-10)</label>
+          <div class="diag-multi-wrap" id="e-cie10-multi">
+          <div class="diag-slot" id="e-cie10-slot-1" >
+            <div class="diag-slot-inner">
+              <div class="ac-wrap" style="position:relative;flex:1">
+                <input type="text" id="ac-e-cie10-1" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
+                <div class="ac-dropdown" id="drop-e-cie10-1"></div>
+              </div>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',1)" title="Quitar">✕</button>
             </div>
-            <div class="ac-selected-badge" id="badge-cie10-1" style="display:none"></div>
-            <input type="hidden" id="diag-cie10-1">
+            <div class="diag-selected-row" id="badge-e-cie10-1">
+              <span class="ac-sel-code" id="badge-code-e-cie10-1"></span>
+              <span class="ac-sel-label" id="badge-label-e-cie10-1"></span>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie10',1)">✕</button>
+            </div>
+            <input type="hidden" id="diag-e-cie10-1">
           </div>
-          <div class="diag-slot" id="cie10-slot-2" style='display:none'>
-            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',2)" title="Quitar">✕</button></div>
-            <div class="ac-wrap">
-              <input type="text" id="ac-cie10-2" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-              <div class="ac-dropdown" id="drop-cie10-2"></div>
+          <div class="diag-slot" id="e-cie10-slot-2" style='display:none'>
+            <div class="diag-slot-inner">
+              <div class="ac-wrap" style="position:relative;flex:1">
+                <input type="text" id="ac-e-cie10-2" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
+                <div class="ac-dropdown" id="drop-e-cie10-2"></div>
+              </div>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',2)" title="Quitar">✕</button>
             </div>
-            <div class="ac-selected-badge" id="badge-cie10-2" style="display:none"></div>
-            <input type="hidden" id="diag-cie10-2">
+            <div class="diag-selected-row" id="badge-e-cie10-2">
+              <span class="ac-sel-code" id="badge-code-e-cie10-2"></span>
+              <span class="ac-sel-label" id="badge-label-e-cie10-2"></span>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie10',2)">✕</button>
+            </div>
+            <input type="hidden" id="diag-e-cie10-2">
           </div>
-          <div class="diag-slot" id="cie10-slot-3" style='display:none'>
-            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',3)" title="Quitar">✕</button></div>
-            <div class="ac-wrap">
-              <input type="text" id="ac-cie10-3" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-              <div class="ac-dropdown" id="drop-cie10-3"></div>
+          <div class="diag-slot" id="e-cie10-slot-3" style='display:none'>
+            <div class="diag-slot-inner">
+              <div class="ac-wrap" style="position:relative;flex:1">
+                <input type="text" id="ac-e-cie10-3" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
+                <div class="ac-dropdown" id="drop-e-cie10-3"></div>
+              </div>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',3)" title="Quitar">✕</button>
             </div>
-            <div class="ac-selected-badge" id="badge-cie10-3" style="display:none"></div>
-            <input type="hidden" id="diag-cie10-3">
+            <div class="diag-selected-row" id="badge-e-cie10-3">
+              <span class="ac-sel-code" id="badge-code-e-cie10-3"></span>
+              <span class="ac-sel-label" id="badge-label-e-cie10-3"></span>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie10',3)">✕</button>
+            </div>
+            <input type="hidden" id="diag-e-cie10-3">
           </div>
-          <div class="diag-slot" id="cie10-slot-4" style='display:none'>
-            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',4)" title="Quitar">✕</button></div>
-            <div class="ac-wrap">
-              <input type="text" id="ac-cie10-4" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-              <div class="ac-dropdown" id="drop-cie10-4"></div>
+          <div class="diag-slot" id="e-cie10-slot-4" style='display:none'>
+            <div class="diag-slot-inner">
+              <div class="ac-wrap" style="position:relative;flex:1">
+                <input type="text" id="ac-e-cie10-4" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
+                <div class="ac-dropdown" id="drop-e-cie10-4"></div>
+              </div>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',4)" title="Quitar">✕</button>
             </div>
-            <div class="ac-selected-badge" id="badge-cie10-4" style="display:none"></div>
-            <input type="hidden" id="diag-cie10-4">
+            <div class="diag-selected-row" id="badge-e-cie10-4">
+              <span class="ac-sel-code" id="badge-code-e-cie10-4"></span>
+              <span class="ac-sel-label" id="badge-label-e-cie10-4"></span>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie10',4)">✕</button>
+            </div>
+            <input type="hidden" id="diag-e-cie10-4">
           </div>
-          <div class="diag-slot" id="cie10-slot-5" style='display:none'>
-            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',5)" title="Quitar">✕</button></div>
-            <div class="ac-wrap">
-              <input type="text" id="ac-cie10-5" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-              <div class="ac-dropdown" id="drop-cie10-5"></div>
+          <div class="diag-slot" id="e-cie10-slot-5" style='display:none'>
+            <div class="diag-slot-inner">
+              <div class="ac-wrap" style="position:relative;flex:1">
+                <input type="text" id="ac-e-cie10-5" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
+                <div class="ac-dropdown" id="drop-e-cie10-5"></div>
+              </div>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',5)" title="Quitar">✕</button>
             </div>
-            <div class="ac-selected-badge" id="badge-cie10-5" style="display:none"></div>
-            <input type="hidden" id="diag-cie10-5">
+            <div class="diag-selected-row" id="badge-e-cie10-5">
+              <span class="ac-sel-code" id="badge-code-e-cie10-5"></span>
+              <span class="ac-sel-label" id="badge-label-e-cie10-5"></span>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie10',5)">✕</button>
+            </div>
+            <input type="hidden" id="diag-e-cie10-5">
           </div>
-              <button type="button" class="diag-add-btn" id="cie10-add-btn" onclick="addDiagSlot('cie10')">+ Agregar diagnóstico</button>
-            </div>
-            <div class="ac-hint">Podés agregar hasta 5 diagnósticos</div>
+          <button type="button" class="diag-add-btn" id="e-cie10-add-btn" onclick="addDiagSlot('e-cie10')">＋ Agregar diagnóstico</button>
           </div>
         </div>
+      </div>
 
+
+        <div class="form-row full"><div class="field"><label>Tratamiento</label><textarea id="tratamiento" class="large" placeholder="Indicaciones farmacológicas, dosis, frecuencia..."></textarea></div></div>
         <div class="form-row full">
           <div class="field">
             <label>Diagnóstico (CIE-11)</label>
             <div class="diag-multi-wrap" id="cie11-multi">
           <div class="diag-slot" id="cie11-slot-1" >
-            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',1)" title="Quitar">✕</button></div>
-            <div class="ac-wrap">
-              <input type="text" id="ac-cie11-1" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-              <div class="ac-dropdown" id="drop-cie11-1"></div>
+            <div class="diag-slot-inner">
+              <div class="ac-wrap" style="position:relative;flex:1">
+                <input type="text" id="ac-cie11-1" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
+                <div class="ac-dropdown" id="drop-cie11-1"></div>
+              </div>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',1)" title="Quitar">✕</button>
             </div>
-            <div class="ac-selected-badge" id="badge-cie11-1" style="display:none"></div>
+            <div class="diag-selected-row" id="badge-cie11-1">
+              <span class="ac-sel-code" id="badge-code-cie11-1"></span>
+              <span class="ac-sel-label" id="badge-label-cie11-1"></span>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie11',1)">✕</button>
+            </div>
             <input type="hidden" id="diag-cie11-1">
           </div>
           <div class="diag-slot" id="cie11-slot-2" style='display:none'>
-            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',2)" title="Quitar">✕</button></div>
-            <div class="ac-wrap">
-              <input type="text" id="ac-cie11-2" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-              <div class="ac-dropdown" id="drop-cie11-2"></div>
+            <div class="diag-slot-inner">
+              <div class="ac-wrap" style="position:relative;flex:1">
+                <input type="text" id="ac-cie11-2" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
+                <div class="ac-dropdown" id="drop-cie11-2"></div>
+              </div>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',2)" title="Quitar">✕</button>
             </div>
-            <div class="ac-selected-badge" id="badge-cie11-2" style="display:none"></div>
+            <div class="diag-selected-row" id="badge-cie11-2">
+              <span class="ac-sel-code" id="badge-code-cie11-2"></span>
+              <span class="ac-sel-label" id="badge-label-cie11-2"></span>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie11',2)">✕</button>
+            </div>
             <input type="hidden" id="diag-cie11-2">
           </div>
           <div class="diag-slot" id="cie11-slot-3" style='display:none'>
-            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',3)" title="Quitar">✕</button></div>
-            <div class="ac-wrap">
-              <input type="text" id="ac-cie11-3" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-              <div class="ac-dropdown" id="drop-cie11-3"></div>
+            <div class="diag-slot-inner">
+              <div class="ac-wrap" style="position:relative;flex:1">
+                <input type="text" id="ac-cie11-3" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
+                <div class="ac-dropdown" id="drop-cie11-3"></div>
+              </div>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',3)" title="Quitar">✕</button>
             </div>
-            <div class="ac-selected-badge" id="badge-cie11-3" style="display:none"></div>
+            <div class="diag-selected-row" id="badge-cie11-3">
+              <span class="ac-sel-code" id="badge-code-cie11-3"></span>
+              <span class="ac-sel-label" id="badge-label-cie11-3"></span>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie11',3)">✕</button>
+            </div>
             <input type="hidden" id="diag-cie11-3">
           </div>
           <div class="diag-slot" id="cie11-slot-4" style='display:none'>
-            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',4)" title="Quitar">✕</button></div>
-            <div class="ac-wrap">
-              <input type="text" id="ac-cie11-4" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-              <div class="ac-dropdown" id="drop-cie11-4"></div>
+            <div class="diag-slot-inner">
+              <div class="ac-wrap" style="position:relative;flex:1">
+                <input type="text" id="ac-cie11-4" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
+                <div class="ac-dropdown" id="drop-cie11-4"></div>
+              </div>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',4)" title="Quitar">✕</button>
             </div>
-            <div class="ac-selected-badge" id="badge-cie11-4" style="display:none"></div>
+            <div class="diag-selected-row" id="badge-cie11-4">
+              <span class="ac-sel-code" id="badge-code-cie11-4"></span>
+              <span class="ac-sel-label" id="badge-label-cie11-4"></span>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie11',4)">✕</button>
+            </div>
             <input type="hidden" id="diag-cie11-4">
           </div>
           <div class="diag-slot" id="cie11-slot-5" style='display:none'>
-            <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',5)" title="Quitar">✕</button></div>
-            <div class="ac-wrap">
-              <input type="text" id="ac-cie11-5" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-              <div class="ac-dropdown" id="drop-cie11-5"></div>
+            <div class="diag-slot-inner">
+              <div class="ac-wrap" style="position:relative;flex:1">
+                <input type="text" id="ac-cie11-5" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
+                <div class="ac-dropdown" id="drop-cie11-5"></div>
+              </div>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',5)" title="Quitar">✕</button>
             </div>
-            <div class="ac-selected-badge" id="badge-cie11-5" style="display:none"></div>
+            <div class="diag-selected-row" id="badge-cie11-5">
+              <span class="ac-sel-code" id="badge-code-cie11-5"></span>
+              <span class="ac-sel-label" id="badge-label-cie11-5"></span>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie11',5)">✕</button>
+            </div>
             <input type="hidden" id="diag-cie11-5">
           </div>
-              <button type="button" class="diag-add-btn" id="cie11-add-btn" onclick="addDiagSlot('cie11')">+ Agregar diagnóstico</button>
-            </div>
-            <div class="ac-hint">Podés agregar hasta 5 diagnósticos</div>
-          </div>
-        </div>
-
-        <div class="form-row full" id="evol-section">
-          <div class="field">
-            <label>Evolución</label>
-            <button type="button" class="evol-toggle-btn" id="evol-toggle-btn" onclick="toggleEvol()">
-              <span>Completar examen psicopatológico</span>
-              <span class="evol-arrow">▼</span>
-            </button>
-            <div class="evol-body" id="evol-body">
-              <div class="evol-item" style="background:#fffbeb;border-left:3px solid var(--oro);">
-                <div class="evol-item-title" style="color:var(--oro)">Aspectos Generales del Paciente</div>
-                <div class="evol-item-options" style="background:#fef9ec;border-left-color:var(--oro)">Describí aquí observaciones generales del paciente: estado general al ingreso, contexto de la consulta, motivo de consulta, antecedentes relevantes, impresión clínica inicial, o cualquier aspecto que consideres importante y que no esté contemplado en los campos específicos del examen psicopatológico.</div>
-                <textarea id="evol_general" placeholder="Escribí las observaciones generales del paciente..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Presentación y Aspecto</div>
-                <div class="evol-item-options">Saludable / Enfermizo / Incómodo / Avejentado / Juvenil / Infantil / Extravagante / Otro Aseado / No aseado / Aliñado / Desaliñado / Vestido acorde/desacorde a clima/situación</div>
-                <textarea id="evol_presentacion" placeholder="Escribí tu observación sobre presentación y aspecto..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Actitud</div>
-                <div class="evol-item-options">Colaboradora activa/pasiva / Amigable / Serena / Interesada / Franca / Defensiva / Seductora / Halagadora / Despectiva / Perpleja / Apática / Hostil / Amenazante / Reticente / Evasiva / Precavida / Suspicaz / Agitada / Melancólica / Oposicionista</div>
-                <textarea id="evol_actitud" placeholder="Escribí tu observación sobre actitud..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Conciencia</div>
-                <div class="evol-item-options">Lucidez / Alerta / Hipervigilancia / Somnolencia / Obnubilación / Estupor / Coma</div>
-                <textarea id="evol_conciencia" placeholder="Escribí tu observación sobre conciencia..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Orientación</div>
-                <div class="evol-item-options">Global / Parcial / En tiempo / espacio / persona</div>
-                <textarea id="evol_orientacion" placeholder="Escribí tu observación sobre orientación..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Atención y Concentración</div>
-                <div class="evol-item-options">Euprosexia / Aprosexia / Hipopresexia / Hiperprosexia / Paraprosexia (Hiperprosexia autorreflexiva - hipermetamorfosis) / Estable / Fluctuante</div>
-                <textarea id="evol_atencion" placeholder="Escribí tu observación sobre atención y concentración..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Memoria</div>
-                <div class="evol-item-options">Eumnesia / Amnesia (retrógrada – anterógrada – retroanterógrada – lacunar) / Hipomnesia / Hipermnesia (memoria panorámica - ecmnesia) / Paramnesias (alucinación de la memoria – ilusión de la memoria – paramnesia replicadora de Pick – falsos reconocimientos – ya visto – jamás visto – fabulación de relleno) / Olvidos benignos</div>
-                <textarea id="evol_memoria" placeholder="Escribí tu observación sobre memoria..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Senso-percepción</div>
-                <div class="evol-item-options">Acelerada / Retardada / Abolida / Ilusiones / Alucinaciones verdaderas / Pseudoalucinaciones / Alucinaciones simples/complejas / visual/auditiva/olfativa/gustativa/táctil/cenestésica/hipnagógica/hinapómpica / Despersonalización / Desrealización / Onirismo / Alucinosis</div>
-                <textarea id="evol_senso" placeholder="Escribí tu observación sobre senso-percepción..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Imaginación</div>
-                <div class="evol-item-options">Aumentada / Disminuida / Fabulación / Mentira / Conservada</div>
-                <textarea id="evol_imaginacion" placeholder="Escribí tu observación sobre imaginación..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Inteligencia e Información</div>
-                <div class="evol-item-options">Inferior / Normal / Superior / CI:</div>
-                <textarea id="evol_inteligencia" placeholder="Escribí tu observación sobre inteligencia e información..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Pensamiento</div>
-                <div class="evol-item-options">Ritmo normal / alterado leve, moderado, grave / Taquipsiquia (mentismo-fuga de ideas) / Bradipsiquia (inhibición / estupor / inercia) / Viscosidad / Minuciosidad / Interceptación / Rigidez / Perseveración / Estereotipia / Disgregación / Asociaciones laxas / Incoherencia/Neologismos / Tangencialidad / Circunstancialidad / Abstracto / Concreto</div>
-                <textarea id="evol_pensamiento" placeholder="Escribí tu observación sobre pensamiento..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Ideación</div>
-                <div class="evol-item-options">Sin particularidades / Idea delirante (erotomaníaco-grandeza-celotípico-persecutorio-somático) / Idea obsesiva / Idea sobrevalorada / Idea fija / No presenta / presenta ideación de muerte / de suicidio / de que la vida no vale la pena ser vivida
-              <em>Escala de Suicidalidad (Okasha, 1981): 1. ¿Has pensado alguna vez que la vida no vale la pena? 2. ¿Has deseado alguna vez estar muerto? 3. ¿Has pensado alguna vez terminar con tu vida? 4. ¿Has intentado suicidarte?</em></div>
-                <textarea id="evol_ideacion" placeholder="Escribí tu observación sobre ideación..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Esquema Corporal</div>
-                <div class="evol-item-options">Miembro fantasma / Hemisomatognosia / Anosognosia / Distorsiones de forma / Distorsiones de tamaño / Reduplicación</div>
-                <textarea id="evol_esquema" placeholder="Escribí tu observación sobre esquema corporal..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Juicio</div>
-                <div class="evol-item-options">Conservado / Insuficiente / Debilitado / Suspendido / Desviado / Condicionado catatímicamente / Condicionado por ideación obsesiva / Condicionado por craving — Insuficiencia psíquica: 1) leve, moderada o grave; 2) permanentes o transitorias; 3) global o parcial; 4) génico, congénito o adquirido; 5) tipo y grado de incapacidad que genera</div>
-                <textarea id="evol_juicio" placeholder="Escribí tu observación sobre juicio..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Lenguaje</div>
-                <div class="evol-item-options">Sin particularidades / Microfonía / Macrofonía / Disartria / Disprosodia / Tartamudeo / Afasia / Tics vocales / Ecolalia / Neologismos / Discurso pobre / Verborrea / Mutismo / Estereotipia verbal</div>
-                <textarea id="evol_lenguaje" placeholder="Escribí tu observación sobre lenguaje..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Afectividad</div>
-                <div class="evol-item-options">Eutimia / Hipertimia (pacentera-displacentera) / Hipotimia / Irritabilidad / Aplanamiento / Embotamiento / Anhedonia / Ansiedad / Disforia / Miedo / Labilidad / Euforia / Tristeza / Perplejidad / Moria / Inadecuado / Culpa / Neotimia</div>
-                <textarea id="evol_afectividad" placeholder="Escribí tu observación sobre afectividad..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Actividad Psicomotriz</div>
-                <div class="evol-item-options">Agitación / Enlentecimiento / Tics / Estereotipias / Ecopraxia / Catalepsia / Cataplejía / Bloqueo / Estupor / Negativismo / Impulsión / Compulsión / Disquinesia / Acatisia / Distonía / Amaneramiento / Ritual / Automutilación / Temblor / Inquietud / Excitación / Apraxia / Hipocinesia / Disquinesia / Bruxismo / Ambitendencia</div>
-                <textarea id="evol_psicomotriz" placeholder="Escribí tu observación sobre actividad psicomotriz..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Voluntad</div>
-                <div class="evol-item-options">Eubulia / Abulia / Hipobulia / Hiperbulia (productiva-improductiva)</div>
-                <textarea id="evol_voluntad" placeholder="Escribí tu observación sobre voluntad..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Hábitos</div>
-                <div class="evol-item-options">Insomnio / Hipersomnia / Parasomnia / Sueñoinvertido / Eyaculación precoz / Hiporexia / Hiperexia / Atracón / Ingesta inadecuada / Eyaculación retardada / Vaginismo / Anorgasmia / Dispareunia / Hipersexualidad / Impotencia / Piernas inquietas</div>
-                <textarea id="evol_habitos" placeholder="Escribí tu observación sobre hábitos..."></textarea>
-              </div>
+              <button type="button" class="diag-add-btn" id="cie11-add-btn" onclick="addDiagSlot('cie11')">＋ Agregar diagnóstico</button>
             </div>
           </div>
         </div>
-
-        <div class="form-row full"><div class="field"><label>Tratamiento</label><textarea id="tratamiento" class="large" placeholder="Indicaciones farmacológicas, dosis, frecuencia..."></textarea></div></div>
         <div class="form-row full"><div class="field"><label>Pendientes</label><textarea id="pendientes" class="large" placeholder="Estudios, interconsultas, alertas, próxima cita..."></textarea></div></div>
         <button class="btn btn-primary" id="btn-guardar" onclick="guardarRegistro()">
           <svg width="15" height="15" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -911,52 +877,82 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
         <div class="field">
           <label>Diagnóstico (CIE-11)</label>
           <div class="diag-multi-wrap" id="e-cie11-multi">
-        <div class="diag-slot" id="e-cie11-slot-1" >
-          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',1)" title="Quitar">✕</button></div>
-          <div class="ac-wrap">
-            <input type="text" id="ac-e-cie11-1" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-            <div class="ac-dropdown" id="drop-e-cie11-1"></div>
+          <div class="diag-slot" id="e-cie11-slot-1" >
+            <div class="diag-slot-inner">
+              <div class="ac-wrap" style="position:relative;flex:1">
+                <input type="text" id="ac-e-cie11-1" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
+                <div class="ac-dropdown" id="drop-e-cie11-1"></div>
+              </div>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',1)" title="Quitar">✕</button>
+            </div>
+            <div class="diag-selected-row" id="badge-e-cie11-1">
+              <span class="ac-sel-code" id="badge-code-e-cie11-1"></span>
+              <span class="ac-sel-label" id="badge-label-e-cie11-1"></span>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie11',1)">✕</button>
+            </div>
+            <input type="hidden" id="diag-e-cie11-1">
           </div>
-          <div class="ac-selected-badge" id="badge-e-cie11-1" style="display:none"></div>
-          <input type="hidden" id="diag-e-cie11-1">
-        </div>
-        <div class="diag-slot" id="e-cie11-slot-2" style='display:none'>
-          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',2)" title="Quitar">✕</button></div>
-          <div class="ac-wrap">
-            <input type="text" id="ac-e-cie11-2" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-            <div class="ac-dropdown" id="drop-e-cie11-2"></div>
+          <div class="diag-slot" id="e-cie11-slot-2" style='display:none'>
+            <div class="diag-slot-inner">
+              <div class="ac-wrap" style="position:relative;flex:1">
+                <input type="text" id="ac-e-cie11-2" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
+                <div class="ac-dropdown" id="drop-e-cie11-2"></div>
+              </div>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',2)" title="Quitar">✕</button>
+            </div>
+            <div class="diag-selected-row" id="badge-e-cie11-2">
+              <span class="ac-sel-code" id="badge-code-e-cie11-2"></span>
+              <span class="ac-sel-label" id="badge-label-e-cie11-2"></span>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie11',2)">✕</button>
+            </div>
+            <input type="hidden" id="diag-e-cie11-2">
           </div>
-          <div class="ac-selected-badge" id="badge-e-cie11-2" style="display:none"></div>
-          <input type="hidden" id="diag-e-cie11-2">
-        </div>
-        <div class="diag-slot" id="e-cie11-slot-3" style='display:none'>
-          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',3)" title="Quitar">✕</button></div>
-          <div class="ac-wrap">
-            <input type="text" id="ac-e-cie11-3" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-            <div class="ac-dropdown" id="drop-e-cie11-3"></div>
+          <div class="diag-slot" id="e-cie11-slot-3" style='display:none'>
+            <div class="diag-slot-inner">
+              <div class="ac-wrap" style="position:relative;flex:1">
+                <input type="text" id="ac-e-cie11-3" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
+                <div class="ac-dropdown" id="drop-e-cie11-3"></div>
+              </div>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',3)" title="Quitar">✕</button>
+            </div>
+            <div class="diag-selected-row" id="badge-e-cie11-3">
+              <span class="ac-sel-code" id="badge-code-e-cie11-3"></span>
+              <span class="ac-sel-label" id="badge-label-e-cie11-3"></span>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie11',3)">✕</button>
+            </div>
+            <input type="hidden" id="diag-e-cie11-3">
           </div>
-          <div class="ac-selected-badge" id="badge-e-cie11-3" style="display:none"></div>
-          <input type="hidden" id="diag-e-cie11-3">
-        </div>
-        <div class="diag-slot" id="e-cie11-slot-4" style='display:none'>
-          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',4)" title="Quitar">✕</button></div>
-          <div class="ac-wrap">
-            <input type="text" id="ac-e-cie11-4" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-            <div class="ac-dropdown" id="drop-e-cie11-4"></div>
+          <div class="diag-slot" id="e-cie11-slot-4" style='display:none'>
+            <div class="diag-slot-inner">
+              <div class="ac-wrap" style="position:relative;flex:1">
+                <input type="text" id="ac-e-cie11-4" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
+                <div class="ac-dropdown" id="drop-e-cie11-4"></div>
+              </div>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',4)" title="Quitar">✕</button>
+            </div>
+            <div class="diag-selected-row" id="badge-e-cie11-4">
+              <span class="ac-sel-code" id="badge-code-e-cie11-4"></span>
+              <span class="ac-sel-label" id="badge-label-e-cie11-4"></span>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie11',4)">✕</button>
+            </div>
+            <input type="hidden" id="diag-e-cie11-4">
           </div>
-          <div class="ac-selected-badge" id="badge-e-cie11-4" style="display:none"></div>
-          <input type="hidden" id="diag-e-cie11-4">
-        </div>
-        <div class="diag-slot" id="e-cie11-slot-5" style='display:none'>
-          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',5)" title="Quitar">✕</button></div>
-          <div class="ac-wrap">
-            <input type="text" id="ac-e-cie11-5" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-            <div class="ac-dropdown" id="drop-e-cie11-5"></div>
+          <div class="diag-slot" id="e-cie11-slot-5" style='display:none'>
+            <div class="diag-slot-inner">
+              <div class="ac-wrap" style="position:relative;flex:1">
+                <input type="text" id="ac-e-cie11-5" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
+                <div class="ac-dropdown" id="drop-e-cie11-5"></div>
+              </div>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',5)" title="Quitar">✕</button>
+            </div>
+            <div class="diag-selected-row" id="badge-e-cie11-5">
+              <span class="ac-sel-code" id="badge-code-e-cie11-5"></span>
+              <span class="ac-sel-label" id="badge-label-e-cie11-5"></span>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie11',5)">✕</button>
+            </div>
+            <input type="hidden" id="diag-e-cie11-5">
           </div>
-          <div class="ac-selected-badge" id="badge-e-cie11-5" style="display:none"></div>
-          <input type="hidden" id="diag-e-cie11-5">
-        </div>
-          <button type="button" class="diag-add-btn" id="e-cie11-add-btn" onclick="addDiagSlot('e-cie11')">+ Agregar diagnóstico</button>
+          <button type="button" class="diag-add-btn" id="e-cie11-add-btn" onclick="addDiagSlot('e-cie11')">＋ Agregar diagnóstico</button>
           </div>
         </div>
       </div>
@@ -1772,8 +1768,8 @@ window.selectAcItem = (inputId, dropId, badgeId, hiddenId, idx) => {
   const badge = document.getElementById(badgeId);
   const inp = document.getElementById(inputId);
   const hidden = document.getElementById(hiddenId);
+  if(!drop||!inp||!hidden) return;
   const items = drop.querySelectorAll('.ac-item[data-idx]');
-  // find item by idx in filtered list rendered
   const el = items[idx];
   if (!el) return;
   const code = el.querySelector('.ac-code').textContent;
@@ -1781,10 +1777,16 @@ window.selectAcItem = (inputId, dropId, badgeId, hiddenId, idx) => {
   const full = code + ' ' + label;
   hidden.value = full;
   inp.value = '';
-  inp.placeholder = 'Seleccionado ↓';
+  inp.placeholder = 'Buscar diagnóstico...';
   drop.classList.remove('open');
-  badge.innerHTML = `<span class="ac-sel-code">${code}</span><span class="ac-sel-label">${label}</span><button class="ac-clear" onclick="clearAcItem('${inputId}','${badgeId}','${hiddenId}')">✕</button>`;
-  badge.style.display = 'inline-flex';
+  // New badge structure (diag-selected-row)
+  if(badge) {
+    const codeEl = document.getElementById(badgeId.replace('badge-','badge-code-'));
+    const labelEl = document.getElementById(badgeId.replace('badge-','badge-label-'));
+    if(codeEl) codeEl.textContent = code;
+    if(labelEl) labelEl.textContent = label;
+    badge.style.display = 'flex';
+  }
 };
 
 window.clearAcItem = (inputId, badgeId, hiddenId) => {
@@ -1838,8 +1840,12 @@ window.clearDiagSlot = (prefix, num) => {
   const iid = 'ac-'+prefix+'-'+num;
   const slot = document.getElementById(prefix+'-slot-'+num);
   const h = document.getElementById(hid); if(h) h.value='';
-  const b = document.getElementById(bid); if(b){b.style.display='none';b.innerHTML='';}
-  const inp = document.getElementById(iid); if(inp){inp.value='';inp.placeholder='Escribí para buscar...';}
+  const b = document.getElementById(bid);
+  if(b){ b.style.display='none';
+    const ce=document.getElementById('badge-code-'+prefix+'-'+num); if(ce) ce.textContent='';
+    const le=document.getElementById('badge-label-'+prefix+'-'+num); if(le) le.textContent='';
+  }
+  const inp = document.getElementById(iid); if(inp){inp.value='';inp.placeholder='Buscar diagnóstico...';}
   if(num>1 && slot){ slot.style.display='none'; const btn=document.getElementById(prefix+'-add-btn'); if(btn) btn.disabled=false; }
 };
 function getAllDiags(prefix) {
@@ -1854,7 +1860,20 @@ function setAllDiags(prefix, combined, dataArr) {
   parts.forEach((val, idx) => {
     const n = idx+1;
     if(n>1){ const slot=document.getElementById(prefix+'-slot-'+n); if(slot){slot.style.display='block'; initDiagSlot(prefix,n,dataArr);} }
-    setAcValue('ac-'+prefix+'-'+n,'badge-'+prefix+'-'+n,'diag-'+prefix+'-'+n, val);
+    // Set value directly in new structure
+    const hid = document.getElementById('diag-'+prefix+'-'+n);
+    if(hid) hid.value = val;
+    const spaceIdx = val.indexOf(' ');
+    const code = spaceIdx>-1 ? val.substring(0,spaceIdx) : val;
+    const label = spaceIdx>-1 ? val.substring(spaceIdx+1) : '';
+    const badge = document.getElementById('badge-'+prefix+'-'+n);
+    if(badge){
+      const ce=document.getElementById('badge-code-'+prefix+'-'+n); if(ce) ce.textContent=code;
+      const le=document.getElementById('badge-label-'+prefix+'-'+n); if(le) le.textContent=label;
+      badge.style.display='flex';
+    }
+    const inp=document.getElementById('ac-'+prefix+'-'+n);
+    if(inp) inp.placeholder='Buscar diagnóstico...';
   });
   if(parts.length>=5){ const btn=document.getElementById(prefix+'-add-btn'); if(btn) btn.disabled=true; }
 }
