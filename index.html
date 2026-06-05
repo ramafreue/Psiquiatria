@@ -828,6 +828,93 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <input type="hidden" id="e-cie11-value">
         </div>
       </div>
+      <div class="form-row full" id="e-evol-section" style="max-width:100%;overflow:hidden;display:none">
+        <div class="field">
+          <label>Evolución</label>
+          <button type="button" class="evol-toggle-btn" id="e-evol-toggle-btn" onclick="toggleEvolEdit()">
+            <span>Completar examen psicopatológico</span>
+            <span class="evol-arrow">▼</span>
+          </button>
+          <div class="evol-body" id="e-evol-body">
+              <div class="evol-item" style="background:#fffbeb;border-left:3px solid var(--oro);">
+                <div class="evol-item-title" style="color:var(--oro)">Aspectos Generales</div>
+                <textarea id="e-evol_general" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Presentación y Aspecto</div>
+                <textarea id="e-evol_presentacion" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Actitud</div>
+                <textarea id="e-evol_actitud" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Conciencia</div>
+                <textarea id="e-evol_conciencia" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Orientación</div>
+                <textarea id="e-evol_orientacion" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Atención y Concentración</div>
+                <textarea id="e-evol_atencion" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Memoria</div>
+                <textarea id="e-evol_memoria" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Senso-percepción</div>
+                <textarea id="e-evol_senso" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Imaginación</div>
+                <textarea id="e-evol_imaginacion" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Inteligencia e Información</div>
+                <textarea id="e-evol_inteligencia" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Pensamiento</div>
+                <textarea id="e-evol_pensamiento" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Ideación</div>
+                <textarea id="e-evol_ideacion" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Esquema Corporal</div>
+                <textarea id="e-evol_esquema" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Juicio</div>
+                <textarea id="e-evol_juicio" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Lenguaje</div>
+                <textarea id="e-evol_lenguaje" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Afectividad</div>
+                <textarea id="e-evol_afectividad" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Actividad Psicomotriz</div>
+                <textarea id="e-evol_psicomotriz" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Voluntad</div>
+                <textarea id="e-evol_voluntad" placeholder="Observación..."></textarea>
+              </div>
+              <div class="evol-item">
+                <div class="evol-item-title">Hábitos</div>
+                <textarea id="e-evol_habitos" placeholder="Observación..."></textarea>
+              </div>
+          </div>
+        </div>
+      </div>
       <div class="form-row full"><div class="field"><label>Tratamiento</label><textarea id="e-tratamiento" class="large"></textarea></div></div>
       <div class="form-row full"><div class="field"><label>Pendientes</label><textarea id="e-pendientes" class="large"></textarea></div></div>
       <button class="btn btn-primary" onclick="guardarEdicion()">Guardar cambios</button>
@@ -1388,6 +1475,7 @@ window.abrirEdicion = (id) => {
   diagSetValue('e-cie11', reg.diagnostico_cie11||'');
   if(currentUser && currentUser.email === 'solealbanycaballero@gmail.com') {
   const eEvolSec=document.getElementById('e-evol-section'); if(eEvolSec) eEvolSec.style.display='block';
+  document.getElementById('e-evol_general').value = reg.evol_general||'';
   document.getElementById('e-evol_presentacion').value = reg.evol_presentacion||'';
   document.getElementById('e-evol_actitud').value = reg.evol_actitud||'';
   document.getElementById('e-evol_conciencia').value = reg.evol_conciencia||'';
@@ -1419,7 +1507,7 @@ window.cerrarModal = () => {
   editandoId=null;
   ['e-cie10','e-cie11'].forEach(p=>{ diagSelected[p]=[]; diagRender(p); const inp=document.getElementById(p+'-search'); if(inp) inp.value=''; });
   // reset evol edit fields
-  ['e-evol_presentacion','e-evol_actitud','e-evol_conciencia','e-evol_orientacion',
+  ['e-evol_general','e-evol_presentacion','e-evol_actitud','e-evol_conciencia','e-evol_orientacion',
    'e-evol_atencion','e-evol_memoria','e-evol_senso','e-evol_imaginacion',
    'e-evol_inteligencia','e-evol_pensamiento','e-evol_ideacion','e-evol_esquema',
    'e-evol_juicio','e-evol_lenguaje','e-evol_afectividad','e-evol_psicomotriz',
@@ -1447,6 +1535,7 @@ window.guardarEdicion = async () => {
       ubicacion_otro:ubicVal==='OTRO'?document.getElementById('e-ubicacion_otro').value.trim():'',
       diagnostico_cie10: diagGetValue('e-cie10'),
       diagnostico_cie11: diagGetValue('e-cie11'),
+      evol_general:document.getElementById('e-evol_general')?.value.trim()||'',
       evol_presentacion:document.getElementById('e-evol_presentacion').value.trim(),
       evol_actitud:document.getElementById('e-evol_actitud').value.trim(),
       evol_conciencia:document.getElementById('e-evol_conciencia').value.trim(),
@@ -1773,106 +1862,105 @@ window.generarPDF = (mesAnio, mesNum, anioNum) => {
 
   // ── HEADER (returns new Y) ──
   function drawHeader(y) {
-    // Title box — centred, clean border
-    const titleText = 'REGISTRO MENSUAL DE PRÁCTICAS';
+    const LBL = 7.5;   // label font size
+    const VAL = 9;     // value font size  
+    const LH_LBL = 4.8; // line height after label
+    const LH_VAL = 6.5; // line height after value
+    const LH_PAIR = 2;  // gap between pairs
+
+    // ── TITLE BOX ──
     setFont('bold', 11);
-    doc.setTextColor(...BLACK);
-    const titleW = doc.getTextWidth(titleText) + 14;
-    const titleX = (PW - titleW) / 2;
+    doc.setTextColor(0,0,0);
     doc.setDrawColor(...BLUE_DARK);
-    doc.setLineWidth(0.5);
-    doc.roundedRect(titleX, y, titleW, 9, 1, 1);
-    doc.text(titleText, PW / 2, y + 6, { align: 'center' });
-    y += 14;
+    doc.setLineWidth(0.6);
+    const titleText = 'REGISTRO MENSUAL DE PRÁCTICAS';
+    const titleW = doc.getTextWidth(titleText) + 18;
+    const titleX = (PW - titleW) / 2;
+    doc.roundedRect(titleX, y, titleW, 10, 1.5, 1.5);
+    doc.text(titleText, PW / 2, y + 6.8, { align: 'center' });
+    y += 15;
 
-    // Meta lines — clean two-column layout
-    const LH = 5.8;  // line height
-    doc.setDrawColor(...BLACK);
-    doc.setLineWidth(0.2);
+    // ── HELPER: label on one line, value on next ──
+    function field(label, value) {
+      setFont('bold', LBL);
+      doc.setTextColor(80, 100, 130); // blue-grey for labels
+      doc.text(label, ML, y);
+      y += LH_LBL;
+      setFont('normal', VAL);
+      doc.setTextColor(0, 0, 0);
+      doc.text(value, ML, y);
+      y += LH_VAL + LH_PAIR;
+    }
 
-    setFont('bold', 8.5);
-    doc.text('NOMBRE Y APELLIDO DEL PROFESIONAL:', ML, y);
-    setFont('normal', 8.5);
-    doc.text(profData.nombre, ML + doc.getTextWidth('NOMBRE Y APELLIDO DEL PROFESIONAL: '), y);
-    y += LH;
+    // ── HELPER: two fields side by side ──
+    function fieldPair(lbl1, val1, lbl2, val2) {
+      const col2X = PW / 2;
+      setFont('bold', LBL);
+      doc.setTextColor(80, 100, 130);
+      doc.text(lbl1, ML, y);
+      doc.text(lbl2, col2X, y);
+      y += LH_LBL;
+      setFont('normal', VAL);
+      doc.setTextColor(0, 0, 0);
+      doc.text(val1, ML, y);
+      doc.text(val2, col2X, y);
+      y += LH_VAL + LH_PAIR;
+    }
 
-    setFont('bold', 8.5);
-    doc.text('AÑO QUE CURSA:', ML, y);
-    setFont('normal', 8.5);
-    doc.text(profData.anio, ML + doc.getTextWidth('AÑO QUE CURSA: '), y);
-    y += LH;
+    // ── CONTENT ──
+    field('NOMBRE Y APELLIDO DEL PROFESIONAL:', profData.nombre);
+    fieldPair('AÑO QUE CURSA:', profData.anio, 'LUGAR DE PRÁCTICAS:', profData.lugar);
+    fieldPair('SECTOR:', profData.sector, 'DÍAS QUE CONCURRE:', profData.dias);
+    field('SUPERVISOR DE PRÁCTICAS:', profData.supervisor);
+    fieldPair('MES:', mesLabel, 'AÑO:', anioLabel);
 
-    // Two items on same line
-    setFont('bold', 8.5);
-    doc.text('LUGAR DE PRÁCTICAS:', ML, y);
-    setFont('normal', 8.5);
-    doc.text(profData.lugar, ML + doc.getTextWidth('LUGAR DE PRÁCTICAS: '), y);
-    const sectorX = ML + doc.getTextWidth('LUGAR DE PRÁCTICAS: ' + profData.lugar) + 10;
-    setFont('bold', 8.5);
-    doc.text('SECTOR:', sectorX, y);
-    setFont('normal', 8.5);
-    doc.text(profData.sector, sectorX + doc.getTextWidth('SECTOR: '), y);
-    y += LH;
-
-    setFont('bold', 8.5);
-    doc.text('DÍAS QUE CONCURRE:', ML, y);
-    setFont('normal', 8.5);
-    doc.text(profData.dias, ML + doc.getTextWidth('DÍAS QUE CONCURRE: '), y);
-    y += LH;
-
-    setFont('bold', 8.5);
-    doc.text('SUPERVISOR DE PRÁCTICAS:', ML, y);
-    setFont('normal', 8.5);
-    doc.text(profData.supervisor, ML + doc.getTextWidth('SUPERVISOR DE PRÁCTICAS: '), y);
-    y += LH;
-
-    // MES / AÑO on same line
-    setFont('bold', 8.5);
-    doc.text('MES:', ML, y);
-    setFont('normal', 8.5);
-    doc.text(mesLabel, ML + doc.getTextWidth('MES: '), y);
-    const anioX = ML + doc.getTextWidth('MES: ' + mesLabel) + 10;
-    setFont('bold', 8.5);
-    doc.text('AÑO:', anioX, y);
-    setFont('normal', 8.5);
-    doc.text(anioLabel, anioX + doc.getTextWidth('AÑO: '), y);
-    y += 7;
+    // thin separator line
+    doc.setDrawColor(180, 195, 220);
+    doc.setLineWidth(0.3);
+    doc.line(ML, y, PW - MR, y);
+    y += 5;
 
     return y;
   }
 
   // ── TABLE HEADER (returns new Y) ──
   function drawTableHeader(y) {
-    const HDR_H = 12;
-    setFont('bold', 7.5);
-    doc.setTextColor(...WHITE);
+    const HDR_H = 14;
+    const colHeaders = [
+      ['PACIENTES', 'N° HC/DNI'],
+      ['DIAGNÓSTICO', 'DSM 5-CIE 11'],
+      ['ADMISIÓN', ''],
+      ['CONTROL', 'MEDICACIÓN'],
+      ['PSICOTERAPIA Y', 'CONTROL MÉDIC.']
+    ];
 
     let x = ML;
     cols.forEach((w, i) => {
-      // Fill
+      // Background
       doc.setFillColor(...BLUE_DARK);
       doc.setDrawColor(...BLUE_DARK);
+      doc.setLineWidth(0.3);
       doc.rect(x, y, w, HDR_H, 'FD');
 
-      // Header text (two lines)
-      const lines = [
-        ['PACIENTES','N° HC/DNI'],
-        ['DIAGNÓSTICO','DSM 5-CIE 11'],
-        ['ADMISIÓN',''],
-        ['CONTROL','MEDICACIÓN'],
-        ['PSICOTERAPIA Y','CONTROL MÉDIC.']
-      ][i];
+      // Text
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
 
-      if(lines[1]) {
-        doc.text(lines[0], x + w/2, y + 4,   { align:'center' });
-        doc.text(lines[1], x + w/2, y + 8.5, { align:'center' });
+      const line1 = colHeaders[i][0];
+      const line2 = colHeaders[i][1];
+
+      if (line2) {
+        doc.text(line1, x + w / 2, y + 4.5, { align: 'center' });
+        doc.text(line2, x + w / 2, y + 9.5, { align: 'center' });
       } else {
-        doc.text(lines[0], x + w/2, y + 6.5, { align:'center' });
+        doc.text(line1, x + w / 2, y + 7.5, { align: 'center' });
       }
+
       x += w;
     });
 
-    doc.setTextColor(...BLACK);
+    doc.setTextColor(0, 0, 0);
     return y + HDR_H;
   }
 
