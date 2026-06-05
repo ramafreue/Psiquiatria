@@ -1228,7 +1228,7 @@ function renderCard(reg) {
         </div>
         <div class="autor-badge">Registrado por: ${reg.autorNombre||'Desconocido'}</div>
       </div>
-      <div class="fecha-badge">${formatFecha(reg.fecha)}</div>
+
     </div>
     <div class="reg-body">
       <div class="reg-grid">
@@ -1700,15 +1700,12 @@ window.PROF_DATA = {
 window.MESES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 window.getMesAnioOptions = function() {
-  // Collect unique mes/año from registros of this user
   const set = new Set();
   todosRegistros.forEach(r => {
     if(r.autorUid !== currentUser.uid) return;
-    const f = r.fecha || r.fecha_ingreso || '';
-    if(f) {
-      const [y,m] = f.split('-');
-      if(y && m) set.add(y+'-'+m);
-    }
+    if(!r.fecha_ingreso) return;
+    const [y,m] = r.fecha_ingreso.split('-');
+    if(y && m) set.add(y+'-'+m);
   });
   return [...set].sort().reverse();
 }
@@ -1755,16 +1752,11 @@ window.cargarImpresion = function() {
 window.getRegistrosParaImpresion = function(mesAnio) {
   return todosRegistros.filter(r => {
     if(r.autorUid !== currentUser.uid) return false;
+    if(!r.fecha_ingreso) return false;
     if(!mesAnio) return true;
-    const f = r.fecha || r.fecha_ingreso || '';
-    if(!f) return false;
-    const [y,m] = f.split('-');
+    const [y,m] = r.fecha_ingreso.split('-');
     return (y+'-'+m) === mesAnio;
-  }).sort((a,b) => {
-    const fa = a.fecha||a.fecha_ingreso||'';
-    const fb = b.fecha||b.fecha_ingreso||'';
-    return fa.localeCompare(fb);
-  });
+  }).sort((a,b) => (a.fecha_ingreso||'').localeCompare(b.fecha_ingreso||''));
 }
 
 window.previewImpresion = function() {
