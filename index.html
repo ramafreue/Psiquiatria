@@ -239,7 +239,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .ac-wrap { position:relative; }
 .ac-input { width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text); background:#fafbff; outline:none; transition:border-color .2s,box-shadow .2s; }
 .ac-input:focus { border-color:var(--azul-mid); box-shadow:0 0 0 3px rgba(39,86,168,.12); background:white; }
-.ac-dropdown { position:absolute; top:100%; left:0; right:0; background:white; border:1.5px solid var(--azul-mid); border-top:none; border-radius:0 0 8px 8px; max-height:220px; overflow-y:auto; z-index:500; box-shadow:0 8px 20px rgba(26,58,107,.15); display:none; }
+.ac-dropdown { position:absolute; top:100%; left:0; right:0; background:white; border:1.5px solid var(--azul-mid); border-top:none; border-radius:0 0 8px 8px; max-height:220px; overflow-y:auto; z-index:1000; box-shadow:0 8px 20px rgba(26,58,107,.15); display:none; }
 .ac-dropdown.open { display:block; }
 .ac-item { padding:9px 12px; font-size:13px; cursor:pointer; border-bottom:1px solid #f0f3fa; display:flex; gap:8px; align-items:baseline; }
 .ac-item:last-child { border-bottom:none; }
@@ -363,8 +363,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 
 /* MULTI DIAGNÓSTICO */
-.diag-multi-wrap { display:flex; flex-direction:column; gap:0; border:1.5px solid var(--border); border-radius:8px; overflow:hidden; background:#fafbff; }
-.diag-slot { padding:0; border-bottom:1px solid var(--border); background:#fafbff; }
+.diag-multi-wrap { display:flex; flex-direction:column; gap:0; border:1.5px solid var(--border); border-radius:8px; overflow:visible; background:#fafbff; }
+.diag-slot { padding:0; border-bottom:1px solid var(--border); background:#fafbff; position:relative; }
 .diag-slot:last-of-type { border-bottom:none; }
 .diag-slot-inner { display:flex; align-items:center; gap:6px; padding:4px 6px 4px 10px; }
 .diag-slot-inner .ac-wrap { flex:1; }
@@ -554,88 +554,194 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
         <div class="form-row full">
         <div class="field">
           <label>Diagnóstico (CIE-10)</label>
-          <div class="diag-multi-wrap" id="e-cie10-multi">
-          <div class="diag-slot" id="e-cie10-slot-1" >
+          <div class="diag-multi-wrap" id="cie10-multi">
+          <div class="diag-slot" id="cie10-slot-1" >
             <div class="diag-slot-inner">
               <div class="ac-wrap" style="position:relative;flex:1">
                 <input type="text" id="ac-e-cie10-1" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
                 <div class="ac-dropdown" id="drop-e-cie10-1"></div>
               </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',1)" title="Quitar">✕</button>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',1)" title="Quitar">✕</button>
             </div>
             <div class="diag-selected-row" id="badge-e-cie10-1">
               <span class="ac-sel-code" id="badge-code-e-cie10-1"></span>
               <span class="ac-sel-label" id="badge-label-e-cie10-1"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie10',1)">✕</button>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie10',1)">✕</button>
             </div>
             <input type="hidden" id="diag-e-cie10-1">
           </div>
-          <div class="diag-slot" id="e-cie10-slot-2" style='display:none'>
+          <div class="diag-slot" id="cie10-slot-2" style='display:none'>
             <div class="diag-slot-inner">
               <div class="ac-wrap" style="position:relative;flex:1">
                 <input type="text" id="ac-e-cie10-2" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
                 <div class="ac-dropdown" id="drop-e-cie10-2"></div>
               </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',2)" title="Quitar">✕</button>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',2)" title="Quitar">✕</button>
             </div>
             <div class="diag-selected-row" id="badge-e-cie10-2">
               <span class="ac-sel-code" id="badge-code-e-cie10-2"></span>
               <span class="ac-sel-label" id="badge-label-e-cie10-2"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie10',2)">✕</button>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie10',2)">✕</button>
             </div>
             <input type="hidden" id="diag-e-cie10-2">
           </div>
-          <div class="diag-slot" id="e-cie10-slot-3" style='display:none'>
+          <div class="diag-slot" id="cie10-slot-3" style='display:none'>
             <div class="diag-slot-inner">
               <div class="ac-wrap" style="position:relative;flex:1">
                 <input type="text" id="ac-e-cie10-3" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
                 <div class="ac-dropdown" id="drop-e-cie10-3"></div>
               </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',3)" title="Quitar">✕</button>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',3)" title="Quitar">✕</button>
             </div>
             <div class="diag-selected-row" id="badge-e-cie10-3">
               <span class="ac-sel-code" id="badge-code-e-cie10-3"></span>
               <span class="ac-sel-label" id="badge-label-e-cie10-3"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie10',3)">✕</button>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie10',3)">✕</button>
             </div>
             <input type="hidden" id="diag-e-cie10-3">
           </div>
-          <div class="diag-slot" id="e-cie10-slot-4" style='display:none'>
+          <div class="diag-slot" id="cie10-slot-4" style='display:none'>
             <div class="diag-slot-inner">
               <div class="ac-wrap" style="position:relative;flex:1">
                 <input type="text" id="ac-e-cie10-4" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
                 <div class="ac-dropdown" id="drop-e-cie10-4"></div>
               </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',4)" title="Quitar">✕</button>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',4)" title="Quitar">✕</button>
             </div>
             <div class="diag-selected-row" id="badge-e-cie10-4">
               <span class="ac-sel-code" id="badge-code-e-cie10-4"></span>
               <span class="ac-sel-label" id="badge-label-e-cie10-4"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie10',4)">✕</button>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie10',4)">✕</button>
             </div>
             <input type="hidden" id="diag-e-cie10-4">
           </div>
-          <div class="diag-slot" id="e-cie10-slot-5" style='display:none'>
+          <div class="diag-slot" id="cie10-slot-5" style='display:none'>
             <div class="diag-slot-inner">
               <div class="ac-wrap" style="position:relative;flex:1">
                 <input type="text" id="ac-e-cie10-5" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
                 <div class="ac-dropdown" id="drop-e-cie10-5"></div>
               </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',5)" title="Quitar">✕</button>
+              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',5)" title="Quitar">✕</button>
             </div>
             <div class="diag-selected-row" id="badge-e-cie10-5">
               <span class="ac-sel-code" id="badge-code-e-cie10-5"></span>
               <span class="ac-sel-label" id="badge-label-e-cie10-5"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie10',5)">✕</button>
+              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie10',5)">✕</button>
             </div>
             <input type="hidden" id="diag-e-cie10-5">
           </div>
-          <button type="button" class="diag-add-btn" id="e-cie10-add-btn" onclick="addDiagSlot('e-cie10')">＋ Agregar diagnóstico</button>
+          <button type="button" class="diag-add-btn" id="cie10-add-btn" onclick="addDiagSlot('cie10')">＋ Agregar diagnóstico</button>
           </div>
         </div>
       </div>
 
 
+        <div class="form-row full" id="evol-section" style="max-width:100%;overflow:hidden;display:none">
+          <div class="field">
+            <label>Evolución</label>
+            <button type="button" class="evol-toggle-btn" id="evol-toggle-btn" onclick="toggleEvol()">
+              <span>Completar examen psicopatológico</span>
+              <span class="evol-arrow">▼</span>
+            </button>
+            <div class="evol-body" id="evol-body">
+              <div class="evol-item" style="background:#fffbeb;border-left:3px solid var(--oro);">
+                <div class="evol-item-title" style="color:var(--oro)">Aspectos Generales del Paciente</div>
+                <div class="evol-item-options" style="background:#fef9ec;border-left-color:var(--oro)">Describí aquí observaciones generales del paciente: estado general al ingreso, contexto de la consulta, motivo de consulta, antecedentes relevantes, impresión clínica inicial, o cualquier aspecto importante.</div>
+                <textarea id="evol_general" placeholder="Escribí las observaciones generales del paciente..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Presentación y Aspecto</div>
+                <div class="evol-item-options" >Saludable / Enfermizo / Incómodo / Avejentado / Juvenil / Infantil / Extravagante / Otro Aseado / No aseado / Aliñado / Desaliñado / Vestido acorde/desacorde a clima/situación</div>
+                <textarea id="evol_presentacion" placeholder="Observación sobre presentación y aspecto..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Actitud</div>
+                <div class="evol-item-options" >Colaboradora activa/pasiva / Amigable / Serena / Interesada / Franca / Defensiva / Seductora / Halagadora / Despectiva / Perpleja / Apática / Hostil / Amenazante / Reticente / Evasiva / Precavida / Suspicaz / Agitada / Melancólica / Oposicionista</div>
+                <textarea id="evol_actitud" placeholder="Observación sobre actitud..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Conciencia</div>
+                <div class="evol-item-options" >Lucidez / Alerta / Hipervigilancia / Somnolencia / Obnubilación / Estupor / Coma</div>
+                <textarea id="evol_conciencia" placeholder="Observación sobre conciencia..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Orientación</div>
+                <div class="evol-item-options" >Global / Parcial / En tiempo / espacio / persona</div>
+                <textarea id="evol_orientacion" placeholder="Observación sobre orientación..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Atención y Concentración</div>
+                <div class="evol-item-options" >Euprosexia / Aprosexia / Hipopresexia / Hiperprosexia / Paraprosexia (Hiperprosexia autorreflexiva) / Estable / Fluctuante</div>
+                <textarea id="evol_atencion" placeholder="Observación sobre atención y concentración..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Memoria</div>
+                <div class="evol-item-options" >Eumnesia / Amnesia (retrógrada – anterógrada – retroanterógrada – lacunar) / Hipomnesia / Hipermnesia / Paramnesias / Olvidos benignos</div>
+                <textarea id="evol_memoria" placeholder="Observación sobre memoria..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Senso-percepción</div>
+                <div class="evol-item-options" >Acelerada / Retardada / Abolida / Ilusiones / Alucinaciones verdaderas / Pseudoalucinaciones / Alucinaciones simples/complejas / visual/auditiva/olfativa/gustativa/táctil/cenestésica / Despersonalización / Desrealización / Onirismo / Alucinosis</div>
+                <textarea id="evol_senso" placeholder="Observación sobre senso-percepción..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Imaginación</div>
+                <div class="evol-item-options" >Aumentada / Disminuida / Fabulación / Mentira / Conservada</div>
+                <textarea id="evol_imaginacion" placeholder="Observación sobre imaginación..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Inteligencia e Información</div>
+                <div class="evol-item-options" >Inferior / Normal / Superior / CI:</div>
+                <textarea id="evol_inteligencia" placeholder="Observación sobre inteligencia e información..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Pensamiento</div>
+                <div class="evol-item-options" >Ritmo normal / alterado leve, moderado, grave / Taquipsiquia / Bradipsiquia / Viscosidad / Minuciosidad / Interceptación / Rigidez / Perseveración / Estereotipia / Disgregación / Asociaciones laxas / Incoherencia/Neologismos / Tangencialidad / Circunstancialidad / Abstracto / Concreto</div>
+                <textarea id="evol_pensamiento" placeholder="Observación sobre pensamiento..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Ideación</div>
+                <div class="evol-item-options" >Sin particularidades / Idea delirante (erotomaníaco-grandeza-celotípico-persecutorio-somático) / Idea obsesiva / Idea sobrevalorada / Idea fija / No presenta / presenta ideación de muerte / de suicidio / de que la vida no vale la pena ser vivida — Escala de Suicidalidad (Okasha, 1981): 1.¿Ha pensado que la vida no vale la pena? 2.¿Ha deseado estar muerto? 3.¿Ha pensado terminar con su vida? 4.¿Ha intentado suicidarse?</div>
+                <textarea id="evol_ideacion" placeholder="Observación sobre ideación..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Esquema Corporal</div>
+                <div class="evol-item-options" >Miembro fantasma / Hemisomatognosia / Anosognosia / Distorsiones de forma / Distorsiones de tamaño / Reduplicación</div>
+                <textarea id="evol_esquema" placeholder="Observación sobre esquema corporal..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Juicio</div>
+                <div class="evol-item-options" >Conservado / Insuficiente / Debilitado / Suspendido / Desviado / Condicionado catatímicamente / Condicionado por ideación obsesiva / Condicionado por craving</div>
+                <textarea id="evol_juicio" placeholder="Observación sobre juicio..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Lenguaje</div>
+                <div class="evol-item-options" >Sin particularidades / Microfonía / Macrofonía / Disartria / Disprosodia / Tartamudeo / Afasia / Tics vocales / Ecolalia / Neologismos / Discurso pobre / Verborrea / Mutismo / Estereotipia verbal</div>
+                <textarea id="evol_lenguaje" placeholder="Observación sobre lenguaje..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Afectividad</div>
+                <div class="evol-item-options" >Eutimia / Hipertimia (pacentera-displacentera) / Hipotimia / Irritabilidad / Aplanamiento / Embotamiento / Anhedonia / Ansiedad / Disforia / Miedo / Labilidad / Euforia / Tristeza / Perplejidad / Moria / Inadecuado / Culpa / Neotimia</div>
+                <textarea id="evol_afectividad" placeholder="Observación sobre afectividad..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Actividad Psicomotriz</div>
+                <div class="evol-item-options" >Agitación / Enlentecimiento / Tics / Estereotipias / Ecopraxia / Catalepsia / Cataplejía / Bloqueo / Estupor / Negativismo / Impulsión / Compulsión / Disquinesia / Acatisia / Distonía / Amaneramiento / Ritual / Automutilación / Temblor / Inquietud / Excitación / Apraxia / Hipocinesia / Bruxismo / Ambitendencia</div>
+                <textarea id="evol_psicomotriz" placeholder="Observación sobre actividad psicomotriz..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Voluntad</div>
+                <div class="evol-item-options" >Eubulia / Abulia / Hipobulia / Hiperbulia (productiva-improductiva)</div>
+                <textarea id="evol_voluntad" placeholder="Observación sobre voluntad..."></textarea>
+              </div>
+              <div class="evol-item" >
+                <div class="evol-item-title" >Hábitos</div>
+                <div class="evol-item-options" >Insomnio / Hipersomnia / Parasomnia / Sueñoinvertido / Eyaculación precoz / Hiporexia / Hiperexia / Atracón / Ingesta inadecuada / Eyaculación retardada / Vaginismo / Anorgasmia / Dispareunia / Hipersexualidad / Impotencia / Piernas inquietas</div>
+                <textarea id="evol_habitos" placeholder="Observación sobre hábitos..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="form-row full"><div class="field"><label>Tratamiento</label><textarea id="tratamiento" class="large" placeholder="Indicaciones farmacológicas, dosis, frecuencia..."></textarea></div></div>
         <div class="form-row full">
           <div class="field">
@@ -1227,7 +1333,8 @@ onAuthStateChanged(auth, user => {
     // Mostrar EVOLUCIÓN solo para usuario específico
     const EVOL_USER = 'solealbanycaballero@gmail.com';
     const showEvol = user.email === EVOL_USER;
-    document.getElementById('evol-section').style.display = showEvol ? 'grid' : 'none';
+    const evolSec = document.getElementById('evol-section');
+    if(evolSec) evolSec.style.display = showEvol ? 'block' : 'none';
     // Mostrar tab de impresión solo para usuario específico
     const siImp = document.getElementById('si-impresion');
     if(siImp) siImp.style.display = showEvol ? 'flex' : 'none';
@@ -1615,7 +1722,7 @@ window.abrirEdicion = (id) => {
   setAllDiags('e-cie10', reg.diagnostico_cie10||'', CIE10_DATA);
   setAllDiags('e-cie11', reg.diagnostico_cie11||'', CIE11_DATA);
   if(currentUser && currentUser.email === 'solealbanycaballero@gmail.com') {
-  document.getElementById('e-evol-section').style.display = 'grid';
+  const eEvolSec=document.getElementById('e-evol-section'); if(eEvolSec) eEvolSec.style.display='block';
   document.getElementById('e-evol_presentacion').value = reg.evol_presentacion||'';
   document.getElementById('e-evol_actitud').value = reg.evol_actitud||'';
   document.getElementById('e-evol_conciencia').value = reg.evol_conciencia||'';
@@ -1635,7 +1742,7 @@ window.abrirEdicion = (id) => {
   document.getElementById('e-evol_voluntad').value = reg.evol_voluntad||'';
   document.getElementById('e-evol_habitos').value = reg.evol_habitos||'';
   } else {
-  document.getElementById('e-evol-section').style.display = 'none';
+  const eEvolHide=document.getElementById('e-evol-section'); if(eEvolHide) eEvolHide.style.display='none';
   }
   document.getElementById('e-tratamiento').value=reg.tratamiento||'';
   document.getElementById('e-pendientes').value=reg.pendientes||'';
