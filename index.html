@@ -363,23 +363,30 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 
 /* MULTI DIAGNÓSTICO */
-.diag-multi-wrap { display:flex; flex-direction:column; gap:0; border:1.5px solid var(--border); border-radius:8px; overflow:visible; background:#fafbff; }
-.diag-slot { padding:0; border-bottom:1px solid var(--border); background:#fafbff; position:relative; }
-.diag-slot:last-of-type { border-bottom:none; }
-.diag-slot-inner { display:flex; align-items:center; gap:6px; padding:4px 6px 4px 10px; }
-.diag-slot-inner .ac-wrap { flex:1; }
-.diag-slot-inner .ac-input { border:none; background:transparent; padding:8px 4px; font-size:14px; border-radius:0; box-shadow:none !important; }
-.diag-slot-inner .ac-input:focus { background:white; }
-.diag-slot-inner .ac-dropdown { top:calc(100% + 2px); }
-.diag-slot-clear { background:none; border:none; color:var(--muted); cursor:pointer; font-size:16px; padding:4px 6px; line-height:1; flex-shrink:0; }
-.diag-slot-clear:hover { color:var(--rojo); }
-.diag-selected-row { padding:6px 10px; border-top:1px solid var(--border); background:var(--azul-light); display:none; align-items:center; gap:6px; }
-.diag-selected-row .ac-sel-code { font-size:10px; font-weight:700; color:var(--azul); }
-.diag-selected-row .ac-sel-label { font-size:12px; color:var(--text); flex:1; line-height:1.4; }
-.diag-selected-row .ac-clear { background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; padding:0; }
-.diag-add-btn { display:flex; align-items:center; gap:6px; background:white; border:none; border-top:1px dashed var(--border); padding:10px 14px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; color:var(--azul-mid); cursor:pointer; width:100%; justify-content:center; transition:background .2s; }
-.diag-add-btn:hover { background:var(--azul-light); }
-.diag-add-btn:disabled { opacity:.35; cursor:not-allowed; }
+.diag-container { border:1.5px solid var(--border); border-radius:8px; overflow:visible; background:#fafbff; position:relative; }
+.diag-search-row { display:flex; align-items:center; gap:4px; padding:4px 6px 4px 12px; border-bottom:1px solid var(--border); background:white; border-radius:8px 8px 0 0; }
+.diag-container.no-selected .diag-search-row { border-radius:8px; border-bottom:none; }
+.diag-search-input { flex:1; border:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text); outline:none; padding:8px 4px; }
+.diag-search-input::placeholder { color:#b0b8c8; }
+.diag-search-clear { background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer; padding:2px 6px; line-height:1; display:none; }
+.diag-search-clear.visible { display:block; }
+.diag-search-clear:hover { color:var(--rojo); }
+.diag-dropdown { position:absolute; top:100%; left:-1px; right:-1px; background:white; border:1.5px solid var(--azul-mid); border-top:none; border-radius:0 0 8px 8px; max-height:240px; overflow-y:auto; z-index:1000; box-shadow:0 8px 24px rgba(26,58,107,.18); display:none; margin-top:-1px; }
+.diag-dropdown.open { display:block; }
+.diag-dd-item { padding:9px 14px; font-size:13px; cursor:pointer; border-bottom:1px solid #f0f3fa; display:flex; gap:10px; align-items:baseline; }
+.diag-dd-item:last-child { border-bottom:none; }
+.diag-dd-item:hover, .diag-dd-item.sel { background:var(--azul-light); }
+.diag-dd-code { font-size:11px; font-weight:700; color:var(--azul-mid); min-width:56px; flex-shrink:0; }
+.diag-dd-label { color:var(--text); line-height:1.3; }
+.diag-selected-list { padding:0; }
+.diag-selected-item { display:flex; align-items:flex-start; gap:8px; padding:8px 12px; border-top:1px solid var(--border); background:var(--azul-light); }
+.diag-selected-item:first-child { border-top:none; }
+.diag-sel-texts { flex:1; }
+.diag-sel-code { font-size:10px; font-weight:700; color:var(--azul); display:block; margin-bottom:1px; }
+.diag-sel-label { font-size:12px; color:var(--text); line-height:1.4; }
+.diag-sel-remove { background:none; border:none; color:var(--muted); cursor:pointer; font-size:16px; padding:0 2px; line-height:1; flex-shrink:0; margin-top:1px; }
+.diag-sel-remove:hover { color:var(--rojo); }
+.diag-hint { font-size:11px; color:var(--muted); padding:8px 12px; text-align:center; border-top:1px solid var(--border); font-style:italic; }
 
 
 /* RESPONSIVE */
@@ -552,89 +559,35 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           Evaluación clínica
         </div>
         <div class="form-row full">
-        <div class="field">
-          <label>Diagnóstico (CIE-10)</label>
-          <div class="diag-multi-wrap" id="cie10-multi">
-          <div class="diag-slot" id="cie10-slot-1" >
-            <div class="diag-slot-inner">
-              <div class="ac-wrap" style="position:relative;flex:1">
-                <input type="text" id="ac-e-cie10-1" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
-                <div class="ac-dropdown" id="drop-e-cie10-1"></div>
+          <div class="field">
+            <label>Diagnóstico (CIE-10)</label>
+            <div class="diag-container no-selected" id="cie10-container">
+              <div class="diag-search-row">
+                <input type="text" id="cie10-search" class="diag-search-input" placeholder="Escribí para buscar diagnóstico..." autocomplete="off" oninput="diagSearch('cie10')" onkeydown="diagKeydown(event,'cie10')">
+                <button type="button" class="diag-search-clear" id="cie10-search-clear" onclick="diagClearSearch('cie10')">✕</button>
               </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',1)" title="Quitar">✕</button>
+              <div class="diag-dropdown" id="cie10-dropdown"></div>
+              <div class="diag-selected-list" id="cie10-selected"></div>
+              <div class="diag-hint" id="cie10-hint" style="display:none">Máximo 5 diagnósticos</div>
             </div>
-            <div class="diag-selected-row" id="badge-e-cie10-1">
-              <span class="ac-sel-code" id="badge-code-e-cie10-1"></span>
-              <span class="ac-sel-label" id="badge-label-e-cie10-1"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie10',1)">✕</button>
-            </div>
-            <input type="hidden" id="diag-e-cie10-1">
-          </div>
-          <div class="diag-slot" id="cie10-slot-2" style='display:none'>
-            <div class="diag-slot-inner">
-              <div class="ac-wrap" style="position:relative;flex:1">
-                <input type="text" id="ac-e-cie10-2" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
-                <div class="ac-dropdown" id="drop-e-cie10-2"></div>
-              </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',2)" title="Quitar">✕</button>
-            </div>
-            <div class="diag-selected-row" id="badge-e-cie10-2">
-              <span class="ac-sel-code" id="badge-code-e-cie10-2"></span>
-              <span class="ac-sel-label" id="badge-label-e-cie10-2"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie10',2)">✕</button>
-            </div>
-            <input type="hidden" id="diag-e-cie10-2">
-          </div>
-          <div class="diag-slot" id="cie10-slot-3" style='display:none'>
-            <div class="diag-slot-inner">
-              <div class="ac-wrap" style="position:relative;flex:1">
-                <input type="text" id="ac-e-cie10-3" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
-                <div class="ac-dropdown" id="drop-e-cie10-3"></div>
-              </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',3)" title="Quitar">✕</button>
-            </div>
-            <div class="diag-selected-row" id="badge-e-cie10-3">
-              <span class="ac-sel-code" id="badge-code-e-cie10-3"></span>
-              <span class="ac-sel-label" id="badge-label-e-cie10-3"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie10',3)">✕</button>
-            </div>
-            <input type="hidden" id="diag-e-cie10-3">
-          </div>
-          <div class="diag-slot" id="cie10-slot-4" style='display:none'>
-            <div class="diag-slot-inner">
-              <div class="ac-wrap" style="position:relative;flex:1">
-                <input type="text" id="ac-e-cie10-4" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
-                <div class="ac-dropdown" id="drop-e-cie10-4"></div>
-              </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',4)" title="Quitar">✕</button>
-            </div>
-            <div class="diag-selected-row" id="badge-e-cie10-4">
-              <span class="ac-sel-code" id="badge-code-e-cie10-4"></span>
-              <span class="ac-sel-label" id="badge-label-e-cie10-4"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie10',4)">✕</button>
-            </div>
-            <input type="hidden" id="diag-e-cie10-4">
-          </div>
-          <div class="diag-slot" id="cie10-slot-5" style='display:none'>
-            <div class="diag-slot-inner">
-              <div class="ac-wrap" style="position:relative;flex:1">
-                <input type="text" id="ac-e-cie10-5" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
-                <div class="ac-dropdown" id="drop-e-cie10-5"></div>
-              </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie10',5)" title="Quitar">✕</button>
-            </div>
-            <div class="diag-selected-row" id="badge-e-cie10-5">
-              <span class="ac-sel-code" id="badge-code-e-cie10-5"></span>
-              <span class="ac-sel-label" id="badge-label-e-cie10-5"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie10',5)">✕</button>
-            </div>
-            <input type="hidden" id="diag-e-cie10-5">
-          </div>
-          <button type="button" class="diag-add-btn" id="cie10-add-btn" onclick="addDiagSlot('cie10')">＋ Agregar diagnóstico</button>
+            <input type="hidden" id="cie10-value">
           </div>
         </div>
-      </div>
-
+        <div class="form-row full">
+          <div class="field">
+            <label>Diagnóstico (CIE-11)</label>
+            <div class="diag-container no-selected" id="cie11-container">
+              <div class="diag-search-row">
+                <input type="text" id="cie11-search" class="diag-search-input" placeholder="Escribí para buscar diagnóstico..." autocomplete="off" oninput="diagSearch('cie11')" onkeydown="diagKeydown(event,'cie11')">
+                <button type="button" class="diag-search-clear" id="cie11-search-clear" onclick="diagClearSearch('cie11')">✕</button>
+              </div>
+              <div class="diag-dropdown" id="cie11-dropdown"></div>
+              <div class="diag-selected-list" id="cie11-selected"></div>
+              <div class="diag-hint" id="cie11-hint" style="display:none">Máximo 5 diagnósticos</div>
+            </div>
+            <input type="hidden" id="cie11-value">
+          </div>
+        </div>
 
         <div class="form-row full" id="evol-section" style="max-width:100%;overflow:hidden;display:none">
           <div class="field">
@@ -646,7 +599,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <div class="evol-body" id="evol-body">
               <div class="evol-item" style="background:#fffbeb;border-left:3px solid var(--oro);">
                 <div class="evol-item-title" style="color:var(--oro)">Aspectos Generales del Paciente</div>
-                <div class="evol-item-options" style="background:#fef9ec;border-left-color:var(--oro)">Describí aquí observaciones generales del paciente: estado general al ingreso, contexto de la consulta, motivo de consulta, antecedentes relevantes, impresión clínica inicial, o cualquier aspecto importante.</div>
+                
                 <textarea id="evol_general" placeholder="Escribí las observaciones generales del paciente..."></textarea>
               </div>
               <div class="evol-item" >
@@ -743,88 +696,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           </div>
         </div>
         <div class="form-row full"><div class="field"><label>Tratamiento</label><textarea id="tratamiento" class="large" placeholder="Indicaciones farmacológicas, dosis, frecuencia..."></textarea></div></div>
-        <div class="form-row full">
-          <div class="field">
-            <label>Diagnóstico (CIE-11)</label>
-            <div class="diag-multi-wrap" id="cie11-multi">
-          <div class="diag-slot" id="cie11-slot-1" >
-            <div class="diag-slot-inner">
-              <div class="ac-wrap" style="position:relative;flex:1">
-                <input type="text" id="ac-cie11-1" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
-                <div class="ac-dropdown" id="drop-cie11-1"></div>
-              </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',1)" title="Quitar">✕</button>
-            </div>
-            <div class="diag-selected-row" id="badge-cie11-1">
-              <span class="ac-sel-code" id="badge-code-cie11-1"></span>
-              <span class="ac-sel-label" id="badge-label-cie11-1"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie11',1)">✕</button>
-            </div>
-            <input type="hidden" id="diag-cie11-1">
-          </div>
-          <div class="diag-slot" id="cie11-slot-2" style='display:none'>
-            <div class="diag-slot-inner">
-              <div class="ac-wrap" style="position:relative;flex:1">
-                <input type="text" id="ac-cie11-2" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
-                <div class="ac-dropdown" id="drop-cie11-2"></div>
-              </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',2)" title="Quitar">✕</button>
-            </div>
-            <div class="diag-selected-row" id="badge-cie11-2">
-              <span class="ac-sel-code" id="badge-code-cie11-2"></span>
-              <span class="ac-sel-label" id="badge-label-cie11-2"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie11',2)">✕</button>
-            </div>
-            <input type="hidden" id="diag-cie11-2">
-          </div>
-          <div class="diag-slot" id="cie11-slot-3" style='display:none'>
-            <div class="diag-slot-inner">
-              <div class="ac-wrap" style="position:relative;flex:1">
-                <input type="text" id="ac-cie11-3" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
-                <div class="ac-dropdown" id="drop-cie11-3"></div>
-              </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',3)" title="Quitar">✕</button>
-            </div>
-            <div class="diag-selected-row" id="badge-cie11-3">
-              <span class="ac-sel-code" id="badge-code-cie11-3"></span>
-              <span class="ac-sel-label" id="badge-label-cie11-3"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie11',3)">✕</button>
-            </div>
-            <input type="hidden" id="diag-cie11-3">
-          </div>
-          <div class="diag-slot" id="cie11-slot-4" style='display:none'>
-            <div class="diag-slot-inner">
-              <div class="ac-wrap" style="position:relative;flex:1">
-                <input type="text" id="ac-cie11-4" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
-                <div class="ac-dropdown" id="drop-cie11-4"></div>
-              </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',4)" title="Quitar">✕</button>
-            </div>
-            <div class="diag-selected-row" id="badge-cie11-4">
-              <span class="ac-sel-code" id="badge-code-cie11-4"></span>
-              <span class="ac-sel-label" id="badge-label-cie11-4"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie11',4)">✕</button>
-            </div>
-            <input type="hidden" id="diag-cie11-4">
-          </div>
-          <div class="diag-slot" id="cie11-slot-5" style='display:none'>
-            <div class="diag-slot-inner">
-              <div class="ac-wrap" style="position:relative;flex:1">
-                <input type="text" id="ac-cie11-5" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
-                <div class="ac-dropdown" id="drop-cie11-5"></div>
-              </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('cie11',5)" title="Quitar">✕</button>
-            </div>
-            <div class="diag-selected-row" id="badge-cie11-5">
-              <span class="ac-sel-code" id="badge-code-cie11-5"></span>
-              <span class="ac-sel-label" id="badge-label-cie11-5"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('cie11',5)">✕</button>
-            </div>
-            <input type="hidden" id="diag-cie11-5">
-          </div>
-              <button type="button" class="diag-add-btn" id="cie11-add-btn" onclick="addDiagSlot('cie11')">＋ Agregar diagnóstico</button>
-            </div>
-          </div>
+        <div class="form-row full">          </div>
         </div>
         <div class="form-row full"><div class="field"><label>Pendientes</label><textarea id="pendientes" class="large" placeholder="Estudios, interconsultas, alertas, próxima cita..."></textarea></div></div>
         <button class="btn btn-primary" id="btn-guardar" onclick="guardarRegistro()">
@@ -929,238 +801,31 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       <div class="form-row full">
         <div class="field">
           <label>Diagnóstico (CIE-10)</label>
-          <div class="diag-multi-wrap" id="e-cie10-multi">
-        <div class="diag-slot" id="e-cie10-slot-1" >
-          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',1)" title="Quitar">✕</button></div>
-          <div class="ac-wrap">
-            <input type="text" id="ac-e-cie10-1" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-            <div class="ac-dropdown" id="drop-e-cie10-1"></div>
+          <div class="diag-container no-selected" id="e-cie10-container">
+            <div class="diag-search-row">
+              <input type="text" id="e-cie10-search" class="diag-search-input" placeholder="Escribí para buscar diagnóstico..." autocomplete="off" oninput="diagSearch('e-cie10')" onkeydown="diagKeydown(event,'e-cie10')">
+              <button type="button" class="diag-search-clear" id="e-cie10-search-clear" onclick="diagClearSearch('e-cie10')">✕</button>
+            </div>
+            <div class="diag-dropdown" id="e-cie10-dropdown"></div>
+            <div class="diag-selected-list" id="e-cie10-selected"></div>
+            <div class="diag-hint" id="e-cie10-hint" style="display:none">Máximo 5 diagnósticos</div>
           </div>
-          <div class="ac-selected-badge" id="badge-e-cie10-1" style="display:none"></div>
-          <input type="hidden" id="diag-e-cie10-1">
-        </div>
-        <div class="diag-slot" id="e-cie10-slot-2" style='display:none'>
-          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',2)" title="Quitar">✕</button></div>
-          <div class="ac-wrap">
-            <input type="text" id="ac-e-cie10-2" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-            <div class="ac-dropdown" id="drop-e-cie10-2"></div>
-          </div>
-          <div class="ac-selected-badge" id="badge-e-cie10-2" style="display:none"></div>
-          <input type="hidden" id="diag-e-cie10-2">
-        </div>
-        <div class="diag-slot" id="e-cie10-slot-3" style='display:none'>
-          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',3)" title="Quitar">✕</button></div>
-          <div class="ac-wrap">
-            <input type="text" id="ac-e-cie10-3" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-            <div class="ac-dropdown" id="drop-e-cie10-3"></div>
-          </div>
-          <div class="ac-selected-badge" id="badge-e-cie10-3" style="display:none"></div>
-          <input type="hidden" id="diag-e-cie10-3">
-        </div>
-        <div class="diag-slot" id="e-cie10-slot-4" style='display:none'>
-          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',4)" title="Quitar">✕</button></div>
-          <div class="ac-wrap">
-            <input type="text" id="ac-e-cie10-4" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-            <div class="ac-dropdown" id="drop-e-cie10-4"></div>
-          </div>
-          <div class="ac-selected-badge" id="badge-e-cie10-4" style="display:none"></div>
-          <input type="hidden" id="diag-e-cie10-4">
-        </div>
-        <div class="diag-slot" id="e-cie10-slot-5" style='display:none'>
-          <div style="text-align:right;margin-bottom:4px"><button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie10',5)" title="Quitar">✕</button></div>
-          <div class="ac-wrap">
-            <input type="text" id="ac-e-cie10-5" class="ac-input" placeholder="Escribí para buscar..." autocomplete="off">
-            <div class="ac-dropdown" id="drop-e-cie10-5"></div>
-          </div>
-          <div class="ac-selected-badge" id="badge-e-cie10-5" style="display:none"></div>
-          <input type="hidden" id="diag-e-cie10-5">
-        </div>
-          <button type="button" class="diag-add-btn" id="e-cie10-add-btn" onclick="addDiagSlot('e-cie10')">+ Agregar diagnóstico</button>
-          </div>
+          <input type="hidden" id="e-cie10-value">
         </div>
       </div>
       <div class="form-row full">
         <div class="field">
           <label>Diagnóstico (CIE-11)</label>
-          <div class="diag-multi-wrap" id="e-cie11-multi">
-          <div class="diag-slot" id="e-cie11-slot-1" >
-            <div class="diag-slot-inner">
-              <div class="ac-wrap" style="position:relative;flex:1">
-                <input type="text" id="ac-e-cie11-1" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
-                <div class="ac-dropdown" id="drop-e-cie11-1"></div>
-              </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',1)" title="Quitar">✕</button>
+          <div class="diag-container no-selected" id="e-cie11-container">
+            <div class="diag-search-row">
+              <input type="text" id="e-cie11-search" class="diag-search-input" placeholder="Escribí para buscar diagnóstico..." autocomplete="off" oninput="diagSearch('e-cie11')" onkeydown="diagKeydown(event,'e-cie11')">
+              <button type="button" class="diag-search-clear" id="e-cie11-search-clear" onclick="diagClearSearch('e-cie11')">✕</button>
             </div>
-            <div class="diag-selected-row" id="badge-e-cie11-1">
-              <span class="ac-sel-code" id="badge-code-e-cie11-1"></span>
-              <span class="ac-sel-label" id="badge-label-e-cie11-1"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie11',1)">✕</button>
-            </div>
-            <input type="hidden" id="diag-e-cie11-1">
+            <div class="diag-dropdown" id="e-cie11-dropdown"></div>
+            <div class="diag-selected-list" id="e-cie11-selected"></div>
+            <div class="diag-hint" id="e-cie11-hint" style="display:none">Máximo 5 diagnósticos</div>
           </div>
-          <div class="diag-slot" id="e-cie11-slot-2" style='display:none'>
-            <div class="diag-slot-inner">
-              <div class="ac-wrap" style="position:relative;flex:1">
-                <input type="text" id="ac-e-cie11-2" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
-                <div class="ac-dropdown" id="drop-e-cie11-2"></div>
-              </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',2)" title="Quitar">✕</button>
-            </div>
-            <div class="diag-selected-row" id="badge-e-cie11-2">
-              <span class="ac-sel-code" id="badge-code-e-cie11-2"></span>
-              <span class="ac-sel-label" id="badge-label-e-cie11-2"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie11',2)">✕</button>
-            </div>
-            <input type="hidden" id="diag-e-cie11-2">
-          </div>
-          <div class="diag-slot" id="e-cie11-slot-3" style='display:none'>
-            <div class="diag-slot-inner">
-              <div class="ac-wrap" style="position:relative;flex:1">
-                <input type="text" id="ac-e-cie11-3" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
-                <div class="ac-dropdown" id="drop-e-cie11-3"></div>
-              </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',3)" title="Quitar">✕</button>
-            </div>
-            <div class="diag-selected-row" id="badge-e-cie11-3">
-              <span class="ac-sel-code" id="badge-code-e-cie11-3"></span>
-              <span class="ac-sel-label" id="badge-label-e-cie11-3"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie11',3)">✕</button>
-            </div>
-            <input type="hidden" id="diag-e-cie11-3">
-          </div>
-          <div class="diag-slot" id="e-cie11-slot-4" style='display:none'>
-            <div class="diag-slot-inner">
-              <div class="ac-wrap" style="position:relative;flex:1">
-                <input type="text" id="ac-e-cie11-4" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
-                <div class="ac-dropdown" id="drop-e-cie11-4"></div>
-              </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',4)" title="Quitar">✕</button>
-            </div>
-            <div class="diag-selected-row" id="badge-e-cie11-4">
-              <span class="ac-sel-code" id="badge-code-e-cie11-4"></span>
-              <span class="ac-sel-label" id="badge-label-e-cie11-4"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie11',4)">✕</button>
-            </div>
-            <input type="hidden" id="diag-e-cie11-4">
-          </div>
-          <div class="diag-slot" id="e-cie11-slot-5" style='display:none'>
-            <div class="diag-slot-inner">
-              <div class="ac-wrap" style="position:relative;flex:1">
-                <input type="text" id="ac-e-cie11-5" class="ac-input" placeholder="Buscar diagnóstico..." autocomplete="off">
-                <div class="ac-dropdown" id="drop-e-cie11-5"></div>
-              </div>
-              <button type="button" class="diag-slot-clear" onclick="clearDiagSlot('e-cie11',5)" title="Quitar">✕</button>
-            </div>
-            <div class="diag-selected-row" id="badge-e-cie11-5">
-              <span class="ac-sel-code" id="badge-code-e-cie11-5"></span>
-              <span class="ac-sel-label" id="badge-label-e-cie11-5"></span>
-              <button type="button" class="ac-clear" onclick="clearDiagSlot('e-cie11',5)">✕</button>
-            </div>
-            <input type="hidden" id="diag-e-cie11-5">
-          </div>
-          <button type="button" class="diag-add-btn" id="e-cie11-add-btn" onclick="addDiagSlot('e-cie11')">＋ Agregar diagnóstico</button>
-          </div>
-        </div>
-      </div>
-      <div class="form-row full" id="e-evol-section" style="display:none">
-        <div class="field">
-          <label>Evolución</label>
-          <button type="button" class="evol-toggle-btn" id="e-evol-toggle-btn" onclick="toggleEvolEdit()">
-            <span>Completar examen psicopatológico</span>
-            <span class="evol-arrow">▼</span>
-          </button>
-          <div class="evol-body" id="e-evol-body">
-              <div class="evol-item">
-                <div class="evol-item-title">Presentación y Aspecto</div>
-                <div class="evol-item-options">Saludable / Enfermizo / Incómodo / Avejentado / Juvenil / Infantil / Extravagante / Otro Aseado / No aseado / Aliñado / Desaliñado / Vestido acorde/desacorde a clima/situación</div>
-                <textarea id="e-evol_presentacion" placeholder="Escribí tu observación sobre presentación y aspecto..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Actitud</div>
-                <div class="evol-item-options">Colaboradora activa/pasiva / Amigable / Serena / Interesada / Franca / Defensiva / Seductora / Halagadora / Despectiva / Perpleja / Apática / Hostil / Amenazante / Reticente / Evasiva / Precavida / Suspicaz / Agitada / Melancólica / Oposicionista</div>
-                <textarea id="e-evol_actitud" placeholder="Escribí tu observación sobre actitud..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Conciencia</div>
-                <div class="evol-item-options">Lucidez / Alerta / Hipervigilancia / Somnolencia / Obnubilación / Estupor / Coma</div>
-                <textarea id="e-evol_conciencia" placeholder="Escribí tu observación sobre conciencia..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Orientación</div>
-                <div class="evol-item-options">Global / Parcial / En tiempo / espacio / persona</div>
-                <textarea id="e-evol_orientacion" placeholder="Escribí tu observación sobre orientación..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Atención y Concentración</div>
-                <div class="evol-item-options">Euprosexia / Aprosexia / Hipopresexia / Hiperprosexia / Paraprosexia (Hiperprosexia autorreflexiva - hipermetamorfosis) / Estable / Fluctuante</div>
-                <textarea id="e-evol_atencion" placeholder="Escribí tu observación sobre atención y concentración..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Memoria</div>
-                <div class="evol-item-options">Eumnesia / Amnesia (retrógrada – anterógrada – retroanterógrada – lacunar) / Hipomnesia / Hipermnesia (memoria panorámica - ecmnesia) / Paramnesias (alucinación de la memoria – ilusión de la memoria – paramnesia replicadora de Pick – falsos reconocimientos – ya visto – jamás visto – fabulación de relleno) / Olvidos benignos</div>
-                <textarea id="e-evol_memoria" placeholder="Escribí tu observación sobre memoria..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Senso-percepción</div>
-                <div class="evol-item-options">Acelerada / Retardada / Abolida / Ilusiones / Alucinaciones verdaderas / Pseudoalucinaciones / Alucinaciones simples/complejas / visual/auditiva/olfativa/gustativa/táctil/cenestésica/hipnagógica/hinapómpica / Despersonalización / Desrealización / Onirismo / Alucinosis</div>
-                <textarea id="e-evol_senso" placeholder="Escribí tu observación sobre senso-percepción..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Imaginación</div>
-                <div class="evol-item-options">Aumentada / Disminuida / Fabulación / Mentira / Conservada</div>
-                <textarea id="e-evol_imaginacion" placeholder="Escribí tu observación sobre imaginación..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Inteligencia e Información</div>
-                <div class="evol-item-options">Inferior / Normal / Superior / CI:</div>
-                <textarea id="e-evol_inteligencia" placeholder="Escribí tu observación sobre inteligencia e información..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Pensamiento</div>
-                <div class="evol-item-options">Ritmo normal / alterado leve, moderado, grave / Taquipsiquia (mentismo-fuga de ideas) / Bradipsiquia (inhibición / estupor / inercia) / Viscosidad / Minuciosidad / Interceptación / Rigidez / Perseveración / Estereotipia / Disgregación / Asociaciones laxas / Incoherencia/Neologismos / Tangencialidad / Circunstancialidad / Abstracto / Concreto</div>
-                <textarea id="e-evol_pensamiento" placeholder="Escribí tu observación sobre pensamiento..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Ideación</div>
-                <div class="evol-item-options">Sin particularidades / Idea delirante (erotomaníaco-grandeza-celotípico-persecutorio-somático) / Idea obsesiva / Idea sobrevalorada / Idea fija / No presenta / presenta ideación de muerte / de suicidio / de que la vida no vale la pena ser vivida — Escala de Suicidalidad (Okasha, 1981): 1. ¿Has pensado alguna vez que la vida no vale la pena? 2. ¿Has deseado alguna vez estar muerto? 3. ¿Has pensado alguna vez terminar con tu vida? 4. ¿Has intentado suicidarte?</div>
-                <textarea id="e-evol_ideacion" placeholder="Escribí tu observación sobre ideación..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Esquema Corporal</div>
-                <div class="evol-item-options">Miembro fantasma / Hemisomatognosia / Anosognosia / Distorsiones de forma / Distorsiones de tamaño / Reduplicación</div>
-                <textarea id="e-evol_esquema" placeholder="Escribí tu observación sobre esquema corporal..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Juicio</div>
-                <div class="evol-item-options">Conservado / Insuficiente / Debilitado / Suspendido / Desviado / Condicionado catatímicamente / Condicionado por ideación obsesiva / Condicionado por craving — Insuficiencia psíquica: 1) leve, moderada o grave; 2) permanentes o transitorias; 3) global o parcial; 4) génico, congénito o adquirido; 5) tipo y grado de incapacidad que genera</div>
-                <textarea id="e-evol_juicio" placeholder="Escribí tu observación sobre juicio..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Lenguaje</div>
-                <div class="evol-item-options">Sin particularidades / Microfonía / Macrofonía / Disartria / Disprosodia / Tartamudeo / Afasia / Tics vocales / Ecolalia / Neologismos / Discurso pobre / Verborrea / Mutismo / Estereotipia verbal</div>
-                <textarea id="e-evol_lenguaje" placeholder="Escribí tu observación sobre lenguaje..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Afectividad</div>
-                <div class="evol-item-options">Eutimia / Hipertimia (pacentera-displacentera) / Hipotimia / Irritabilidad / Aplanamiento / Embotamiento / Anhedonia / Ansiedad / Disforia / Miedo / Labilidad / Euforia / Tristeza / Perplejidad / Moria / Inadecuado / Culpa / Neotimia</div>
-                <textarea id="e-evol_afectividad" placeholder="Escribí tu observación sobre afectividad..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Actividad Psicomotriz</div>
-                <div class="evol-item-options">Agitación / Enlentecimiento / Tics / Estereotipias / Ecopraxia / Catalepsia / Cataplejía / Bloqueo / Estupor / Negativismo / Impulsión / Compulsión / Disquinesia / Acatisia / Distonía / Amaneramiento / Ritual / Automutilación / Temblor / Inquietud / Excitación / Apraxia / Hipocinesia / Disquinesia / Bruxismo / Ambitendencia</div>
-                <textarea id="e-evol_psicomotriz" placeholder="Escribí tu observación sobre actividad psicomotriz..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Voluntad</div>
-                <div class="evol-item-options">Eubulia / Abulia / Hipobulia / Hiperbulia (productiva-improductiva)</div>
-                <textarea id="e-evol_voluntad" placeholder="Escribí tu observación sobre voluntad..."></textarea>
-              </div>
-              <div class="evol-item">
-                <div class="evol-item-title">Hábitos</div>
-                <div class="evol-item-options">Insomnio / Hipersomnia / Parasomnia / Sueñoinvertido / Eyaculación precoz / Hiporexia / Hiperexia / Atracón / Ingesta inadecuada / Eyaculación retardada / Vaginismo / Anorgasmia / Dispareunia / Hipersexualidad / Impotencia / Piernas inquietas</div>
-                <textarea id="e-evol_habitos" placeholder="Escribí tu observación sobre hábitos..."></textarea>
-              </div>
-          </div>
+          <input type="hidden" id="e-cie11-value">
         </div>
       </div>
       <div class="form-row full"><div class="field"><label>Tratamiento</label><textarea id="e-tratamiento" class="large"></textarea></div></div>
@@ -1405,8 +1070,8 @@ window.guardarRegistro = async () => {
       fecha_egreso: document.getElementById('fecha_egreso').value,
       ubicacion: ubicVal,
       ubicacion_otro: ubicVal==='OTRO'?document.getElementById('ubicacion_otro').value.trim():'',
-      diagnostico_cie10: getAllDiags('cie10'),
-      diagnostico_cie11: getAllDiags('cie11'),
+      diagnostico_cie10: diagGetValue('cie10'),
+      diagnostico_cie11: diagGetValue('cie11'),
       evol_general: document.getElementById('evol_general').value.trim(),
       evol_presentacion: document.getElementById('evol_presentacion').value.trim(),
       evol_actitud: document.getElementById('evol_actitud').value.trim(),
@@ -1433,7 +1098,7 @@ window.guardarRegistro = async () => {
       creadoEn: serverTimestamp()
     });
     ['apellido','nombre','dni','edad','direccion','fecha_ingreso','fecha_egreso','diagnostico_cie10','diagnostico_cie11','tratamiento','pendientes','ubicacion_otro'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-    ['cie10','cie11'].forEach(p=>{ for(let i=1;i<=5;i++) clearDiagSlot(p,i); });
+    ['cie10','cie11'].forEach(p=>{ diagSelected[p]=[]; diagRender(p); const inp=document.getElementById(p+'-search'); if(inp) inp.value=''; });
         ['evol_general','evol_presentacion','evol_actitud','evol_conciencia','evol_orientacion','evol_atencion','evol_memoria','evol_senso','evol_imaginacion','evol_inteligencia','evol_pensamiento','evol_ideacion','evol_esquema','evol_juicio','evol_lenguaje','evol_afectividad','evol_psicomotriz','evol_voluntad','evol_habitos'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
     document.getElementById('ubicacion').value='';
     document.getElementById('otro-wrap').style.display='none';
@@ -1719,8 +1384,8 @@ window.abrirEdicion = (id) => {
   document.getElementById('e-ubicacion').value=reg.ubicacion||'';
   document.getElementById('e-ubicacion_otro').value=reg.ubicacion_otro||'';
   document.getElementById('e-otro-wrap').style.display=reg.ubicacion==='OTRO'?'grid':'none';
-  setAllDiags('e-cie10', reg.diagnostico_cie10||'', CIE10_DATA);
-  setAllDiags('e-cie11', reg.diagnostico_cie11||'', CIE11_DATA);
+  diagSetValue('e-cie10', reg.diagnostico_cie10||'');
+  diagSetValue('e-cie11', reg.diagnostico_cie11||'');
   if(currentUser && currentUser.email === 'solealbanycaballero@gmail.com') {
   const eEvolSec=document.getElementById('e-evol-section'); if(eEvolSec) eEvolSec.style.display='block';
   document.getElementById('e-evol_presentacion').value = reg.evol_presentacion||'';
@@ -1752,7 +1417,7 @@ window.abrirEdicion = (id) => {
 window.cerrarModal = () => {
   document.getElementById('modal-overlay').classList.remove('open');
   editandoId=null;
-  ['e-cie10','e-cie11'].forEach(p=>{ for(let i=1;i<=5;i++) clearDiagSlot(p,i); });
+  ['e-cie10','e-cie11'].forEach(p=>{ diagSelected[p]=[]; diagRender(p); const inp=document.getElementById(p+'-search'); if(inp) inp.value=''; });
   // reset evol edit fields
   ['e-evol_presentacion','e-evol_actitud','e-evol_conciencia','e-evol_orientacion',
    'e-evol_atencion','e-evol_memoria','e-evol_senso','e-evol_imaginacion',
@@ -1780,8 +1445,8 @@ window.guardarEdicion = async () => {
       fecha_egreso:document.getElementById('e-fecha_egreso').value,
       ubicacion:ubicVal,
       ubicacion_otro:ubicVal==='OTRO'?document.getElementById('e-ubicacion_otro').value.trim():'',
-      diagnostico_cie10: getAllDiags('e-cie10'),
-      diagnostico_cie11: getAllDiags('e-cie11'),
+      diagnostico_cie10: diagGetValue('e-cie10'),
+      diagnostico_cie11: diagGetValue('e-cie11'),
       evol_presentacion:document.getElementById('e-evol_presentacion').value.trim(),
       evol_actitud:document.getElementById('e-evol_actitud').value.trim(),
       evol_conciencia:document.getElementById('e-evol_conciencia').value.trim(),
@@ -1917,73 +1582,6 @@ function setAcValue(inputId, badgeId, hiddenId, fullVal) {
   badge.style.display = 'inline-flex';
 }
 
-// ── INIT MULTI-DIAGNOSIS AUTOCOMPLETES ──
-function initDiagSlot(prefix, slotNum, dataArr) {
-  const inputId  = 'ac-'    + prefix + '-' + slotNum;
-  const dropId   = 'drop-'  + prefix + '-' + slotNum;
-  const badgeId  = 'badge-' + prefix + '-' + slotNum;
-  const hiddenId = 'diag-'  + prefix + '-' + slotNum;
-  if(document.getElementById(inputId)) buildAutocomplete(inputId, dropId, badgeId, dataArr, hiddenId);
-}
-['cie10','cie11','e-cie10','e-cie11'].forEach(pfx => {
-  const data = pfx.includes('cie11') ? CIE11_DATA : CIE10_DATA;
-  initDiagSlot(pfx, 1, data);
-});
-window.addDiagSlot = (prefix) => {
-  const data = prefix.includes('cie11') ? CIE11_DATA : CIE10_DATA;
-  for(let i=2;i<=5;i++){
-    const slot = document.getElementById(prefix+'-slot-'+i);
-    if(slot && slot.style.display==='none'){
-      slot.style.display='block';
-      initDiagSlot(prefix, i, data);
-      if(i===5){ const btn=document.getElementById(prefix+'-add-btn'); if(btn) btn.disabled=true; }
-      return;
-    }
-  }
-};
-window.clearDiagSlot = (prefix, num) => {
-  const hid = 'diag-'+prefix+'-'+num;
-  const bid = 'badge-'+prefix+'-'+num;
-  const iid = 'ac-'+prefix+'-'+num;
-  const slot = document.getElementById(prefix+'-slot-'+num);
-  const h = document.getElementById(hid); if(h) h.value='';
-  const b = document.getElementById(bid);
-  if(b){ b.style.display='none';
-    const ce=document.getElementById('badge-code-'+prefix+'-'+num); if(ce) ce.textContent='';
-    const le=document.getElementById('badge-label-'+prefix+'-'+num); if(le) le.textContent='';
-  }
-  const inp = document.getElementById(iid); if(inp){inp.value='';inp.placeholder='Buscar diagnóstico...';}
-  if(num>1 && slot){ slot.style.display='none'; const btn=document.getElementById(prefix+'-add-btn'); if(btn) btn.disabled=false; }
-};
-function getAllDiags(prefix) {
-  const vals=[];
-  for(let i=1;i<=5;i++){ const v=document.getElementById('diag-'+prefix+'-'+i); if(v&&v.value.trim()) vals.push(v.value.trim()); }
-  return vals.join(' | ');
-}
-function setAllDiags(prefix, combined, dataArr) {
-  for(let i=1;i<=5;i++) clearDiagSlot(prefix, i);
-  if(!combined) return;
-  const parts = combined.split(' | ').filter(Boolean);
-  parts.forEach((val, idx) => {
-    const n = idx+1;
-    if(n>1){ const slot=document.getElementById(prefix+'-slot-'+n); if(slot){slot.style.display='block'; initDiagSlot(prefix,n,dataArr);} }
-    // Set value directly in new structure
-    const hid = document.getElementById('diag-'+prefix+'-'+n);
-    if(hid) hid.value = val;
-    const spaceIdx = val.indexOf(' ');
-    const code = spaceIdx>-1 ? val.substring(0,spaceIdx) : val;
-    const label = spaceIdx>-1 ? val.substring(spaceIdx+1) : '';
-    const badge = document.getElementById('badge-'+prefix+'-'+n);
-    if(badge){
-      const ce=document.getElementById('badge-code-'+prefix+'-'+n); if(ce) ce.textContent=code;
-      const le=document.getElementById('badge-label-'+prefix+'-'+n); if(le) le.textContent=label;
-      badge.style.display='flex';
-    }
-    const inp=document.getElementById('ac-'+prefix+'-'+n);
-    if(inp) inp.placeholder='Buscar diagnóstico...';
-  });
-  if(parts.length>=5){ const btn=document.getElementById(prefix+'-add-btn'); if(btn) btn.disabled=true; }
-}
 
 
 window.toggleEvol = () => {
@@ -2391,6 +1989,132 @@ window.generarPDF = (mesAnio, mesNum, anioNum) => {
   showToast('✓ PDF descargado correctamente', 'ok');
 };
 
+
+
+// ── SINGLE-SEARCH MULTI-DIAGNOSIS ──
+const diagData = { cie10: CIE10_DATA, cie11: CIE11_DATA };
+const diagSelected = {}; // prefix -> [{code, label}]
+let diagFocusIdx = {};
+
+function diagGetData(prefix) {
+  if(prefix.startsWith('e-')) return prefix.includes('cie11') ? CIE11_DATA : CIE10_DATA;
+  return prefix.includes('cie11') ? CIE11_DATA : CIE10_DATA;
+}
+
+function normDiag(s) {
+  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+}
+
+window.diagSearch = (prefix) => {
+  const inp = document.getElementById(prefix+'-search');
+  const drop = document.getElementById(prefix+'-dropdown');
+  const clearBtn = document.getElementById(prefix+'-search-clear');
+  const q = inp.value.trim();
+  if(clearBtn) clearBtn.classList.toggle('visible', q.length > 0);
+  if(!q || q.length < 2) { drop.classList.remove('open'); return; }
+  const data = diagGetData(prefix);
+  const qn = normDiag(q);
+  const already = (diagSelected[prefix]||[]).map(x=>x.code);
+  const res = data.filter(it => !already.includes(it.code) && (normDiag(it.code).includes(qn) || normDiag(it.label).includes(qn)));
+  diagFocusIdx[prefix] = -1;
+  if(!res.length) { drop.innerHTML='<div class="diag-dd-item" style="color:var(--muted);justify-content:center">Sin resultados</div>'; drop.classList.add('open'); return; }
+  drop.innerHTML = res.slice(0,60).map((it,i) =>
+    `<div class="diag-dd-item" data-idx="${i}" data-code="${it.code}" data-label="${it.label.replace(/"/g,'&quot;')}" onmousedown="event.preventDefault()" onclick="diagSelect('${prefix}','${it.code}','${it.label.replace(/'/g,'\u0027')}')">
+      <span class="diag-dd-code">${it.code}</span>
+      <span class="diag-dd-label">${it.label}</span>
+    </div>`
+  ).join('') + (res.length>60 ? `<div class="diag-dd-item" style="color:var(--muted);font-size:11px;justify-content:center">...${res.length-60} más — seguí escribiendo para filtrar</div>` : '');
+  drop.classList.add('open');
+};
+
+window.diagKeydown = (e, prefix) => {
+  const drop = document.getElementById(prefix+'-dropdown');
+  if(!drop.classList.contains('open')) return;
+  const items = drop.querySelectorAll('.diag-dd-item[data-idx]');
+  let idx = diagFocusIdx[prefix]||0;
+  if(e.key==='ArrowDown'){ e.preventDefault(); idx=Math.min(idx+1,items.length-1); diagFocusIdx[prefix]=idx; items.forEach((el,i)=>el.classList.toggle('sel',i===idx)); items[idx]?.scrollIntoView({block:'nearest'}); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); idx=Math.max(idx-1,0); diagFocusIdx[prefix]=idx; items.forEach((el,i)=>el.classList.toggle('sel',i===idx)); items[idx]?.scrollIntoView({block:'nearest'}); }
+  else if(e.key==='Enter' && idx>=0 && items[idx]){ e.preventDefault(); const el=items[idx]; diagSelect(prefix, el.dataset.code, el.dataset.label); }
+  else if(e.key==='Escape'){ drop.classList.remove('open'); }
+};
+
+window.diagSelect = (prefix, code, label) => {
+  if(!(prefix in diagSelected)) diagSelected[prefix]=[];
+  if(diagSelected[prefix].length>=5) return;
+  if(diagSelected[prefix].find(x=>x.code===code)) return;
+  diagSelected[prefix].push({code,label});
+  diagRender(prefix);
+  const inp=document.getElementById(prefix+'-search');
+  const drop=document.getElementById(prefix+'-dropdown');
+  if(inp){inp.value='';inp.focus();}
+  const cb=document.getElementById(prefix+'-search-clear');
+  if(cb) cb.classList.remove('visible');
+  if(drop) drop.classList.remove('open');
+};
+
+window.diagRemove = (prefix, code) => {
+  if(!diagSelected[prefix]) return;
+  diagSelected[prefix] = diagSelected[prefix].filter(x=>x.code!==code);
+  diagRender(prefix);
+  document.getElementById(prefix+'-search')?.focus();
+};
+
+window.diagClearSearch = (prefix) => {
+  const inp=document.getElementById(prefix+'-search');
+  if(inp){inp.value='';inp.focus();}
+  document.getElementById(prefix+'-dropdown')?.classList.remove('open');
+  const cb=document.getElementById(prefix+'-search-clear');
+  if(cb) cb.classList.remove('visible');
+};
+
+function diagRender(prefix) {
+  const list=document.getElementById(prefix+'-selected');
+  const hint=document.getElementById(prefix+'-hint');
+  const container=document.getElementById(prefix+'-container');
+  const hidden=document.getElementById(prefix+'-value');
+  const sel=diagSelected[prefix]||[];
+  if(list) {
+    list.innerHTML = sel.map(it=>`
+      <div class="diag-selected-item">
+        <div class="diag-sel-texts">
+          <span class="diag-sel-code">${it.code}</span>
+          <span class="diag-sel-label">${it.label}</span>
+        </div>
+        <button type="button" class="diag-sel-remove" onmousedown="event.preventDefault()" onclick="diagRemove('${prefix}','${it.code}')">✕</button>
+      </div>`).join('');
+  }
+  if(hint) hint.style.display = sel.length>=5 ? 'block':'none';
+  if(container) container.classList.toggle('no-selected', sel.length===0);
+  if(hidden) hidden.value = sel.map(x=>x.code+' '+x.label).join(' | ');
+  // Hide search if max reached
+  const searchRow=document.getElementById(prefix+'-search')?.closest('.diag-search-row');
+  if(searchRow) searchRow.style.display = sel.length>=5 ? 'none':'flex';
+}
+
+function diagGetValue(prefix) {
+  return (diagSelected[prefix]||[]).map(x=>x.code+' '+x.label).join(' | ');
+}
+
+function diagSetValue(prefix, combined) {
+  diagSelected[prefix]=[];
+  if(!combined) { diagRender(prefix); return; }
+  combined.split(' | ').filter(Boolean).forEach(v=>{
+    const sp=v.indexOf(' ');
+    const code=sp>-1?v.substring(0,sp):v;
+    const label=sp>-1?v.substring(sp+1):'';
+    if(diagSelected[prefix].length<5) diagSelected[prefix].push({code,label});
+  });
+  diagRender(prefix);
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', e=>{
+  ['cie10','cie11','e-cie10','e-cie11'].forEach(pfx=>{
+    const drop=document.getElementById(pfx+'-dropdown');
+    const inp=document.getElementById(pfx+'-search');
+    if(drop && inp && !inp.contains(e.target) && !drop.contains(e.target)) drop.classList.remove('open');
+  });
+});
 
 
 </script>
