@@ -2549,13 +2549,43 @@ window.compartirWhatsapp = (pdfDataUrl, filename) => {
 };
 
 window.compartirMail = (pdfDataUrl, filename, fl) => {
-  const a=document.createElement('a'); a.href=pdfDataUrl; a.download=filename; a.click();
+  // Step 1: auto-download PDF as blob
+  try {
+    const byteString = atob(pdfDataUrl.split(',')[1]);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for(let i=0;i<byteString.length;i++) ia[i]=byteString.charCodeAt(i);
+    const blob = new Blob([ab],{type:'application/pdf'});
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=blobUrl; a.download=filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(blobUrl),5000);
+  } catch(e) {
+    const a=document.createElement('a'); a.href=pdfDataUrl; a.download=filename; a.click();
+  }
+
+  // Step 2: show instruction in modal then open mail client
+  const ov = document.getElementById('export-modal-overlay');
+  if(ov) {
+    const instrDiv = document.createElement('div');
+    instrDiv.style.cssText = 'background:#fef3c7;border:1.5px solid #fcd34d;border-radius:10px;padding:14px 16px;font-family:"DM Sans",sans-serif;font-size:13px;color:#92400e;line-height:1.6;margin:0 0 8px';
+    instrDiv.innerHTML = '<strong>📎 PDF descargado.</strong><br>Se abrirá tu cliente de email. <strong>Adjuntá el archivo <em>' + filename + '</em></strong> que se acaba de guardar en tu dispositivo.';
+    const btnArea = ov.querySelector('[style*="flex-direction:column"]');
+    if(btnArea) btnArea.insertBefore(instrDiv, btnArea.firstChild);
+  }
+
   setTimeout(()=>{
     const s=encodeURIComponent('Pase de Guardia '+fl+' — Hospital Sanguinetti');
-    const b=encodeURIComponent('Estimado/a,\n\nAdjunto el Pase de Guardia del día '+fl+'.\n\nHospital Sanguinetti — Salud Mental');
+    const b=encodeURIComponent('Estimado/a,
+
+Se adjunta el Pase de Guardia del día '+fl+'.
+
+⚠ Recordá adjuntar el archivo '+filename+' a este email.
+
+Hospital Sanguinetti — Salud Mental');
     window.location.href='mailto:?subject='+s+'&body='+b;
-  },600);
-  showToast('PDF guardado — se abrirá tu cliente de email');
+  }, 900);
 };
 
 </script>
