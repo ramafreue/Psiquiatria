@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Registro Psiquiátrico — Htal. Sanguinetti</title>
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a3a6b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Psiquiatría">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -2678,6 +2689,57 @@ window.compartirMail = (pdfDataUrl, filename, fl) => {
   }, 900);
 };
 
+</script>
+<script>
+// Register Service Worker for PWA
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/Psiquiatria/sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW registration failed:', err));
+  });
+}
+
+// PWA install prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show install banner after login
+  setTimeout(() => {
+    const installed = localStorage.getItem('pwa_installed');
+    if(!installed && deferredPrompt) showInstallBanner();
+  }, 3000);
+});
+
+function showInstallBanner() {
+  const banner = document.createElement('div');
+  banner.id = 'pwa-banner';
+  banner.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a3a6b;color:white;padding:12px 20px;border-radius:12px;font-family:"DM Sans",sans-serif;font-size:13px;z-index:9998;display:flex;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,.3);max-width:320px;width:90%';
+  banner.innerHTML = '<span style="font-size:22px">📱</span><div style="flex:1"><strong>Instalar como app</strong><br><span style="opacity:.8;font-size:12px">Accedé desde tu pantalla de inicio</span></div><button onclick="installPWA()" style="background:#c9993a;border:none;color:white;padding:8px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;white-space:nowrap">Instalar</button><button onclick="document.getElementById('pwa-banner').remove()" style="background:none;border:none;color:rgba(255,255,255,.6);font-size:20px;cursor:pointer;padding:0 4px">✕</button>';
+  document.body.appendChild(banner);
+}
+
+window.installPWA = async () => {
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const result = await deferredPrompt.userChoice;
+  if(result.outcome === 'accepted') {
+    localStorage.setItem('pwa_installed', '1');
+    const banner = document.getElementById('pwa-banner');
+    if(banner) banner.remove();
+    setTimeout(() => {
+      const t = document.getElementById('toast');
+      if(t){ t.textContent = '✓ App instalada correctamente'; t.className='toast ok'; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+    }, 500);
+  }
+  deferredPrompt = null;
+};
+
+window.addEventListener('appinstalled', () => {
+  localStorage.setItem('pwa_installed', '1');
+  deferredPrompt = null;
+});
 </script>
 </body>
 </html>
