@@ -1391,11 +1391,14 @@ window.generarEstadisticas = () => {
   if(!desde||!hasta){ showToast('Seleccioná rango de fechas'); return; }
   const MESES_ES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
-  const enRango=todosRegistros.filter(r=>{ const fi=r.fecha_ingreso||r.fecha||''; return fi>=desde && fi<=hasta; });
+  // Excluir INTERCONSULTA de todos los indicadores de estadística
+  const enRango=todosRegistros.filter(r=>{
+    const fi=r.fecha_ingreso||r.fecha||'';
+    return fi>=desde && fi<=hasta && tipoPaciente(r)!=='interconsulta';
+  });
   const internados=enRango.filter(r=>tipoPaciente(r)==='internado');
   const altas=enRango.filter(r=>tipoPaciente(r)==='alta');
   const consultorios=enRango.filter(r=>tipoPaciente(r)==='consultorio');
-  const interconsultas=enRango.filter(r=>tipoPaciente(r)==='interconsulta');
 
   let promDias=0;
   if(altas.length>0){ const tot=altas.reduce((a,r)=>a+(diasInternacion(r.fecha_ingreso,r.fecha_egreso)||0),0); promDias=(tot/altas.length).toFixed(1); }
