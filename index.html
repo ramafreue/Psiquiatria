@@ -485,6 +485,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       <button class="sidebar-item" id="si-estadistica" onclick="switchTab('estadistica',this);closeSidebar()">
         <span class="si-icon">📊</span><span class="si-label">Estadística</span>
       </button>
+      <button class="sidebar-item" id="si-guardia" onclick="switchTab('guardia',this);closeSidebar()">
+        <span class="si-icon">🏥</span><span class="si-label">Pase de Guardia</span>
+      </button>
       <button class="sidebar-item" id="si-impresion" style="display:none" onclick="switchTab('impresion',this);closeSidebar()">
         <span class="si-icon">🖨</span><span class="si-label">Imprimir / PDF</span>
       </button>
@@ -746,6 +749,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
     <!-- IMPRESION -->
     <div class="panel" id="panel-impresion"></div>
 
+    <!-- GUARDIA -->
+    <div class="panel" id="panel-guardia"></div>
+
     <!-- ESTADISTICA -->
     <div class="panel" id="panel-estadistica">
       <div class="card">
@@ -754,6 +760,18 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <div><label>Desde</label><input type="date" id="est-desde"></div>
           <div><label>Hasta</label><input type="date" id="est-hasta"></div>
           <button onclick="generarEstadisticas()">Generar</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+          <span style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em">O buscar por mes</span>
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:end">
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--azul);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Mes y año</label>
+            <input type="month" id="est-mes" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;background:#fafbff;outline:none;-webkit-appearance:none;appearance:none">
+          </div>
+          <button onclick="generarEstadisticasMes()" style="background:var(--azul-light);color:var(--azul);border:1.5px solid var(--border);border-radius:8px;padding:10px 16px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap">Ver mes</button>
         </div>
       </div>
       <div id="est-contenido"><div class="empty-state"><p>Seleccioná un rango de fechas y hacé click en Generar</p></div></div>
@@ -1118,7 +1136,8 @@ function refrescarVistaActiva() {
 
 const TAB_TITLES = {
   'nuevo':'Nuevo registro', 'buscar':'Buscar', 'internados':'Internados',
-  'todos':'Todos los registros', 'estadistica':'Estadística', 'impresion':'Imprimir / PDF'
+  'todos':'Todos los registros', 'estadistica':'Estadística', 'impresion':'Imprimir / PDF',
+  'guardia':'Pase de Guardia'
 };
 window.switchTab = (tab, el) => {
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
@@ -1131,6 +1150,7 @@ window.switchTab = (tab, el) => {
   if(tab==='internados') cargarInternados();
   if(tab==='todos') cargarTodos();
   if(tab==='impresion') window.cargarImpresion();
+  if(tab==='guardia') cargarGuardia();
 };
 window.openSidebar = () => {
   document.getElementById('sidebar').classList.add('open');
@@ -2203,6 +2223,279 @@ document.addEventListener('click', e=>{
   });
 });
 
+
+
+// ================================================================
+// ESTADÍSTICA - MES SELECTOR
+// ================================================================
+window.generarEstadisticasMes = () => {
+  const mes = document.getElementById('est-mes').value;
+  if(!mes) { showToast('Seleccioná un mes y año'); return; }
+  const [y,m] = mes.split('-');
+  const desde = mes + '-01';
+  const diasMes = new Date(parseInt(y), parseInt(m), 0).getDate();
+  const hasta = mes + '-' + String(diasMes).padStart(2,'0');
+  document.getElementById('est-desde').value = desde;
+  document.getElementById('est-hasta').value = hasta;
+  generarEstadisticas();
+};
+
+// ================================================================
+// PASE DE GUARDIA
+// ================================================================
+const GUARDIA_STORE_KEY = 'pase_guardia_historico_v1';
+
+function getGuardiaHistorico() {
+  try { return JSON.parse(localStorage.getItem(GUARDIA_STORE_KEY)) || {}; }
+  catch(e) { return {}; }
+}
+function saveGuardiaHistorico(fecha, pdfDataUrl) {
+  const hist = getGuardiaHistorico();
+  hist[fecha] = { fecha, savedAt: new Date().toISOString(), pdfDataUrl };
+  localStorage.setItem(GUARDIA_STORE_KEY, JSON.stringify(hist));
+}
+
+function cargarGuardia() {
+  const fechaHoy = hoy();
+  const hist = getGuardiaHistorico();
+  const fechasHist = Object.keys(hist).sort().reverse();
+
+  const pacientesGuardia = todosRegistros.filter(r => {
+    const t = tipoPaciente(r);
+    return t === 'internado' || t === 'interconsulta';
+  });
+
+  const histOptions = fechasHist.length
+    ? fechasHist.map(f => `<option value="${f}">${formatFecha(f)}</option>`).join('')
+    : '<option value="">Sin pases anteriores</option>';
+
+  document.getElementById('panel-guardia').innerHTML = `
+    <div class="card">
+      <div class="card-title">🏥 Pase de Guardia</div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-bottom:8px">
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--azul);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Fecha del pase</label>
+          <input type="date" id="guardia-fecha" value="${fechaHoy}" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;background:#fafbff;outline:none">
+        </div>
+        <button onclick="generarPaseGuardia()" style="background:var(--azul);color:white;border:none;border-radius:8px;padding:11px 18px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap">Generar PDF</button>
+      </div>
+      <p style="font-size:12px;color:var(--muted)">Incluye <strong>${pacientesGuardia.length}</strong> paciente${pacientesGuardia.length!==1?'s':''} internados (excluye altas y consultorios)</p>
+    </div>
+    <div class="card">
+      <div class="card-title" style="font-size:14px">📋 Consultar pases anteriores</div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--azul);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Seleccionar fecha</label>
+          <select id="guardia-hist-select" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;background:#fafbff;outline:none;-webkit-appearance:none;appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236b7280%22 stroke-width=%222%22%3E%3Cpolyline points=%226 9 12 15 18 9%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 12px center;padding-right:32px">
+            <option value="">— Seleccionar fecha —</option>
+            ${histOptions}
+          </select>
+        </div>
+        <button onclick="descargarGuardiaHistorico()" style="background:var(--azul-light);color:var(--azul);border:1.5px solid var(--border);border-radius:8px;padding:11px 16px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer">Ver PDF</button>
+      </div>
+      ${fechasHist.length===0 ? '<p style="font-size:12px;color:var(--muted);margin-top:10px;text-align:center">No hay pases guardados aún</p>' : ''}
+    </div>`;
+}
+
+window.generarPaseGuardia = () => {
+  const fecha = document.getElementById('guardia-fecha')?.value || hoy();
+  const pacientes = todosRegistros.filter(r => {
+    const t = tipoPaciente(r);
+    return t === 'internado' || t === 'interconsulta';
+  }).sort((a,b) => (a.apellido||'').localeCompare(b.apellido||''));
+
+  if(!pacientes.length) { showToast('No hay pacientes internados para incluir','err'); return; }
+
+  const doc = buildPaseGuardiaPDF(fecha, pacientes);
+  const pdfDataUrl = doc.output('datauristring');
+  const filename = 'Pase_Guardia_' + fecha + '.pdf';
+
+  // Save to local history
+  saveGuardiaHistorico(fecha, pdfDataUrl);
+  cargarGuardia();
+  mostrarModalExportar(pdfDataUrl, filename, fecha);
+};
+
+window.descargarGuardiaHistorico = () => {
+  const sel = document.getElementById('guardia-hist-select')?.value;
+  if(!sel) { showToast('Seleccioná una fecha'); return; }
+  const hist = getGuardiaHistorico();
+  const entry = hist[sel];
+  if(!entry || !entry.pdfDataUrl) { showToast('No se encontró el PDF','err'); return; }
+  mostrarModalExportar(entry.pdfDataUrl, 'Pase_Guardia_' + sel + '.pdf', sel);
+};
+
+function buildPaseGuardiaPDF(fecha, pacientes) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const PW=210, PH=297, ML=10, MR=10, MT=12;
+  const cW=PW-ML-MR;
+  const cols=[48,40,56,46];
+  const BLUE=[26,58,107], BLACK=[0,0,0], WHITE=[255,255,255], GREY=[248,250,255];
+
+  function sf(style,size){ doc.setFont('helvetica',style); doc.setFontSize(size); }
+
+  function drawPageHeader(y) {
+    doc.setFillColor(...BLUE);
+    doc.rect(ML,y,cW,12,'F');
+    sf('bold',12); doc.setTextColor(...WHITE);
+    doc.text('HOSPITAL SANGUINETTI — SALUD MENTAL', PW/2, y+8, {align:'center'});
+    y+=15;
+    sf('bold',10); doc.setTextColor(...BLUE);
+    doc.text('PASE DE GUARDIA', ML, y);
+    const [fy,fm,fd]=fecha.split('-');
+    sf('normal',9); doc.setTextColor(70,70,70);
+    doc.text('Fecha: '+fd+'/'+fm+'/'+fy, PW/2, y, {align:'center'});
+    if(currentUser){ const n=currentUser.displayName||currentUser.email; doc.text('Dr/a. '+n, PW-MR, y, {align:'right'}); }
+    y+=4;
+    doc.setDrawColor(180,195,220); doc.setLineWidth(0.3);
+    doc.line(ML,y,PW-MR,y); y+=4;
+    return y;
+  }
+
+  function drawTableHeader(y) {
+    const H=12;
+    const hdrs=[['DATOS DEL','PACIENTE'],['DIAGNÓSTICO','(CIE-10)'],['TRATAMIENTO',''],['PENDIENTES','']];
+    let x=ML;
+    sf('bold',7.5); doc.setTextColor(...WHITE);
+    cols.forEach((w,i)=>{
+      doc.setFillColor(...BLUE); doc.setDrawColor(...BLUE); doc.setLineWidth(0.2);
+      doc.rect(x,y,w,H,'FD');
+      doc.text(hdrs[i][0], x+w/2, y+(hdrs[i][1]?4:H/2+1.5), {align:'center'});
+      if(hdrs[i][1]) doc.text(hdrs[i][1], x+w/2, y+8.5, {align:'center'});
+      x+=w;
+    });
+    doc.setTextColor(...BLACK);
+    return y+H;
+  }
+
+  function calcRowH(pac) {
+    sf('normal',8);
+    const lh=4, pad=3;
+    const nameL=doc.splitTextToSize((pac.apellido||'')+', '+(pac.nombre||''), cols[0]-5).length;
+    const extraL=(pac.dni?1:0)+(pac.edad?1:0)+(pac.fecha_ingreso?1:0)+(pac.ubicacion?1:0);
+    const col0=1+nameL+extraL;
+    const diagRaw=(pac.diagnostico_cie10||pac.diagnostico||'—').split(' | ').join('\n');
+    const col1=doc.splitTextToSize(diagRaw,cols[1]-4).length;
+    const col2=doc.splitTextToSize(pac.tratamiento||'—',cols[2]-4).length;
+    const col3=doc.splitTextToSize(pac.pendientes||'—',cols[3]-4).length;
+    return Math.max(col0,col1,col2,col3,4)*lh+pad*2;
+  }
+
+  function drawRow(pac, num, y, rowH, shade) {
+    sf('normal',8); doc.setTextColor(...BLACK);
+    const lh=4, pad=3;
+    if(shade){ doc.setFillColor(...GREY); doc.rect(ML,y,cW,rowH,'F'); }
+    doc.setDrawColor(180,195,215); doc.setLineWidth(0.15);
+    let x=ML; cols.forEach(w=>{ doc.rect(x,y,w,rowH); x+=w; });
+    x=ML;
+    // Col 0
+    sf('bold',7); doc.setTextColor(120,140,170);
+    doc.text(String(num), x+2, y+pad);
+    sf('bold',8); doc.setTextColor(...BLACK);
+    const nameW=doc.splitTextToSize((pac.apellido||'')+', '+(pac.nombre||''), cols[0]-5);
+    doc.text(nameW, x+2, y+pad+lh);
+    let cy=y+pad+lh+nameW.length*lh;
+    sf('normal',7.5); doc.setTextColor(60,60,60);
+    if(pac.dni){ doc.text('DNI: '+pac.dni, x+2, cy); cy+=lh; }
+    if(pac.edad){ doc.text('Edad: '+pac.edad+' años', x+2, cy); cy+=lh; }
+    if(pac.fecha_ingreso){ const [a,b,c]=pac.fecha_ingreso.split('-'); doc.text('Ing.: '+c+'/'+b+'/'+a, x+2, cy); cy+=lh; }
+    if(pac.ubicacion){ const ub=pac.ubicacion==='OTRO'?(pac.ubicacion_otro||'OTRO'):pac.ubicacion; doc.text(ub,x+2,cy); }
+    x+=cols[0];
+    // Col 1
+    sf('normal',8); doc.setTextColor(...BLACK);
+    const dR=(pac.diagnostico_cie10||pac.diagnostico||'—').split(' | ').join('\n');
+    doc.text(doc.splitTextToSize(dR,cols[1]-4),x+2,y+pad);
+    x+=cols[1];
+    // Col 2
+    doc.text(doc.splitTextToSize(pac.tratamiento||'—',cols[2]-4),x+2,y+pad);
+    x+=cols[2];
+    // Col 3
+    doc.text(doc.splitTextToSize(pac.pendientes||'—',cols[3]-4),x+2,y+pad);
+  }
+
+  function drawFooter(pn,tp,y) {
+    const fy=Math.max(y+6,PH-14);
+    doc.setDrawColor(180,195,220); doc.setLineWidth(0.2);
+    doc.line(ML,fy,PW-MR,fy);
+    sf('normal',7.5); doc.setTextColor(120,120,120);
+    doc.text('Documento confidencial — Hospital Sanguinetti — Salud Mental', ML, fy+4);
+    doc.text('Pág. '+pn+'/'+tp, PW-MR, fy+4, {align:'right'});
+  }
+
+  const FOOT_RES=20;
+  let y=MT, pn=1, num=1;
+  // Estimate total pages
+  let ty=MT, tp=1;
+  const hH=31, thH=12;
+  ty+=hH+thH;
+  pacientes.forEach(p=>{ const rh=calcRowH(p); if(ty+rh+FOOT_RES>PH){tp++;ty=MT+hH+thH;} ty+=rh; });
+
+  y=drawPageHeader(y); y=drawTableHeader(y);
+  pacientes.forEach((pac,idx)=>{
+    const rh=calcRowH(pac);
+    if(y+rh+FOOT_RES>PH){ drawFooter(pn,tp,y); doc.addPage(); pn++; y=MT; y=drawPageHeader(y); y=drawTableHeader(y); }
+    drawRow(pac,num,y,rh,idx%2===1);
+    y+=rh; num++;
+  });
+  drawFooter(pn,tp,y);
+  return doc;
+}
+
+window.mostrarModalExportar = (pdfDataUrl, filename, fecha) => {
+  const [fy,fm,fd]=fecha.split('-');
+  const fl=fd+'/'+fm+'/'+fy;
+  let ov=document.getElementById('export-modal-overlay');
+  if(!ov){ ov=document.createElement('div'); ov.id='export-modal-overlay'; ov.style.cssText='position:fixed;inset:0;background:rgba(10,20,50,.6);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px'; ov.onclick=e=>{if(e.target===ov)ov.remove();}; document.body.appendChild(ov); }
+  ov.innerHTML=`
+    <div style="background:white;border-radius:16px;width:100%;max-width:360px;overflow:hidden;box-shadow:0 8px 40px rgba(26,58,107,.3)">
+      <div style="background:var(--azul);color:white;padding:16px 20px;display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-family:'DM Serif Display',serif;font-size:17px">Exportar Pase de Guardia</div><div style="font-size:12px;opacity:.7;margin-top:2px">${fl}</div></div>
+        <button onclick="document.getElementById('export-modal-overlay').remove()" style="background:none;border:none;color:white;font-size:22px;cursor:pointer;opacity:.7">✕</button>
+      </div>
+      <div style="padding:20px;display:flex;flex-direction:column;gap:10px">
+        <a href="${pdfDataUrl}" download="${filename}" style="display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--azul);color:white;border-radius:10px;text-decoration:none;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px" onclick="document.getElementById('export-modal-overlay').remove()">
+          <span style="font-size:20px">💾</span><span>Guardar PDF en dispositivo</span>
+        </a>
+        <button onclick="compartirWhatsapp('${pdfDataUrl}','${filename}')" style="display:flex;align-items:center;gap:12px;padding:13px 16px;background:#25D366;color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;width:100%">
+          <span style="font-size:20px">📱</span><span>Compartir por WhatsApp</span>
+        </button>
+        <button onclick="compartirMail('${pdfDataUrl}','${filename}','${fl}')" style="display:flex;align-items:center;gap:12px;padding:13px 16px;background:#EA4335;color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;width:100%">
+          <span style="font-size:20px">✉️</span><span>Enviar por Email</span>
+        </button>
+        <button onclick="document.getElementById('export-modal-overlay').remove()" style="padding:10px;background:var(--azul-light);color:var(--azul);border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer">Cerrar</button>
+      </div>
+    </div>`;
+};
+
+window.compartirWhatsapp = (pdfDataUrl, filename) => {
+  if(navigator.share){
+    fetch(pdfDataUrl).then(r=>r.blob()).then(blob=>{
+      const f=new File([blob],filename,{type:'application/pdf'});
+      if(navigator.canShare&&navigator.canShare({files:[f]})){
+        navigator.share({files:[f],title:'Pase de Guardia',text:'Pase de Guardia — Hospital Sanguinetti'});
+      } else {
+        const a=document.createElement('a'); a.href=pdfDataUrl; a.download=filename; a.click();
+        setTimeout(()=>window.open('https://wa.me/','_blank'),600);
+        showToast('PDF guardado — adjuntalo en WhatsApp');
+      }
+    });
+  } else {
+    const a=document.createElement('a'); a.href=pdfDataUrl; a.download=filename; a.click();
+    setTimeout(()=>window.open('https://web.whatsapp.com','_blank'),600);
+    showToast('PDF guardado — adjuntalo en WhatsApp Web');
+  }
+};
+
+window.compartirMail = (pdfDataUrl, filename, fl) => {
+  const a=document.createElement('a'); a.href=pdfDataUrl; a.download=filename; a.click();
+  setTimeout(()=>{
+    const s=encodeURIComponent('Pase de Guardia '+fl+' — Hospital Sanguinetti');
+    const b=encodeURIComponent('Estimado/a,\n\nAdjunto el Pase de Guardia del día '+fl+'.\n\nHospital Sanguinetti — Salud Mental');
+    window.location.href='mailto:?subject='+s+'&body='+b;
+  },600);
+  showToast('PDF guardado — se abrirá tu cliente de email');
+};
 
 </script>
 </body>
