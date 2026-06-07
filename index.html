@@ -2577,13 +2577,7 @@ window.compartirMail = (pdfDataUrl, filename, fl) => {
 
   setTimeout(()=>{
     const s=encodeURIComponent('Pase de Guardia '+fl+' — Hospital Sanguinetti');
-    const b=encodeURIComponent('Estimado/a,
-
-Se adjunta el Pase de Guardia del día '+fl+'.
-
-⚠ Recordá adjuntar el archivo '+filename+' a este email.
-
-Hospital Sanguinetti — Salud Mental');
+    const b=encodeURIComponent('Estimado/a,\n\nSe adjunta el Pase de Guardia del dia '+fl+'.\n\nRecorda adjuntar el archivo '+filename+' a este email.\n\nHospital Sanguinetti - Salud Mental');
     window.location.href='mailto:?subject='+s+'&body='+b;
   }, 900);
 };
