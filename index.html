@@ -2565,16 +2565,6 @@ window.compartirMail = (pdfDataUrl, filename, fl) => {
     const a=document.createElement('a'); a.href=pdfDataUrl; a.download=filename; a.click();
   }
 
-  // Step 2: show instruction in modal then open mail client
-  const ov = document.getElementById('export-modal-overlay');
-  if(ov) {
-    const instrDiv = document.createElement('div');
-    instrDiv.style.cssText = 'background:#fef3c7;border:1.5px solid #fcd34d;border-radius:10px;padding:14px 16px;font-family:"DM Sans",sans-serif;font-size:13px;color:#92400e;line-height:1.6;margin:0 0 8px';
-    instrDiv.innerHTML = '<strong>📎 PDF descargado.</strong><br>Se abrirá tu cliente de email. <strong>Adjuntá el archivo <em>' + filename + '</em></strong> que se acaba de guardar en tu dispositivo.';
-    const btnArea = ov.querySelector('[style*="flex-direction:column"]');
-    if(btnArea) btnArea.insertBefore(instrDiv, btnArea.firstChild);
-  }
-
   setTimeout(()=>{
     const s=encodeURIComponent('Pase de Guardia '+fl+' — Hospital Sanguinetti');
     const b=encodeURIComponent('Estimado/a,\n\nSe adjunta el Pase de Guardia del dia '+fl+'.\n\nRecorda adjuntar el archivo '+filename+' a este email.\n\nHospital Sanguinetti - Salud Mental');
