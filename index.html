@@ -1498,15 +1498,81 @@ window.generarEstadisticas = () => {
   ]}, options:chartOpts });
 
   if(diagKeys.length>0){
-    window.chartDiagDias = new Chart(document.getElementById('chart-diag-dias'), { type:'bar',
-      data:{ labels:diagKeys, datasets:[
-        { label:'Días promedio', data:diagProm, backgroundColor:'rgba(26,58,107,0.75)', borderColor:'#1a3a6b', borderWidth:1.5, borderRadius:4, yAxisID:'y' },
-        { label:'Nº pacientes', data:diagN, backgroundColor:'rgba(201,153,58,0.7)', borderColor:'#c9993a', borderWidth:2, type:'line', tension:0.3, pointRadius:4, yAxisID:'y2' }
-      ]},
-      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y',
-        plugins:{legend:{position:'top',labels:{font:{family:'DM Sans',size:11}}}},
-        scales:{ y:{ticks:{font:{family:'DM Sans',size:9}}}, x:{beginAtZero:true,ticks:{font:{family:'DM Sans',size:10}}},
-          y2:{position:'right',beginAtZero:true,ticks:{stepSize:1,font:{family:'DM Sans',size:9}},grid:{display:false}} }
+    window.chartDiagDias = new Chart(document.getElementById('chart-diag-dias'), {
+      type:'bar',
+      data:{
+        labels: diagKeys,
+        datasets:[{
+          label:'Días promedio',
+          data: diagProm,
+          backgroundColor:'rgba(26,58,107,0.82)',
+          borderColor:'#1a3a6b',
+          borderWidth:0,
+          borderRadius:4,
+          barThickness:22
+        }]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        indexAxis:'y',
+        layout:{ padding:{ right:52 } },
+        plugins:{
+          legend:{ display:false },
+          tooltip:{ enabled:false },
+          datalabels:{
+            display:false
+          }
+        },
+        scales:{
+          y:{
+            ticks:{
+              font:{family:'DM Sans', size:10},
+              color:'#1a1f2e',
+              padding:8
+            },
+            grid:{ display:false },
+            border:{ display:false }
+          },
+          x:{
+            beginAtZero:true,
+            display:false,
+            grid:{ display:false }
+          }
+        },
+        animation:{
+          onComplete: function() {
+            const chart = this;
+            const ctx = chart.ctx;
+            const dataset = chart.data.datasets[0];
+            const meta = chart.getDatasetMeta(0);
+            ctx.save();
+            meta.data.forEach(function(bar, i) {
+              const dias = parseFloat(diagProm[i]);
+              const nPac = diagN[i];
+              const x = bar.x;
+              const y = bar.y;
+              const h = bar.height;
+
+              // Number of patients — white text centered on bar
+              if(bar.width > 28) {
+                ctx.font = 'bold 11px DM Sans';
+                ctx.fillStyle = 'white';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(nPac + (nPac===1?' pac':' pac'), x/2 + bar.base/2, y);
+              }
+
+              // Days average — dark text to the right of bar
+              ctx.font = 'bold 12px DM Sans';
+              ctx.fillStyle = '#1a3a6b';
+              ctx.textAlign = 'left';
+              ctx.textBaseline = 'middle';
+              ctx.fillText(dias + 'd', x + 6, y);
+            });
+            ctx.restore();
+          }
+        }
       }
     });
   }
