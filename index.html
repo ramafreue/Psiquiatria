@@ -536,6 +536,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
         <div class="form-row full">
           <div class="field"><label>Dirección</label><input type="text" id="direccion" placeholder="Calle 123, Piso 2..."></div>
         </div>
+        <div class="form-row full">
+          <div class="field"><label>Antecedentes psiquiátricos</label><textarea id="antecedentes" style="min-height:80px" placeholder="Internaciones previas, intentos de suicidio previos, diagnósticos anteriores, tratamientos previos..."></textarea></div>
+        </div>
         <div class="form-row">
           <div class="field"><label>Fecha de ingreso</label><input type="date" id="fecha_ingreso"></div>
           <div class="field"><label>Fecha de egreso</label><input type="date" id="fecha_egreso"></div>
@@ -805,6 +808,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
         <div class="field"><label>Fecha de hoy</label><input type="date" id="e-fecha"></div>
       </div>
       <div class="form-row full"><div class="field"><label>Dirección</label><input type="text" id="e-direccion"></div></div>
+      <div class="form-row full"><div class="field"><label>Antecedentes psiquiátricos</label><textarea id="e-antecedentes" style="min-height:80px" placeholder="Internaciones previas, intentos de suicidio previos..."></textarea></div></div>
       <div class="form-row">
         <div class="field"><label>Fecha de ingreso</label><input type="date" id="e-fecha_ingreso"></div>
         <div class="field"><label>Fecha de egreso</label><input type="date" id="e-fecha_egreso"></div>
@@ -1187,6 +1191,7 @@ window.guardarRegistro = async () => {
       fecha_egreso: document.getElementById('fecha_egreso').value,
       ubicacion: ubicVal,
       ubicacion_otro: ubicVal==='OTRO'?document.getElementById('ubicacion_otro').value.trim():'',
+      antecedentes: document.getElementById('antecedentes').value.trim(),
       diagnostico_cie10: diagGetValue('cie10'),
       diagnostico_cie11: diagGetValue('cie11'),
       evol_general: document.getElementById('evol_general').value.trim(),
@@ -1215,6 +1220,7 @@ window.guardarRegistro = async () => {
       creadoEn: serverTimestamp()
     });
     ['apellido','nombre','dni','edad','direccion','fecha_ingreso','fecha_egreso','diagnostico_cie10','diagnostico_cie11','tratamiento','pendientes','ubicacion_otro'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    document.getElementById('antecedentes').value='';
     ['cie10','cie11'].forEach(p=>{ diagSelected[p]=[]; diagRender(p); const inp=document.getElementById(p+'-search'); if(inp) inp.value=''; });
         ['evol_general','evol_presentacion','evol_actitud','evol_conciencia','evol_orientacion','evol_atencion','evol_memoria','evol_senso','evol_imaginacion','evol_inteligencia','evol_pensamiento','evol_ideacion','evol_esquema','evol_juicio','evol_lenguaje','evol_afectividad','evol_psicomotriz','evol_voluntad','evol_habitos'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
     document.getElementById('ubicacion').value='';
@@ -1267,6 +1273,7 @@ function renderCard(reg) {
         <div class="reg-field"><div class="reg-field-label">Fecha de ingreso</div><div class="reg-field-value">${formatFecha(reg.fecha_ingreso)}</div></div>
         <div class="reg-field"><div class="reg-field-label">Fecha de egreso</div><div class="reg-field-value">${reg.fecha_egreso?formatFecha(reg.fecha_egreso):'<span class="empty">Sin alta</span>'}</div></div>
       </div>
+      ${reg.antecedentes?'<div class="reg-field" style="margin-bottom:8px"><div class="reg-field-label" style="color:#b45309">Antecedentes psiquiátricos</div><div class="reg-field-value">'+reg.antecedentes+'</div></div>':''}
       <div class="reg-grid">
         <div class="reg-field"><div class="reg-field-label">Diagnóstico CIE-10</div><div class="reg-field-value" style="display:flex;flex-wrap:wrap;gap:4px">${(reg.diagnostico_cie10||reg.diagnostico||'').split(' | ').filter(Boolean).map(d=>`<span class="diag-badge" style="font-size:11px">${d}</span>`).join('')||'<span class="empty">Sin especificar</span>'}</div></div>
         <div class="reg-field"><div class="reg-field-label">Diagnóstico CIE-11</div><div class="reg-field-value" style="display:flex;flex-wrap:wrap;gap:4px">${(reg.diagnostico_cie11||'').split(' | ').filter(Boolean).map(d=>`<span class="diag-badge" style="font-size:11px;background:#ede9fe;color:#7c3aed">${d}</span>`).join('')||'<span class="empty">—</span>'}</div></div>
@@ -1382,34 +1389,64 @@ window.generarEstadisticas = () => {
   const desde=document.getElementById('est-desde').value;
   const hasta=document.getElementById('est-hasta').value;
   if(!desde||!hasta){ showToast('Seleccioná rango de fechas'); return; }
+  const MESES_ES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
-  const enRango=todosRegistros.filter(r=>{
-    const fi=r.fecha_ingreso||r.fecha||'';
-    return fi>=desde && fi<=hasta;
-  });
-
+  const enRango=todosRegistros.filter(r=>{ const fi=r.fecha_ingreso||r.fecha||''; return fi>=desde && fi<=hasta; });
   const internados=enRango.filter(r=>tipoPaciente(r)==='internado');
   const altas=enRango.filter(r=>tipoPaciente(r)==='alta');
   const consultorios=enRango.filter(r=>tipoPaciente(r)==='consultorio');
   const interconsultas=enRango.filter(r=>tipoPaciente(r)==='interconsulta');
 
-  // Promedio días internación para dados de alta (excluye INTERCONSULTA y CONSULTORIOS)
   let promDias=0;
-  if(altas.length>0){
-    const total=altas.reduce((acc,r)=>{
-      const d=diasInternacion(r.fecha_ingreso,r.fecha_egreso);
-      return acc+(d||0);
-    },0);
-    promDias=(total/altas.length).toFixed(1);
-  }
+  if(altas.length>0){ const tot=altas.reduce((a,r)=>a+(diasInternacion(r.fecha_ingreso,r.fecha_egreso)||0),0); promDias=(tot/altas.length).toFixed(1); }
 
-  // Armar labels por día/semana según rango
+  // ── Flujo mensual ingresos vs altas ──
+  const mesFlujoDatos={};
+  const internAltas=[...internados,...altas];
+  internAltas.forEach(r=>{
+    if(r.fecha_ingreso){ const m=r.fecha_ingreso.substring(0,7); if(!mesFlujoDatos[m]) mesFlujoDatos[m]={i:0,a:0}; mesFlujoDatos[m].i++; }
+    if(r.fecha_egreso){ const m=r.fecha_egreso.substring(0,7); if(!mesFlujoDatos[m]) mesFlujoDatos[m]={i:0,a:0}; mesFlujoDatos[m].a++; }
+  });
+  const mesesFlujo=Object.keys(mesFlujoDatos).sort();
+  const flujoLabels=mesesFlujo.map(m=>{ const [y,mo]=m.split('-'); return MESES_ES[parseInt(mo)-1]+' '+y; });
+  const flujI=mesesFlujo.map(m=>mesFlujoDatos[m].i);
+  const flujA=mesesFlujo.map(m=>mesFlujoDatos[m].a);
+
+  // ── Promedio días por diagnóstico CIE-10 ──
+  const diagDias={};
+  altas.forEach(r=>{
+    const d=diasInternacion(r.fecha_ingreso,r.fecha_egreso);
+    if(d===null) return;
+    const raw=(r.diagnostico_cie10||r.diagnostico||'').split(' | ')[0];
+    if(!raw) return;
+    const code=raw.split(' ')[0];
+    const lbl=raw.substring(code.length+1).trim()||code;
+    const short=lbl.length>28?lbl.substring(0,26)+'..':lbl;
+    const key=code+' '+short;
+    if(!diagDias[key]) diagDias[key]={tot:0,n:0};
+    diagDias[key].tot+=d; diagDias[key].n++;
+  });
+  const diagKeys=Object.keys(diagDias).sort((a,b)=>diagDias[b].n-diagDias[a].n).slice(0,10);
+  const diagProm=diagKeys.map(k=>(diagDias[k].tot/diagDias[k].n).toFixed(1));
+  const diagN=diagKeys.map(k=>diagDias[k].n);
+
+  // ── Reinternaciones ──
+  const pacMap={};
+  internAltas.forEach(r=>{
+    const key=(r.dni||'').replace(/\D/g,'')||(r.apellido+'_'+r.nombre);
+    if(!key) return;
+    if(!pacMap[key]) pacMap[key]={nombre:(r.apellido||'')+', '+(r.nombre||''),n:0,diag:r.diagnostico_cie10||r.diagnostico||'--'};
+    pacMap[key].n++;
+  });
+  const reinternados=Object.values(pacMap).filter(p=>p.n>1).sort((a,b)=>b.n-a.n);
+  const totalPac=Object.keys(pacMap).length;
+  const tasaR=totalPac>0?((reinternados.length/totalPac)*100).toFixed(1):0;
+
+  // ── Labels detalle período ──
   const diffDias=Math.round((new Date(hasta)-new Date(desde))/(1000*60*60*24));
   let labels=[], internData=[], altaData=[], consultData=[];
-
   if(diffDias<=31){
-    // Agrupar por día
-    for(let d=new Date(desde); d<=new Date(hasta); d.setDate(d.getDate()+1)){
+    for(let d=new Date(desde);d<=new Date(hasta);d.setDate(d.getDate()+1)){
       const iso=d.toISOString().split('T')[0];
       labels.push(formatFecha(iso));
       const fi=r=>r.fecha_ingreso===iso||r.fecha===iso;
@@ -1418,69 +1455,67 @@ window.generarEstadisticas = () => {
       consultData.push(enRango.filter(r=>tipoPaciente(r)==='consultorio'&&fi(r)).length);
     }
   } else {
-    // Agrupar por mes
     const meses={};
-    enRango.forEach(r=>{
-      const fi=r.fecha_ingreso||r.fecha||'';
-      if(!fi) return;
-      const mes=fi.substring(0,7);
-      if(!meses[mes]) meses[mes]={i:0,a:0,c:0};
-      const t=tipoPaciente(r);
-      if(t==='internado') meses[mes].i++;
-      else if(t==='alta') meses[mes].a++;
-      else meses[mes].c++;
-    });
-    Object.keys(meses).sort().forEach(m=>{
-      const [y,mo]=m.split('-');
-      labels.push(`${mo}/${y}`);
-      internData.push(meses[m].i);
-      altaData.push(meses[m].a);
-      consultData.push(meses[m].c);
-    });
+    enRango.forEach(r=>{ const fi=r.fecha_ingreso||r.fecha||''; if(!fi) return; const mes=fi.substring(0,7); if(!meses[mes]) meses[mes]={i:0,a:0,c:0}; const t=tipoPaciente(r); if(t==='internado') meses[mes].i++; else if(t==='alta') meses[mes].a++; else meses[mes].c++; });
+    Object.keys(meses).sort().forEach(m=>{ const [y,mo]=m.split('-'); labels.push(MESES_ES[parseInt(mo)-1]+'/'+y); internData.push(meses[m].i); altaData.push(meses[m].a); consultData.push(meses[m].c); });
   }
 
-  document.getElementById('est-contenido').innerHTML=`
-  <div class="est-kpi">
-    <div class="kpi-card"><div class="kpi-num">${internados.length+altas.length}</div><div class="kpi-label">Internaciones en período</div></div>
-    <div class="kpi-card"><div class="kpi-num">${altas.length>0?promDias+'d':'—'}</div><div class="kpi-label">Promedio días internación</div></div>
-    <div class="kpi-card"><div class="kpi-num">${internados.length}</div><div class="kpi-label">Aún internados</div></div>
-    <div class="kpi-card"><div class="kpi-num">${consultorios.length}</div><div class="kpi-label">Atenciones consultorio</div></div>
-  </div>
-  <div class="chart-card">
-    <h3>Internados y Altas</h3>
-    <p>Pacientes ingresados por internación en el período seleccionado</p>
-    <div class="chart-wrap"><canvas id="chart-internados"></canvas></div>
-  </div>
-  <div class="chart-card">
-    <h3>Atenciones en Consultorios</h3>
-    <p>Pacientes atendidos en consultorio en el período seleccionado</p>
-    <div class="chart-wrap"><canvas id="chart-consultorios"></canvas></div>
-  </div>`;
+  const reinRow=reinternados.length>0
+    ?reinternados.map(p=>'<tr><td style="padding:6px 10px;border-bottom:1px solid var(--border)">'+p.nombre+'</td><td style="padding:6px 10px;border-bottom:1px solid var(--border);text-align:center"><strong>'+p.n+'</strong></td><td style="padding:6px 10px;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted)">'+p.diag+'</td></tr>').join('')
+    :'<tr><td colspan="3" style="padding:12px;text-align:center;color:var(--muted)">Sin reinternaciones en el período</td></tr>';
+
+  document.getElementById('est-contenido').innerHTML=
+    '<div class="est-kpi">'
+    +'<div class="kpi-card"><div class="kpi-num">'+(internados.length+altas.length)+'</div><div class="kpi-label">Internaciones en período</div></div>'
+    +'<div class="kpi-card"><div class="kpi-num">'+(altas.length>0?promDias+'d':'--')+'</div><div class="kpi-label">Prom. días internación</div></div>'
+    +'<div class="kpi-card"><div class="kpi-num">'+internados.length+'</div><div class="kpi-label">Aún internados</div></div>'
+    +'<div class="kpi-card"><div class="kpi-num">'+tasaR+'%</div><div class="kpi-label">Tasa reinternación</div></div>'
+    +'</div>'
+    +'<div class="chart-card"><h3>Ingresos vs. Altas por mes calendario</h3><p>Flujo mensual de pacientes internados</p><div class="chart-wrap"><canvas id="chart-flujo"></canvas></div></div>'
+    +'<div class="chart-card"><h3>Detalle del período</h3><p>Internaciones y egresos en el rango seleccionado</p><div class="chart-wrap"><canvas id="chart-internados"></canvas></div></div>'
+    +(diagKeys.length>0?'<div class="chart-card"><h3>Promedio días de internación por diagnóstico (CIE-10)</h3><p>Top diagnósticos — barras: días promedio | línea: cantidad de pacientes</p><div class="chart-wrap" style="height:280px"><canvas id="chart-diag-dias"></canvas></div></div>':'')
+    +'<div class="chart-card"><h3>Consultorios e Interconsultas</h3><p>Atenciones por fuera de internación</p><div class="chart-wrap"><canvas id="chart-consultorios"></canvas></div></div>'
+    +'<div class="chart-card"><h3>Reinternaciones en el período</h3><p>Pacientes con más de un ingreso — tasa: <strong>'+tasaR+'%</strong> ('+reinternados.length+' de '+totalPac+' pacientes únicos)</p>'
+    +'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">'
+    +'<thead><tr style="background:var(--azul-light)"><th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--azul);text-transform:uppercase">Paciente</th><th style="padding:8px 10px;text-align:center;font-size:11px;color:var(--azul);text-transform:uppercase">Ingresos</th><th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--azul);text-transform:uppercase">Diagnóstico</th></tr></thead>'
+    +'<tbody>'+reinRow+'</tbody></table></div></div>';
 
   if(chartInternados) chartInternados.destroy();
   if(chartConsultorios) chartConsultorios.destroy();
+  if(window.chartFlujo) window.chartFlujo.destroy();
+  if(window.chartDiagDias) window.chartDiagDias.destroy();
 
-  chartInternados = new Chart(document.getElementById('chart-internados'), {
-    type:'bar',
-    data:{
-      labels,
-      datasets:[
-        { label:'Internados', data:internData, backgroundColor:'rgba(201,65,65,0.75)', borderColor:'#c04040', borderWidth:1.5, borderRadius:4 },
-        { label:'Altas', data:altaData, backgroundColor:'rgba(34,139,80,0.75)', borderColor:'#228b50', borderWidth:1.5, borderRadius:4 }
-      ]
-    },
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top',labels:{font:{family:'DM Sans',size:12}}}}, scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'DM Sans'}},grid:{color:'rgba(0,0,0,.06)'}},x:{ticks:{font:{family:'DM Sans',size:10}},grid:{display:false}}} }
-  });
+  const chartOpts = { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top',labels:{font:{family:'DM Sans',size:12}}}}, scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'DM Sans'}},grid:{color:'rgba(0,0,0,.06)'}},x:{ticks:{font:{family:'DM Sans',size:10}},grid:{display:false}}} };
 
-  chartConsultorios = new Chart(document.getElementById('chart-consultorios'), {
-    type:'bar',
-    data:{
-      labels,
-      datasets:[{ label:'Consultorios', data:consultData, backgroundColor:'rgba(124,58,237,0.75)', borderColor:'#7c3aed', borderWidth:1.5, borderRadius:4 }]
-    },
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top',labels:{font:{family:'DM Sans',size:12}}}}, scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'DM Sans'}},grid:{color:'rgba(0,0,0,.06)'}},x:{ticks:{font:{family:'DM Sans',size:10}},grid:{display:false}}} }
-  });
+  window.chartFlujo = new Chart(document.getElementById('chart-flujo'), { type:'bar', data:{ labels:flujoLabels, datasets:[
+    { label:'Ingresos', data:flujI, backgroundColor:'rgba(39,86,168,0.75)', borderColor:'#2756a8', borderWidth:1.5, borderRadius:4 },
+    { label:'Altas', data:flujA, backgroundColor:'rgba(21,128,61,0.75)', borderColor:'#15803d', borderWidth:1.5, borderRadius:4 }
+  ]}, options:chartOpts });
+
+  chartInternados = new Chart(document.getElementById('chart-internados'), { type:'bar', data:{ labels, datasets:[
+    { label:'Internados', data:internData, backgroundColor:'rgba(201,65,65,0.75)', borderColor:'#c04040', borderWidth:1.5, borderRadius:4 },
+    { label:'Altas', data:altaData, backgroundColor:'rgba(34,139,80,0.75)', borderColor:'#228b50', borderWidth:1.5, borderRadius:4 }
+  ]}, options:chartOpts });
+
+  if(diagKeys.length>0){
+    window.chartDiagDias = new Chart(document.getElementById('chart-diag-dias'), { type:'bar',
+      data:{ labels:diagKeys, datasets:[
+        { label:'Días promedio', data:diagProm, backgroundColor:'rgba(26,58,107,0.75)', borderColor:'#1a3a6b', borderWidth:1.5, borderRadius:4, yAxisID:'y' },
+        { label:'Nº pacientes', data:diagN, backgroundColor:'rgba(201,153,58,0.7)', borderColor:'#c9993a', borderWidth:2, type:'line', tension:0.3, pointRadius:4, yAxisID:'y2' }
+      ]},
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y',
+        plugins:{legend:{position:'top',labels:{font:{family:'DM Sans',size:11}}}},
+        scales:{ y:{ticks:{font:{family:'DM Sans',size:9}}}, x:{beginAtZero:true,ticks:{font:{family:'DM Sans',size:10}}},
+          y2:{position:'right',beginAtZero:true,ticks:{stepSize:1,font:{family:'DM Sans',size:9}},grid:{display:false}} }
+      }
+    });
+  }
+
+  chartConsultorios = new Chart(document.getElementById('chart-consultorios'), { type:'bar', data:{ labels, datasets:[
+    { label:'Consultorios', data:consultData, backgroundColor:'rgba(124,58,237,0.75)', borderColor:'#7c3aed', borderWidth:1.5, borderRadius:4 }
+  ]}, options:chartOpts });
 };
+
 
 // ── ELIMINAR ──
 window.eliminarRegistro = async (id) => {
@@ -1500,6 +1535,7 @@ window.abrirEdicion = (id) => {
   document.getElementById('e-edad').value=reg.edad||'';
   document.getElementById('e-fecha').value=reg.fecha||'';
   document.getElementById('e-direccion').value=reg.direccion||'';
+  document.getElementById('e-antecedentes').value=reg.antecedentes||'';
   document.getElementById('e-fecha_ingreso').value=reg.fecha_ingreso||'';
   document.getElementById('e-fecha_egreso').value=reg.fecha_egreso||'';
   document.getElementById('e-ubicacion').value=reg.ubicacion||'';
@@ -1567,6 +1603,7 @@ window.guardarEdicion = async () => {
       fecha_egreso:document.getElementById('e-fecha_egreso').value,
       ubicacion:ubicVal,
       ubicacion_otro:ubicVal==='OTRO'?document.getElementById('e-ubicacion_otro').value.trim():'',
+      antecedentes: document.getElementById('e-antecedentes').value.trim(),
       diagnostico_cie10: diagGetValue('e-cie10'),
       diagnostico_cie11: diagGetValue('e-cie11'),
       evol_general:document.getElementById('e-evol_general')?.value.trim()||'',
