@@ -2502,14 +2502,31 @@ window.mostrarModalExportar = (pdfDataUrl, filename, fecha) => {
 };
 
 window.verPDFInline = (pdfDataUrl) => {
-  // Open PDF in new tab/window for viewing
-  const win = window.open('', '_blank');
-  if(win) {
-    win.document.write('<html><head><title>Pase de Guardia</title><style>body{margin:0;padding:0;background:#333}iframe{width:100%;height:100vh;border:none}</style></head><body><iframe src="'+pdfDataUrl+'"></iframe></body></html>');
-    win.document.close();
-  } else {
-    // Fallback: direct link
-    window.open(pdfDataUrl, '_blank');
+  // Convert data URI to blob URL — works on all browsers including mobile
+  try {
+    const byteString = atob(pdfDataUrl.split(',')[1]);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for(let i=0;i<byteString.length;i++) ia[i]=byteString.charCodeAt(i);
+    const blob = new Blob([ab], {type:'application/pdf'});
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    // On mobile: open in new tab; on desktop: same
+    a.href = blobUrl;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(blobUrl), 10000);
+  } catch(e) {
+    // Fallback: direct data URI
+    const a = document.createElement('a');
+    a.href = pdfDataUrl;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 };
 window.compartirWhatsapp = (pdfDataUrl, filename) => {
