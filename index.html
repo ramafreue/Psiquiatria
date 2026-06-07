@@ -545,6 +545,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
               <option value="EMERGENCIA">EMERGENCIA</option>
               <option value="INTERNACION">INTERNACION</option>
               <option value="CONSULTORIOS">CONSULTORIOS</option>
+              <option value="INTERCONSULTA">INTERCONSULTA</option>
               <option value="OTRO">OTRO</option>
             </select>
           </div>
@@ -791,6 +792,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <option value="EMERGENCIA">EMERGENCIA</option>
             <option value="INTERNACION">INTERNACION</option>
             <option value="CONSULTORIOS">CONSULTORIOS</option>
+            <option value="INTERCONSULTA">INTERCONSULTA</option>
             <option value="OTRO">OTRO</option>
           </select>
         </div>
@@ -976,6 +978,7 @@ function diasInternacion(ingreso, egreso) {
 // 'alta'        = con fecha egreso <= hoy y no consultorio
 function tipoPaciente(reg) {
   if (reg.ubicacion === 'CONSULTORIOS') return 'consultorio';
+  if (reg.ubicacion === 'INTERCONSULTA') return 'interconsulta';
   if (!reg.fecha_egreso || reg.fecha_egreso > hoy()) return 'internado';
   return 'alta';
 }
@@ -1214,6 +1217,8 @@ function renderCard(reg) {
     if(dias!==null) statusBadge+=` <span class="badge badge-naranja">⏱ ${dias} día${dias!==1?'s':''} internado</span>`;
   } else if(tipo==='consultorio'){
     statusBadge=`<span class="badge badge-violeta">✓ Consultorio</span>`;
+  } else if(tipo==='interconsulta'){
+    statusBadge=`<span class="badge" style="background:#fff7ed;color:#c2410c;border:1.5px solid #fdba74">✓ Interconsulta</span>`;
   }
 
   return `
@@ -1283,11 +1288,12 @@ function cargarInternados() {
   const internados=todosRegistros.filter(r=>tipoPaciente(r)==='internado');
   const altas=todosRegistros.filter(r=>tipoPaciente(r)==='alta');
   const consultorios=todosRegistros.filter(r=>tipoPaciente(r)==='consultorio');
+  const interconsultas=todosRegistros.filter(r=>tipoPaciente(r)==='interconsulta');
   document.getElementById('internados-stats').innerHTML=`
   <div class="stats-row">
     <div class="stat-card"><div class="stat-num">${internados.length}</div><div class="stat-label">Internados</div></div>
     <div class="stat-card"><div class="stat-num">${altas.length}</div><div class="stat-label">Con alta</div></div>
-    <div class="stat-card"><div class="stat-num">${consultorios.length}</div><div class="stat-label">Consultorios</div></div>
+    <div class="stat-card"><div class="stat-num">${consultorios.length + interconsultas.length}</div><div class="stat-label">Consulta/Interc.</div></div>
   </div>`;
   renderLista(internados,'internados-lista','No hay pacientes internados actualmente');
 }
@@ -1358,8 +1364,9 @@ window.generarEstadisticas = () => {
   const internados=enRango.filter(r=>tipoPaciente(r)==='internado');
   const altas=enRango.filter(r=>tipoPaciente(r)==='alta');
   const consultorios=enRango.filter(r=>tipoPaciente(r)==='consultorio');
+  const interconsultas=enRango.filter(r=>tipoPaciente(r)==='interconsulta');
 
-  // Promedio días internación para dados de alta
+  // Promedio días internación para dados de alta (excluye INTERCONSULTA y CONSULTORIOS)
   let promDias=0;
   if(altas.length>0){
     const total=altas.reduce((acc,r)=>{
