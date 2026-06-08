@@ -554,7 +554,40 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <div class="field"><label>Fecha de hoy</label><input type="date" id="fecha"></div>
         </div>
         <div class="form-row full">
-          <div class="field"><label>Dirección / Barrio</label><input type="text" id="direccion" placeholder="Calle 123, Piso 2 / Barrio..."></div>
+          <div class="field"><label>Barrio</label>
+            <select id="direccion" onchange="toggleBarrioOtro()">
+              <option value="">— Seleccionar barrio —</option>
+              <option value="Barrio Salas">Barrio Salas</option>
+              <option value="Fátima">Fátima</option>
+              <option value="Irizar">Irizar</option>
+              <option value="La Lonja">La Lonja</option>
+              <option value="Luis Lagomarsino">Luis Lagomarsino</option>
+              <option value="Manantiales">Manantiales</option>
+              <option value="Manuel Alberti">Manuel Alberti</option>
+              <option value="Manzanares">Manzanares</option>
+              <option value="Manzone">Manzone</option>
+              <option value="Pilarica">Pilarica</option>
+              <option value="San Alejo">San Alejo</option>
+              <option value="San Cayetano">San Cayetano</option>
+              <option value="San Francisco">San Francisco</option>
+              <option value="Toro">Toro</option>
+              <option value="Tres Barrios">Tres Barrios</option>
+              <option value="Tribarrial">Tribarrial</option>
+              <option value="UDI Manuel Alberti">UDI Manuel Alberti</option>
+              <option value="UDI Meisner">UDI Meisner</option>
+              <option value="UDI Villa Rosa">UDI Villa Rosa</option>
+              <option value="Villa Astolfi">Villa Astolfi</option>
+              <option value="Villa del Carmen">Villa del Carmen</option>
+              <option value="Villa Luján">Villa Luján</option>
+              <option value="Villa Verde">Villa Verde</option>
+              <option value="OTRO">OTRO</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row full" id="barrio-otro-wrap" style="display:none">
+          <div class="field">
+            <label>Especificar barrio</label>
+            <input type="text" id="direccion_otro" placeholder="Escribí el barrio..."></div>
         </div>
         <div class="form-row">
           <div class="field"><label>Fecha de ingreso</label><input type="date" id="fecha_ingreso"></div>
@@ -846,7 +879,40 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
         <div class="field"><label>Edad</label><input type="number" id="e-edad" min="0" max="120"></div>
         <div class="field"><label>Fecha de hoy</label><input type="date" id="e-fecha"></div>
       </div>
-      <div class="form-row full"><div class="field"><label>Dirección / Barrio</label><input type="text" id="e-direccion"></div></div>
+      <div class="form-row full"><div class="field"><label>Barrio</label>
+          <select id="e-direccion" onchange="toggleBarrioOtroEdit()">
+            <option value="">— Seleccionar barrio —</option>
+            <option value="Barrio Salas">Barrio Salas</option>
+            <option value="Fátima">Fátima</option>
+            <option value="Irizar">Irizar</option>
+            <option value="La Lonja">La Lonja</option>
+            <option value="Luis Lagomarsino">Luis Lagomarsino</option>
+            <option value="Manantiales">Manantiales</option>
+            <option value="Manuel Alberti">Manuel Alberti</option>
+            <option value="Manzanares">Manzanares</option>
+            <option value="Manzone">Manzone</option>
+            <option value="Pilarica">Pilarica</option>
+            <option value="San Alejo">San Alejo</option>
+            <option value="San Cayetano">San Cayetano</option>
+            <option value="San Francisco">San Francisco</option>
+            <option value="Toro">Toro</option>
+            <option value="Tres Barrios">Tres Barrios</option>
+            <option value="Tribarrial">Tribarrial</option>
+            <option value="UDI Manuel Alberti">UDI Manuel Alberti</option>
+            <option value="UDI Meisner">UDI Meisner</option>
+            <option value="UDI Villa Rosa">UDI Villa Rosa</option>
+            <option value="Villa Astolfi">Villa Astolfi</option>
+            <option value="Villa del Carmen">Villa del Carmen</option>
+            <option value="Villa Luján">Villa Luján</option>
+            <option value="Villa Verde">Villa Verde</option>
+            <option value="OTRO">OTRO</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row full" id="e-barrio-otro-wrap" style="display:none">
+        <div class="field">
+          <label>Especificar barrio</label>
+          <input type="text" id="e-direccion_otro" placeholder="Escribí el barrio..."></div></div>
       <div class="form-row">
         <div class="field"><label>Fecha de ingreso</label><input type="date" id="e-fecha_ingreso"></div>
         <div class="field"><label>Fecha de egreso</label><input type="date" id="e-fecha_egreso"></div>
@@ -1070,6 +1136,51 @@ function setOficioVal(prefix, stored) {
   setOficio('si',prefix);
   var fechaEl=document.getElementById(prefix+'oficio_fecha');
   if(fechaEl&&parts[1]) fechaEl.value=parts[1];
+}
+
+
+// ── BARRIO ──
+function toggleBarrioOtro() {
+  const val = document.getElementById('direccion').value;
+  document.getElementById('barrio-otro-wrap').style.display = val === 'OTRO' ? 'block' : 'none';
+  if(val !== 'OTRO') document.getElementById('direccion_otro').value = '';
+}
+function toggleBarrioOtroEdit() {
+  const val = document.getElementById('e-direccion').value;
+  document.getElementById('e-barrio-otro-wrap').style.display = val === 'OTRO' ? 'block' : 'none';
+  if(val !== 'OTRO') document.getElementById('e-direccion_otro').value = '';
+}
+function getBarrioVal() {
+  const sel = document.getElementById('direccion').value;
+  if(sel === 'OTRO') return 'OTRO: ' + (document.getElementById('direccion_otro').value.trim() || '');
+  return sel;
+}
+function getBarrioValEdit() {
+  const sel = document.getElementById('e-direccion').value;
+  if(sel === 'OTRO') return 'OTRO: ' + (document.getElementById('e-direccion_otro').value.trim() || '');
+  return sel;
+}
+function setBarrioVal(val) {
+  if(!val) { document.getElementById('direccion').value=''; return; }
+  if(val.startsWith('OTRO: ')) {
+    document.getElementById('direccion').value = 'OTRO';
+    document.getElementById('direccion_otro').value = val.replace('OTRO: ','');
+    document.getElementById('barrio-otro-wrap').style.display = 'block';
+  } else {
+    document.getElementById('direccion').value = val;
+    document.getElementById('barrio-otro-wrap').style.display = 'none';
+  }
+}
+function setBarrioValEdit(val) {
+  if(!val) { document.getElementById('e-direccion').value=''; return; }
+  if(val.startsWith('OTRO: ')) {
+    document.getElementById('e-direccion').value = 'OTRO';
+    document.getElementById('e-direccion_otro').value = val.replace('OTRO: ','');
+    document.getElementById('e-barrio-otro-wrap').style.display = 'block';
+  } else {
+    document.getElementById('e-direccion').value = val;
+    document.getElementById('e-barrio-otro-wrap').style.display = 'none';
+  }
 }
 
 </script>
@@ -1301,7 +1412,8 @@ window.guardarRegistro = async () => {
       dni: document.getElementById('dni').value.trim(),
       edad: document.getElementById('edad').value.trim(),
       fecha: document.getElementById('fecha').value,
-      direccion: document.getElementById('direccion').value.trim(),
+      direccion: getBarrioVal(),
+      direccion_otro: document.getElementById('direccion_otro')?.value.trim()||'',
       fecha_ingreso: document.getElementById('fecha_ingreso').value,
       fecha_egreso: document.getElementById('fecha_egreso').value,
       ubicacion: ubicVal,
@@ -1337,6 +1449,9 @@ window.guardarRegistro = async () => {
     });
     ['apellido','nombre','dni','edad','direccion','fecha_ingreso','fecha_egreso','diagnostico_cie10','diagnostico_cie11','tratamiento','pendientes','ubicacion_otro'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
     document.getElementById('antecedentes').value='';
+    document.getElementById('direccion').value='';
+    if(document.getElementById('direccion_otro')) document.getElementById('direccion_otro').value='';
+    document.getElementById('barrio-otro-wrap').style.display='none';
     setOficio('no','');
     ['cie10','cie11'].forEach(p=>{ diagSelected[p]=[]; diagRender(p); const inp=document.getElementById(p+'-search'); if(inp) inp.value=''; });
         ['evol_general','evol_presentacion','evol_actitud','evol_conciencia','evol_orientacion','evol_atencion','evol_memoria','evol_senso','evol_imaginacion','evol_inteligencia','evol_pensamiento','evol_ideacion','evol_esquema','evol_juicio','evol_lenguaje','evol_afectividad','evol_psicomotriz','evol_voluntad','evol_habitos'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -1721,7 +1836,7 @@ window.abrirEdicion = (id) => {
   document.getElementById('e-dni').value=reg.dni||'';
   document.getElementById('e-edad').value=reg.edad||'';
   document.getElementById('e-fecha').value=reg.fecha||'';
-  document.getElementById('e-direccion').value=reg.direccion||'';
+  setBarrioValEdit(reg.direccion||'');
 
   document.getElementById('e-antecedentes').value=reg.antecedentes||'';
   document.getElementById('e-fecha_ingreso').value=reg.fecha_ingreso||'';
@@ -1767,6 +1882,8 @@ window.cerrarModal = () => {
   document.getElementById('modal-overlay').classList.remove('open');
   editandoId=null;
   setOficio('no','e-');
+  setBarrioValEdit('');
+  document.getElementById('e-barrio-otro-wrap').style.display='none';
   ['e-cie10','e-cie11'].forEach(p=>{ diagSelected[p]=[]; diagRender(p); const inp=document.getElementById(p+'-search'); if(inp) inp.value=''; });
   // reset evol edit fields
   ['e-evol_general','e-evol_presentacion','e-evol_actitud','e-evol_conciencia','e-evol_orientacion',
@@ -1790,7 +1907,7 @@ window.guardarEdicion = async () => {
       dni:document.getElementById('e-dni').value.trim(),
       edad:document.getElementById('e-edad').value.trim(),
       fecha:document.getElementById('e-fecha').value,
-      direccion:document.getElementById('e-direccion').value.trim(),
+      direccion: getBarrioValEdit(),
       fecha_ingreso:document.getElementById('e-fecha_ingreso').value,
       fecha_egreso:document.getElementById('e-fecha_egreso').value,
       ubicacion:ubicVal,
