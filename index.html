@@ -426,6 +426,15 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   .sidebar { width:280px; }
 }
 
+
+/* OFICIO */
+.oficio-wrap { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.oficio-toggle { display:flex; border:1.5px solid var(--border); border-radius:8px; overflow:hidden; }
+.oficio-opt { padding:9px 18px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; cursor:pointer; border:none; background:#fafbff; color:var(--muted); transition:all .15s; }
+.oficio-opt.active-si { background:#dcfce7; color:#15803d; font-weight:700; }
+.oficio-opt.active-no { background:#fee2e2; color:#c0392b; font-weight:700; }
+.oficio-date-wrap { flex:1; min-width:140px; }
+
 </style>
 </head>
 <body>
@@ -545,10 +554,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <div class="field"><label>Fecha de hoy</label><input type="date" id="fecha"></div>
         </div>
         <div class="form-row full">
-          <div class="field"><label>Dirección</label><input type="text" id="direccion" placeholder="Calle 123, Piso 2..."></div>
-        </div>
-        <div class="form-row full">
-          <div class="field"><label>Antecedentes psiquiátricos</label><textarea id="antecedentes" style="min-height:80px" placeholder="Internaciones previas, intentos de suicidio previos, diagnósticos anteriores, tratamientos previos..."></textarea></div>
+          <div class="field"><label>Dirección / Barrio</label><input type="text" id="direccion" placeholder="Calle 123, Piso 2 / Barrio..."></div>
         </div>
         <div class="form-row">
           <div class="field"><label>Fecha de ingreso</label><input type="date" id="fecha_ingreso"></div>
@@ -570,6 +576,22 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
         <div class="form-row full" id="otro-wrap" style="display:none">
           <div class="field"><label>Especificar ubicación</label><input type="text" id="ubicacion_otro" placeholder="Escribí la ubicación..."></div>
         </div>
+        <div class="form-row full">
+          <div class="field">
+            <label>Oficio judicial</label>
+            <div class="oficio-wrap">
+              <div class="oficio-toggle">
+                <button type="button" class="oficio-opt active-no" id="oficio-no" onclick="setOficio('no','')">NO</button>
+                <button type="button" class="oficio-opt" id="oficio-si" onclick="setOficio('si','')">SÍ</button>
+              </div>
+              <div class="oficio-date-wrap" id="oficio-date-wrap" style="display:none">
+                <input type="date" id="oficio_fecha" placeholder="Fecha del oficio">
+              </div>
+              <input type="hidden" id="oficio_valor" value="NO">
+            </div>
+          </div>
+        </div>
+
       </div>
       <div class="card">
         <div class="card-title">
@@ -607,7 +629,13 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           </div>
         </div>
 
-        <div class="form-row full" id="evol-section" style="max-width:100%;overflow:hidden;display:none">
+        <div class="form-row full" id="antecedentes-section" style="display:none">
+          <div class="field">
+            <label>Antecedentes psiquiátricos</label>
+            <textarea id="antecedentes" style="min-height:80px" placeholder="Internaciones previas, intentos de suicidio previos, diagnósticos anteriores, tratamientos previos..."></textarea>
+          </div>
+        </div>
+                <div class="form-row full" id="evol-section" style="max-width:100%;overflow:hidden;display:none">
           <div class="field">
             <label>Evolución</label>
             <button type="button" class="evol-toggle-btn" id="evol-toggle-btn" onclick="toggleEvol()">
@@ -818,8 +846,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
         <div class="field"><label>Edad</label><input type="number" id="e-edad" min="0" max="120"></div>
         <div class="field"><label>Fecha de hoy</label><input type="date" id="e-fecha"></div>
       </div>
-      <div class="form-row full"><div class="field"><label>Dirección</label><input type="text" id="e-direccion"></div></div>
-      <div class="form-row full"><div class="field"><label>Antecedentes psiquiátricos</label><textarea id="e-antecedentes" style="min-height:80px" placeholder="Internaciones previas, intentos de suicidio previos..."></textarea></div></div>
+      <div class="form-row full"><div class="field"><label>Dirección / Barrio</label><input type="text" id="e-direccion"></div></div>
       <div class="form-row">
         <div class="field"><label>Fecha de ingreso</label><input type="date" id="e-fecha_ingreso"></div>
         <div class="field"><label>Fecha de egreso</label><input type="date" id="e-fecha_egreso"></div>
@@ -840,6 +867,22 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       <div class="form-row full" id="e-otro-wrap" style="display:none">
         <div class="field"><label>Especificar ubicación</label><input type="text" id="e-ubicacion_otro"></div>
       </div>
+      <div class="form-row full">
+        <div class="field">
+          <label>Oficio judicial</label>
+          <div class="oficio-wrap">
+            <div class="oficio-toggle">
+              <button type="button" class="oficio-opt active-no" id="e-oficio-no" onclick="setOficio('no','e-')">NO</button>
+              <button type="button" class="oficio-opt" id="e-oficio-si" onclick="setOficio('si','e-')">SÍ</button>
+            </div>
+            <div class="oficio-date-wrap" id="e-oficio-date-wrap" style="display:none">
+              <input type="date" id="e-oficio_fecha">
+            </div>
+            <input type="hidden" id="e-oficio_valor" value="NO">
+          </div>
+        </div>
+      </div>
+
       <div class="form-row full">
         <div class="field">
           <label>Diagnóstico (CIE-10)</label>
@@ -870,7 +913,13 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <input type="hidden" id="e-cie11-value">
         </div>
       </div>
-      <div class="form-row full" id="e-evol-section" style="max-width:100%;overflow:hidden;display:none">
+      <div class="form-row full" id="e-antecedentes-section" style="display:none">
+        <div class="field">
+          <label>Antecedentes psiquiátricos</label>
+          <textarea id="e-antecedentes" style="min-height:80px" placeholder="Internaciones previas, intentos de suicidio previos, diagnósticos anteriores..."></textarea>
+        </div>
+      </div>
+            <div class="form-row full" id="e-evol-section" style="max-width:100%;overflow:hidden;display:none">
         <div class="field">
           <label>Evolución</label>
           <button type="button" class="evol-toggle-btn" id="e-evol-toggle-btn" onclick="toggleEvolEdit()">
@@ -884,74 +933,92 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Presentación y Aspecto</div>
+                <div class="evol-item-options">Saludable / Enfermizo / Incómodo / Avejentado / Juvenil / Infantil / Extravagante / Aseado / No aseado / Aliñado / Desaliñado / Vestido acorde/desacorde a clima/situación</div>
                 <textarea id="e-evol_presentacion" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Actitud</div>
+                <div class="evol-item-options">Colaboradora activa/pasiva / Amigable / Serena / Interesada / Franca / Defensiva / Seductora / Hostil / Amenazante / Reticente / Evasiva / Suspicaz / Agitada / Melancólica / Oposicionista</div>
                 <textarea id="e-evol_actitud" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Conciencia</div>
+                <div class="evol-item-options">Lucidez / Alerta / Hipervigilancia / Somnolencia / Obnubilación / Estupor / Coma</div>
                 <textarea id="e-evol_conciencia" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Orientación</div>
+                <div class="evol-item-options">Global / Parcial / En tiempo / espacio / persona</div>
                 <textarea id="e-evol_orientacion" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Atención y Concentración</div>
+                <div class="evol-item-options">Euprosexia / Aprosexia / Hipopresexia / Hiperprosexia / Paraprosexia / Estable / Fluctuante</div>
                 <textarea id="e-evol_atencion" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Memoria</div>
+                <div class="evol-item-options">Eumnesia / Amnesia (retrógrada–anterógrada–retroanterógrada–lacunar) / Hipomnesia / Hipermnesia / Paramnesias / Olvidos benignos</div>
                 <textarea id="e-evol_memoria" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Senso-percepción</div>
+                <div class="evol-item-options">Acelerada / Retardada / Abolida / Ilusiones / Alucinaciones verdaderas / Pseudoalucinaciones / visual/auditiva/olfativa/gustativa/táctil / Despersonalización / Desrealización / Onirismo / Alucinosis</div>
                 <textarea id="e-evol_senso" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Imaginación</div>
+                <div class="evol-item-options">Aumentada / Disminuida / Fabulación / Mentira / Conservada</div>
                 <textarea id="e-evol_imaginacion" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Inteligencia e Información</div>
+                <div class="evol-item-options">Inferior / Normal / Superior / CI:</div>
                 <textarea id="e-evol_inteligencia" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Pensamiento</div>
+                <div class="evol-item-options">Ritmo normal/alterado / Taquipsiquia / Bradipsiquia / Viscosidad / Interceptación / Rigidez / Perseveración / Estereotipia / Disgregación / Asociaciones laxas / Incoherencia / Tangencialidad / Abstracto / Concreto</div>
                 <textarea id="e-evol_pensamiento" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Ideación</div>
+                <div class="evol-item-options">Sin particularidades / Idea delirante / Idea obsesiva / Idea sobrevalorada / Idea fija / No presenta / Ideación de muerte / de suicidio — Escala Suicidalidad (Okasha 1981)</div>
                 <textarea id="e-evol_ideacion" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Esquema Corporal</div>
+                <div class="evol-item-options">Miembro fantasma / Hemisomatognosia / Anosognosia / Distorsiones de forma / Distorsiones de tamaño / Reduplicación</div>
                 <textarea id="e-evol_esquema" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Juicio</div>
+                <div class="evol-item-options">Conservado / Insuficiente / Debilitado / Suspendido / Desviado / Condicionado catatímicamente / por ideación obsesiva / por craving</div>
                 <textarea id="e-evol_juicio" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Lenguaje</div>
+                <div class="evol-item-options">Sin particularidades / Microfonía / Macrofonía / Disartria / Tartamudeo / Afasia / Tics vocales / Ecolalia / Neologismos / Discurso pobre / Verborrea / Mutismo / Estereotipia verbal</div>
                 <textarea id="e-evol_lenguaje" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Afectividad</div>
+                <div class="evol-item-options">Eutimia / Hipertimia / Hipotimia / Irritabilidad / Aplanamiento / Embotamiento / Anhedonia / Ansiedad / Disforia / Miedo / Labilidad / Euforia / Tristeza / Perplejidad / Moria / Inadecuado / Culpa / Neotimia</div>
                 <textarea id="e-evol_afectividad" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Actividad Psicomotriz</div>
+                <div class="evol-item-options">Agitación / Enlentecimiento / Tics / Estereotipias / Ecopraxia / Catalepsia / Cataplejía / Bloqueo / Estupor / Negativismo / Impulsión / Compulsión / Disquinesia / Acatisia / Distonía / Temblor / Excitación / Apraxia / Hipocinesia / Bruxismo / Ambitendencia</div>
                 <textarea id="e-evol_psicomotriz" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Voluntad</div>
+                <div class="evol-item-options">Eubulia / Abulia / Hipobulia / Hiperbulia (productiva-improductiva)</div>
                 <textarea id="e-evol_voluntad" placeholder="Observación..."></textarea>
               </div>
               <div class="evol-item">
                 <div class="evol-item-title">Hábitos</div>
+                <div class="evol-item-options">Insomnio / Hipersomnia / Parasomnia / Sueñoinvertido / Hiporexia / Hiperexia / Atracón / Vaginismo / Anorgasmia / Dispareunia / Hipersexualidad / Impotencia / Piernas inquietas</div>
                 <textarea id="e-evol_habitos" placeholder="Observación..."></textarea>
               </div>
           </div>
@@ -1130,6 +1197,8 @@ onAuthStateChanged(auth, user => {
     const showEvol = user.email === EVOL_USER;
     const evolSec = document.getElementById('evol-section');
     if(evolSec) evolSec.style.display = showEvol ? 'block' : 'none';
+    const antSec = document.getElementById('antecedentes-section');
+    if(antSec) antSec.style.display = showEvol ? 'block' : 'none';
     // Mostrar tab de impresión solo para usuario específico
     const siImp = document.getElementById('si-impresion');
     if(siImp) siImp.style.display = showEvol ? 'flex' : 'none';
@@ -1202,6 +1271,7 @@ window.guardarRegistro = async () => {
       fecha_egreso: document.getElementById('fecha_egreso').value,
       ubicacion: ubicVal,
       ubicacion_otro: ubicVal==='OTRO'?document.getElementById('ubicacion_otro').value.trim():'',
+      oficio: getOficioVal(''),
       antecedentes: document.getElementById('antecedentes').value.trim(),
       diagnostico_cie10: diagGetValue('cie10'),
       diagnostico_cie11: diagGetValue('cie11'),
@@ -1232,6 +1302,7 @@ window.guardarRegistro = async () => {
     });
     ['apellido','nombre','dni','edad','direccion','fecha_ingreso','fecha_egreso','diagnostico_cie10','diagnostico_cie11','tratamiento','pendientes','ubicacion_otro'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
     document.getElementById('antecedentes').value='';
+    setOficio('no','');
     ['cie10','cie11'].forEach(p=>{ diagSelected[p]=[]; diagRender(p); const inp=document.getElementById(p+'-search'); if(inp) inp.value=''; });
         ['evol_general','evol_presentacion','evol_actitud','evol_conciencia','evol_orientacion','evol_atencion','evol_memoria','evol_senso','evol_imaginacion','evol_inteligencia','evol_pensamiento','evol_ideacion','evol_esquema','evol_juicio','evol_lenguaje','evol_afectividad','evol_psicomotriz','evol_voluntad','evol_habitos'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
     document.getElementById('ubicacion').value='';
@@ -1316,7 +1387,8 @@ function renderCard(reg) {
       ${propio?'<span class="badge badge-azul">✓ Tuyo</span>':''}
       ${statusBadge}
       <div style="margin-left:auto;display:flex;gap:6px">
-        ${propio?`<button class="btn btn-sm" onclick="abrirEdicion('${reg.id}')">✎ Editar</button><button class="btn btn-danger" onclick="eliminarRegistro('${reg.id}')">✕</button>`:''}
+        <button class="btn btn-sm" onclick="abrirEdicion('${reg.id}')">✎ Editar</button>
+      ${propio?`<button class="btn btn-danger" onclick="eliminarRegistro('${reg.id}')">✕</button>`:''}
       </div>
     </div>
   </div>`;
@@ -1607,7 +1679,7 @@ window.eliminarRegistro = async (id) => {
 // ── EDITAR ──
 window.abrirEdicion = (id) => {
   const reg=todosRegistros.find(r=>r.id===id);
-  if(!reg||!esPropio(reg)) return;
+  if(!reg) return;
   editandoId=id;
   document.getElementById('e-apellido').value=reg.apellido||'';
   document.getElementById('e-nombre').value=reg.nombre||'';
@@ -1615,6 +1687,7 @@ window.abrirEdicion = (id) => {
   document.getElementById('e-edad').value=reg.edad||'';
   document.getElementById('e-fecha').value=reg.fecha||'';
   document.getElementById('e-direccion').value=reg.direccion||'';
+  setOficioVal('e-', reg.oficio||'NO');
   document.getElementById('e-antecedentes').value=reg.antecedentes||'';
   document.getElementById('e-fecha_ingreso').value=reg.fecha_ingreso||'';
   document.getElementById('e-fecha_egreso').value=reg.fecha_egreso||'';
@@ -1625,6 +1698,7 @@ window.abrirEdicion = (id) => {
   diagSetValue('e-cie11', reg.diagnostico_cie11||'');
   if(currentUser && currentUser.email === 'solealbanycaballero@gmail.com') {
   const eEvolSec=document.getElementById('e-evol-section'); if(eEvolSec) eEvolSec.style.display='block';
+  const eAntSec=document.getElementById('e-antecedentes-section'); if(eAntSec) eAntSec.style.display='block';
   document.getElementById('e-evol_general').value = reg.evol_general||'';
   document.getElementById('e-evol_presentacion').value = reg.evol_presentacion||'';
   document.getElementById('e-evol_actitud').value = reg.evol_actitud||'';
@@ -1646,6 +1720,7 @@ window.abrirEdicion = (id) => {
   document.getElementById('e-evol_habitos').value = reg.evol_habitos||'';
   } else {
   const eEvolHide=document.getElementById('e-evol-section'); if(eEvolHide) eEvolHide.style.display='none';
+  const eAntHide=document.getElementById('e-antecedentes-section'); if(eAntHide) eAntHide.style.display='none';
   }
   document.getElementById('e-tratamiento').value=reg.tratamiento||'';
   document.getElementById('e-pendientes').value=reg.pendientes||'';
@@ -1655,6 +1730,7 @@ window.abrirEdicion = (id) => {
 window.cerrarModal = () => {
   document.getElementById('modal-overlay').classList.remove('open');
   editandoId=null;
+  setOficio('no','e-');
   ['e-cie10','e-cie11'].forEach(p=>{ diagSelected[p]=[]; diagRender(p); const inp=document.getElementById(p+'-search'); if(inp) inp.value=''; });
   // reset evol edit fields
   ['e-evol_general','e-evol_presentacion','e-evol_actitud','e-evol_conciencia','e-evol_orientacion',
@@ -1683,6 +1759,7 @@ window.guardarEdicion = async () => {
       fecha_egreso:document.getElementById('e-fecha_egreso').value,
       ubicacion:ubicVal,
       ubicacion_otro:ubicVal==='OTRO'?document.getElementById('e-ubicacion_otro').value.trim():'',
+      oficio: getOficioVal('e-'),
       antecedentes: document.getElementById('e-antecedentes').value.trim(),
       diagnostico_cie10: diagGetValue('e-cie10'),
       diagnostico_cie11: diagGetValue('e-cie11'),
@@ -2740,6 +2817,39 @@ window.addEventListener('appinstalled', () => {
   localStorage.setItem('pwa_installed', '1');
   deferredPrompt = null;
 });
+
+// ── OFICIO ──
+window.setOficio = (val, prefix) => {
+  const siBtn = document.getElementById(prefix+'oficio-si');
+  const noBtn = document.getElementById(prefix+'oficio-no');
+  const wrap  = document.getElementById(prefix+'oficio-date-wrap');
+  const hidden= document.getElementById(prefix+'oficio_valor');
+  if(val==='si'){
+    siBtn.className='oficio-opt active-si';
+    noBtn.className='oficio-opt';
+    wrap.style.display='block';
+    hidden.value='SI';
+  } else {
+    noBtn.className='oficio-opt active-no';
+    siBtn.className='oficio-opt';
+    wrap.style.display='none';
+    if(document.getElementById(prefix+'oficio_fecha')) document.getElementById(prefix+'oficio_fecha').value='';
+    hidden.value='NO';
+  }
+};
+function getOficioVal(prefix) {
+  const v=document.getElementById(prefix+'oficio_valor')?.value||'NO';
+  const f=document.getElementById(prefix+'oficio_fecha')?.value||'';
+  return v==='SI' ? 'SI|'+f : 'NO';
+}
+function setOficioVal(prefix, stored) {
+  if(!stored||stored==='NO'){ setOficio('no',prefix); return; }
+  const parts=stored.split('|');
+  setOficio('si',prefix);
+  const fechaEl=document.getElementById(prefix+'oficio_fecha');
+  if(fechaEl&&parts[1]) fechaEl.value=parts[1];
+}
+
 </script>
 </body>
 </html>
