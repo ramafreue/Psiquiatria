@@ -1717,18 +1717,22 @@ async function procesarImportacion(patients, filename) {
     // ── SAVE TO FIREBASE ──
     if(accion === 'importar') {
       try {
-        const { collection: fbCol, addDoc: fbAdd, serverTimestamp: fbTS } = window._fbImport;
+        const fbCol = window._fbImport.collection;
+        const fbAdd = window._fbImport.addDoc;
+        const fbTS  = window._fbImport.serverTimestamp;
+        const fechaHoyStr = (typeof hoy === 'function') ? hoy() : new Date().toLocaleDateString('sv-SE');
+        const user = window.currentUser;
         await fbAdd(fbCol(window._fbDB, 'registros'), {
           apellido: p.apellido,
           nombre: p.nombre,
           dni: p.dni,
           edad: p.edad,
-          fecha: hoy(),
+          fecha: fechaHoyStr,
           fecha_ingreso: p.fechaIngreso || '',
           fecha_egreso: '',
           ubicacion: p.ubicacion,
           ubicacion_otro: p.ubicacion === 'OTRO' ? 'Derivación' : '',
-          oficio: p.oficio === 'SI' ? ('SI|'+(p.oficioFecha||todayStr)) : 'NO',
+          oficio: p.oficio === 'SI' ? ('SI|'+(p.oficioFecha||fechaHoyStr)) : 'NO',
           diagnostico_cie10: diagCIE10,
           diagnostico_cie11: '',
           diagnostico: diagCIE10,
@@ -1738,8 +1742,8 @@ async function procesarImportacion(patients, filename) {
           direccion: '',
           importado: true,
           reinternacion: p.reinternacion === 'SI',
-          autorUid: currentUser.uid,
-          autorNombre: currentUser.displayName || currentUser.email,
+          autorUid: user ? user.uid : '',
+          autorNombre: user ? (user.displayName || user.email) : 'Importación',
           creadoEn: fbTS()
         });
         results.push({ p, accion:'ok', msg: observacion, diag: diagCIE10 });
