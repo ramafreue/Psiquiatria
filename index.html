@@ -2161,7 +2161,7 @@ function renderCard(reg) {
       ${statusBadge}
       <div style="margin-left:auto;display:flex;gap:6px">
         <button class="btn btn-sm" onclick="abrirEdicion('${reg.id}')">✎ Editar</button>
-      ${propio?`<button class="btn btn-danger" onclick="eliminarRegistro('${reg.id}')">✕</button>`:''}
+      <button class="btn btn-danger" onclick="eliminarRegistro('${reg.id}')">✕</button>
       </div>
     </div>
   </div>`;
@@ -3014,9 +3014,11 @@ window.generarPDF = (mesAnio, mesNum, anioNum) => {
     doc.text(doc.splitTextToSize(diagStr, cols[1]-4), x+2, y+pad);
     x += cols[1];
 
-    // Col 2: Admisión — centred, bold SI
-    setFont('bold', 9);
-    doc.text('SI', x + cols[2]/2, y + rowH/2 + 1, { align:'center' });
+    // Col 2: Admisión = Fecha de Ingreso
+    setFont('normal', 8);
+    doc.setTextColor(...BLACK);
+    const admFecha = reg.fecha_ingreso ? formatFecha(reg.fecha_ingreso) : '—';
+    doc.text(admFecha, x + cols[2]/2, y + rowH/2 + 1, { align:'center' });
     x += cols[2];
 
     // Col 3: Tratamiento
