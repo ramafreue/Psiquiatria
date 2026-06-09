@@ -1365,10 +1365,15 @@ function extractPatientsFromRows(rows) {
     let oficioFecha = '';
     
     if(fechaOficio) {
+      // Col 5 = OFICIO column has a date -> internacion por oficio judicial
       ubicacion = 'INTERNACION';
       fechaIngreso = fechaOficio;
       oficio = 'SI';
       oficioFecha = fechaOficio;
+    } else if(fechaInvoluntario && !esObservacion && !esInternacion && !esDerivacion) {
+      // Has involuntary date but no X markers -> try to infer from context
+      ubicacion = 'INTERNACION';
+      fechaIngreso = fechaInvoluntario;
     } else if(esObservacion) {
       ubicacion = 'EMERGENCIA';
       fechaIngreso = fechaInvoluntario || fechaVoluntario || '';
@@ -1400,16 +1405,37 @@ function extractPatientsFromRows(rows) {
 function parseDate(val) {
   if(!val) return '';
   const s = String(val).trim();
-  if(!s || s==='null' || s==='NaN') return '';
-  // Try ISO format YYYY-MM-DD
-  const iso = s.match(/(\d{4})-(\d{2})-(\d{2})/);
-  if(iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
-  // Try DD/MM/YYYY
-  const dmy = s.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if(dmy) return `${dmy[3]}-${dmy[2].padStart(2,'0')}-${dmy[1].padStart(2,'0')}`;
-  // Try MM/DD/YYYY (US)
-  const mdy = s.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if(mdy) return `${mdy[3]}-${mdy[1].padStart(2,'0')}-${mdy[2].padStart(2,'0')}`;
+  if(!s || s==='null' || s==='NaN' || s==='undefined') return '';
+
+  // SheetJS ISO with time: "2026-07-06T00:00:00.000Z" -> use local date
+  if(s.includes('T')) {
+    // Parse as local date to avoid timezone shift
+    const parts = s.split('T')[0].split('-');
+    if(parts.length === 3) return parts[0]+'-'+parts[1].padStart(2,'0')+'-'+parts[2].padStart(2,'0');
+  }
+
+  // ISO YYYY-MM-DD
+  const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(iso) return iso[1]+'-'+iso[2]+'-'+iso[3];
+
+  // DD/MM/YYYY (Argentina standard)
+  const dmy = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(dmy) return dmy[3]+'-'+dmy[2].padStart(2,'0')+'-'+dmy[1].padStart(2,'0');
+
+  // DD-MM-YYYY
+  const dmy2 = s.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+  if(dmy2) return dmy2[3]+'-'+dmy2[2].padStart(2,'0')+'-'+dmy2[1].padStart(2,'0');
+
+  // Excel serial number (days since 1900)
+  const num = parseFloat(s);
+  if(!isNaN(num) && num > 40000 && num < 60000) {
+    const d = new Date(Math.round((num - 25569) * 86400 * 1000));
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return y+'-'+m+'-'+day;
+  }
+
   return '';
 }
 
@@ -1683,8 +1709,8 @@ async function procesarImportacion(patients, filename) {
           nombre: p.nombre,
           dni: p.dni,
           edad: p.edad,
-          fecha: hoy,
-          fecha_ingreso: p.fechaIngreso || hoy,
+          fecha: hoy(),
+          fecha_ingreso: p.fechaIngreso || '',
           fecha_egreso: '',
           ubicacion: p.ubicacion,
           ubicacion_otro: p.ubicacion === 'OTRO' ? 'Derivación' : '',
@@ -1774,7 +1800,13 @@ let chartInternados = null;
 let chartConsultorios = null;
 
 // ── UTILS ──
-function hoy() { return new Date().toISOString().split('T')[0]; }
+function hoy() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+day;
+}
 function formatFecha(iso) { if(!iso) return '—'; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; }
 function initials(n) { return (n||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
 
