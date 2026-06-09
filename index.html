@@ -1442,36 +1442,180 @@ async function mapDiagToCIE10(diagRaw) {
   return diagRaw; // fallback: keep original
 }
 
-// ── LOCAL DIAGNOSIS MAP (fast, no API) ──
+// ── LOCAL DIAGNOSIS MAP — Psiquiatra experimentado ──
 function localDiagMap(raw) {
   if(!raw) return '';
-  const r = raw.toUpperCase().trim();
-  const MAP = [
-    [['TCL','TRASTORNO LIMITE','BORDERLINE','LÍMITE DE PERSONALIDAD'], 'F60.31 Trastorno de inestabilidad emocional de la personalidad, tipo límite'],
-    [['ESQUIZOFRENIA','SCHIZOPHRENIA','EXCITACION PSICOMOTRIZ'], 'F20.9 Esquizofrenia sin especificación'],
-    [['DEPRESION','DEPRESIÓN','EPISODIO DEPRESIVO'], 'F32.1 Episodio depresivo moderado'],
-    [['IDEACION SUICIDA','IDEAS SUICIDAS','SUICID'], 'F32.3 Episodio depresivo grave con síntomas psicóticos'],
-    [['BIPOLAR'], 'F31.9 Trastorno bipolar sin especificación'],
-    [['ANSIEDAD','ANXIETY'], 'F41.9 Trastorno de ansiedad sin especificación'],
-    [['TOC','OBSESIVO'], 'F42.9 Trastorno obsesivo-compulsivo sin especificación'],
-    [['PSICOSIS','PSICÓTICO','PSICOTICO'], 'F29 Psicosis no orgánica sin especificación'],
-    [['INTOXICACION','INTOXICACIÓN','SOBREDOSIS'], 'F19.0 Intoxicación aguda por múltiples drogas'],
-    [['ALCOHOL'], 'F10.2 Síndrome de dependencia al alcohol'],
-    [['DEMENCIA','ALZHEIMER'], 'F00.9 Demencia en la enfermedad de Alzheimer sin especificación'],
-    [['TDAH','DEFICIT ATENCION'], 'F90.0 Perturbación de la actividad y de la atención'],
-    [['AUTISMO'], 'F84.0 Autismo infantil'],
-    [['PANICO','PÁNICO'], 'F41.0 Trastorno de pánico'],
-    [['FOBIA'], 'F40.9 Trastorno fóbico de ansiedad sin especificación'],
-    [['TEPT','ESTRES POSTRAUMATICO'], 'F43.1 Trastorno de estrés postraumático'],
-    [['ANOREXIA'], 'F50.0 Anorexia nerviosa'],
-    [['BULIMIA'], 'F50.2 Bulimia nerviosa'],
-    [['RETRASO MENTAL','RETRASO MADURATIVO'], 'F79 Retraso mental sin especificación'],
-  ];
-  for(const [keys, code] of MAP) {
-    if(keys.some(k => r.includes(k))) return code;
-  }
-  return '';
+  const r = raw.toUpperCase().trim()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')  // remove accents
+    .replace(/[^A-Z0-9\s\-]/g,' ')
+    .replace(/\s+/g,' ');
+
+  // Helper: check if any keyword matches
+  const has = (...keys) => keys.some(k => r.includes(k));
+
+  // ── PSICOSIS / ESQUIZOFRENIA ──
+  if(has('ESQUIZOFRENIA PARANOIDE','ESQUIZO PARANOIDE')) return 'F20.0 Esquizofrenia paranoide';
+  if(has('ESQUIZOFRENIA CATATONICA','ESQUIZO CATATONICA')) return 'F20.2 Esquizofrenia catatónica';
+  if(has('ESQUIZOFRENIA RESIDUAL','ESQUIZO RESIDUAL')) return 'F20.5 Esquizofrenia residual';
+  if(has('ESQUIZOFRENIA SIMPLE')) return 'F20.6 Esquizofrenia simple';
+  if(has('ESQUIZOFRENIA','ESQUIZO','SCHIZOPHRENIA')) return 'F20.9 Esquizofrenia sin especificación';
+  if(has('ESQUIZOTIPICO','ESQUIZOTIPAL')) return 'F21 Trastorno esquizotípico';
+  if(has('ESQUIZOAFECTIVO MANIACO')) return 'F25.0 Trastorno esquizoafectivo de tipo maníaco';
+  if(has('ESQUIZOAFECTIVO DEPRESIVO')) return 'F25.1 Trastorno esquizoafectivo de tipo depresivo';
+  if(has('ESQUIZOAFECTIVO')) return 'F25.9 Trastorno esquizoafectivo sin especificación';
+  if(has('PSICOSIS AGUDA','PSICOSIS BREVE','PSICOSIS TRANSITORIA')) return 'F23.9 Trastorno psicótico agudo y transitorio sin especificación';
+  if(has('PSICOSIS INDUCIDA','PSICOSIS TOXICA','PSICOSIS POR SUSTANCIA')) return 'F19.5 Trastorno psicótico inducido por múltiples drogas';
+  if(has('DELIRIO PERSECUTORIO','TRASTORNO DELIRANTE','PARANOIA')) return 'F22.0 Trastorno delirante';
+  if(has('EXCITACION PSICOMOTRIZ','AGITACION PSICOMOTRIZ','AGITACION PSICOM')) return 'F20.9 Esquizofrenia sin especificación';
+  if(has('PSICOSIS','PSICOTICO','PSICÓTICO')) return 'F29 Psicosis no orgánica sin especificación';
+
+  // ── TRASTORNOS DEL ESTADO DE ANIMO ──
+  if(has('MANIA','MANIACO','MANÍA','MANÍACO')) return 'F30.9 Episodio maníaco sin especificación';
+  if(has('BIPOLAR I','BIPOLAR TIPO I')) return 'F31.2 Trastorno bipolar, episodio actual maníaco con síntomas psicóticos';
+  if(has('BIPOLAR II','BIPOLAR TIPO II')) return 'F31.8 Otros trastornos bipolares';
+  if(has('BIPOLAR','TRASTORNO BIPOLAR')) return 'F31.9 Trastorno bipolar sin especificación';
+  if(has('CICLOTIMIA')) return 'F34.0 Ciclotimia';
+  if(has('DISTIMIA','DISTIMICO')) return 'F34.1 Distimia';
+  if(has('DEPRESION GRAVE','DEPRESIÓN GRAVE','EPISODIO DEPRESIVO GRAVE')) return 'F32.2 Episodio depresivo grave sin síntomas psicóticos';
+  if(has('DEPRESION MODERADA','DEPRESIÓN MODERADA','EPISODIO DEPRESIVO MODERADO')) return 'F32.1 Episodio depresivo moderado';
+  if(has('DEPRESION LEVE','DEPRESIÓN LEVE')) return 'F32.0 Episodio depresivo leve';
+  if(has('DEPRESION PSICOTICA','DEPRESION CON PSICOSIS')) return 'F32.3 Episodio depresivo grave con síntomas psicóticos';
+  if(has('DEPRESION POSTPARTO','DEPRESION PUERPERAL')) return 'F53.0 Trastornos mentales y del comportamiento leves asociados al puerperio';
+  if(has('DEPRESION RECURRENTE','TRASTORNO DEPRESIVO RECURRENTE')) return 'F33.9 Trastorno depresivo recurrente sin especificación';
+  if(has('IDEACION SUICIDA','IDEAS SUICIDAS','IDEACIÓN SUICIDA','RIESGO SUICIDA','TENTATIVA DE SUICIDIO','INTENTO DE SUICIDIO','PARASUICIDIO')) return 'F32.3 Episodio depresivo grave con síntomas psicóticos';
+  if(has('DEPRESION','DEPRESIVO','DEPRESIÓN')) return 'F32.9 Episodio depresivo sin especificación';
+
+  // ── TRASTORNOS DE PERSONALIDAD ──
+  if(has('TCL','TRASTORNO LIMITE','TRASTORNO LÍMITE','BORDERLINE','LIMÍTROFE','LIMITROFE')) return 'F60.31 Trastorno de inestabilidad emocional de la personalidad, tipo límite';
+  if(has('TLP','PERSONALIDAD LIMITE','PERSONALIDAD LÍMITE')) return 'F60.31 Trastorno de inestabilidad emocional de la personalidad, tipo límite';
+  if(has('PERSONALIDAD PARANOIDE','TRASTORNO PARANOIDE')) return 'F60.0 Trastorno paranoide de la personalidad';
+  if(has('PERSONALIDAD ESQUIZOIDE')) return 'F60.1 Trastorno esquizoide de la personalidad';
+  if(has('PERSONALIDAD DISOCIAL','ANTISOCIAL','PSICOPATIA')) return 'F60.2 Trastorno disocial de la personalidad';
+  if(has('PERSONALIDAD IMPULSIVA','IMPULSIVIDAD')) return 'F60.30 Trastorno de inestabilidad emocional de la personalidad, tipo impulsivo';
+  if(has('PERSONALIDAD HISTRIONICA','HISTRI')) return 'F60.4 Trastorno histriónico de la personalidad';
+  if(has('PERSONALIDAD ANANCASICA','OBSESIVA COMPULSIVA DE PERSONALIDAD')) return 'F60.5 Trastorno anancástico de la personalidad';
+  if(has('PERSONALIDAD ANSIOSA','PERSONALIDAD EVITATIVA','PERSONALIDAD FOBICA')) return 'F60.6 Trastorno ansioso con conducta de evitación de la personalidad';
+  if(has('PERSONALIDAD DEPENDIENTE')) return 'F60.7 Trastorno dependiente de la personalidad';
+  if(has('TRASTORNO DE PERSONALIDAD','PERSONALIDAD PATOLOGICA')) return 'F60.9 Trastorno de la personalidad sin especificación';
+
+  // ── ANSIEDAD ──
+  if(has('TRASTORNO DE PANICO','CRISIS DE PANICO','CRISIS DE PÁNICO','ATAQUE DE PANICO')) return 'F41.0 Trastorno de pánico';
+  if(has('TAG','ANSIEDAD GENERALIZADA','TRASTORNO DE ANSIEDAD GENERALIZADA')) return 'F41.1 Trastorno de ansiedad generalizada';
+  if(has('ANSIEDAD MIXTA','MIXTO ANSIOSO DEPRESIVO','ANSIOSO DEPRESIVO')) return 'F41.2 Trastorno mixto ansioso-depresivo';
+  if(has('FOBIA SOCIAL','ANSIEDAD SOCIAL')) return 'F40.1 Fobias sociales';
+  if(has('AGORAFOBIA')) return 'F40.0 Agorafobia';
+  if(has('FOBIA ESPECIFICA','FOBIA ESPECIFICA')) return 'F40.2 Fobias específicas';
+  if(has('ANSIEDAD','ANSIOSO')) return 'F41.9 Trastorno de ansiedad sin especificación';
+
+  // ── TOC / RELACIONADOS ──
+  if(has('TOC','TRASTORNO OBSESIVO COMPULSIVO','OCD')) return 'F42.2 Trastorno obsesivo-compulsivo con pensamientos y actos obsesivos mixtos';
+  if(has('TRICOTILOMAN')) return 'F63.3 Tricotilomanía';
+  if(has('HIPOCONDRIA','HIPOCONDRÍA')) return 'F45.2 Trastorno hipocondríaco';
+
+  // ── ESTRES / ADAPTACION ──
+  if(has('TEPT','ESTRES POSTRAUMATICO','ESTRÉS POSTRAUMÁTICO','TRAUMA')) return 'F43.1 Trastorno de estrés postraumático';
+  if(has('REACCION AGUDA AL ESTRES','REACCIÓN AGUDA')) return 'F43.0 Reacción aguda al estrés';
+  if(has('TRASTORNO DE ADAPTACION','TRASTORNO ADAPTATIVO','REACCION DE ADAPTACION')) return 'F43.2 Trastorno de adaptación';
+  if(has('DUELO')) return 'F43.2 Trastorno de adaptación';
+
+  // ── DISOCIATIVO ──
+  if(has('DISOCIATIVO','DISOCIACION','DISOCIACIÓN','CONVERSION','CONVERSIÓN')) return 'F44.9 Trastorno disociativo sin especificación';
+  if(has('DESPERSONALIZACION','DESREALIZACIÓN','DESREALIZACION')) return 'F48.1 Síndrome de despersonalización-desrealización';
+  if(has('AMNESIA DISOCIATIVA')) return 'F44.0 Amnesia disociativa';
+
+  // ── TRASTORNOS POR SUSTANCIAS ──
+  if(has('SINDROME DE ABSTINENCIA ALCOHOLICA','ABSTINENCIA ALCOHOL','DELIRIUM TREMENS')) return 'F10.4 Síndrome de abstinencia de alcohol con delirium';
+  if(has('DEPENDENCIA AL ALCOHOL','DEPENDENCIA ALCOHOLICA','ALCOHOLISMO')) return 'F10.2 Síndrome de dependencia al alcohol';
+  if(has('INTOXICACION ALCOHOLICA','INTOXICACION POR ALCOHOL')) return 'F10.0 Intoxicación aguda por alcohol';
+  if(has('USO NOCIVO ALCOHOL')) return 'F10.1 Uso nocivo de alcohol';
+  if(has('DEPENDENCIA CANNABIS','DEPENDENCIA MARIHUANA')) return 'F12.2 Síndrome de dependencia a cannabinoides';
+  if(has('INTOXICACION CANNABIS','INTOXICACION MARIHUANA')) return 'F12.0 Intoxicación aguda por cannabinoides';
+  if(has('COCAINA','COCAÍNA')) return 'F14.2 Síndrome de dependencia a cocaína';
+  if(has('PASTA BASE','PACO')) return 'F14.2 Síndrome de dependencia a cocaína';
+  if(has('HEROINA','OPIOI','MORFINA')) return 'F11.2 Síndrome de dependencia a opioides';
+  if(has('DEPENDENCIA BENZODIACEPINA','DEPENDENCIA BENZO')) return 'F13.2 Síndrome de dependencia a sedantes o hipnóticos';
+  if(has('DEPENDENCIA MULTIPLE','POLITOXICOMANIA','POLITOXICOMANÍA')) return 'F19.2 Síndrome de dependencia a múltiples drogas';
+  if(has('INTOXICACION MEDICAMENTOSA','INTOXICACION POR FARMACOS','SOBREDOSIS')) return 'F19.0 Intoxicación aguda por múltiples drogas y otras sustancias psicoactivas';
+  if(has('TRASTORNO POR SUSTANCIA','USO DE SUSTANCIA')) return 'F19.9 Trastorno mental y del comportamiento inducido por múltiples drogas sin especificación';
+
+  // ── ALIMENTARIOS ──
+  if(has('ANOREXIA')) return 'F50.0 Anorexia nerviosa';
+  if(has('BULIMIA')) return 'F50.2 Bulimia nerviosa';
+  if(has('TRASTORNO ALIMENTARIO','TRASTORNO DE LA CONDUCTA ALIMENTARIA','TCA')) return 'F50.9 Trastorno de la conducta alimentaria sin especificación';
+
+  // ── NEUROCOGNITIVOS / ORGANICOS ──
+  if(has('ALZHEIMER')) return 'F00.9 Demencia en la enfermedad de Alzheimer sin especificación';
+  if(has('DEMENCIA VASCULAR')) return 'F01.9 Demencia vascular sin especificación';
+  if(has('DEMENCIA','DETERIORO COGNITIVO MAYOR')) return 'F03 Demencia sin especificación';
+  if(has('DELIRIUM','SINDROME CONFUSIONAL AGUDO','SCA')) return 'F05.9 Delirium sin especificación';
+  if(has('DETERIORO COGNITIVO LEVE','DCL')) return 'F06.7 Trastorno cognoscitivo leve';
+
+  // ── NEURODESARROLLO ──
+  if(has('TDAH','DEFICIT ATENCION','DÉFICIT ATENCION','HIPERACTIVIDAD')) return 'F90.0 Perturbación de la actividad y de la atención';
+  if(has('AUTISMO','TEA','TRASTORNO DEL ESPECTRO')) return 'F84.0 Autismo infantil';
+  if(has('ASPERGER')) return 'F84.5 Síndrome de Asperger';
+  if(has('RETRASO MENTAL LEVE')) return 'F70 Retraso mental leve';
+  if(has('RETRASO MENTAL MODERADO')) return 'F71 Retraso mental moderado';
+  if(has('RETRASO MENTAL GRAVE','RETRASO MENTAL SEVERO')) return 'F72 Retraso mental grave';
+  if(has('RETRASO MENTAL','RETRASO MADURATIVO','DISCAPACIDAD INTELECTUAL')) return 'F79 Retraso mental sin especificación';
+  if(has('RETRASO MADURATIVO')) return 'F79 Retraso mental sin especificación';
+
+  // ── SOMATOFORMES ──
+  if(has('SOMATIZACION','SOMATIZACIÓN','SOMATOMORFO')) return 'F45.0 Trastorno de somatización';
+  if(has('DOLOR CRONICO PSICOGENO','DOLOR SOMATOMORFO')) return 'F45.4 Trastorno de dolor somatomorfo persistente';
+
+  // ── CONDUCTA DISRUPTIVA ──
+  if(has('TRASTORNO DISOCIAL','CONDUCTA DISOCIAL')) return 'F91.9 Trastorno disocial sin especificación';
+  if(has('TRASTORNO NEGATIVISTA','OPOSICIONISTA')) return 'F91.3 Trastorno disocial desafiante y oposicionista';
+  if(has('JUEGO PATOLOGICO','JUEGO COMPULSIVO')) return 'F63.0 Juego patológico';
+
+  // ── SUEÑO ──
+  if(has('INSOMNIO')) return 'F51.0 Insomnio no orgánico';
+  if(has('HIPERSOMNIA')) return 'F51.1 Hipersomnia no orgánica';
+
+  // ── ESPECIFICOS ARGENTINOS / COLOQUIALES ──
+  if(has('C4','CIE 4','CODIGO 4')) return 'F20.9 Esquizofrenia sin especificación'; // C4 = code for acute psychosis in Arg hospitals
+  if(has('CRISIS','DESCOMPENSACION','DESCOMPENSACIÓN')) return 'F29 Psicosis no orgánica sin especificación';
+  if(has('CONDUCTA SUICIDA','TENTATIVA')) return 'F32.3 Episodio depresivo grave con síntomas psicóticos';
+  if(has('INTOXICACION','INTOXICACIÓN')) return 'F19.0 Intoxicación aguda por múltiples drogas y otras sustancias psicoactivas';
+
+  return ''; // Let Claude API handle the rest
 }
+
+// ── MAP DIAGNOSIS using Claude API as backup ──
+async function mapDiagToCIE10(diagRaw) {
+  if(!diagRaw) return '';
+  // Try local map first (fast, no API cost)
+  const local = localDiagMap(diagRaw);
+  if(local) return local;
+  // Use Claude API for complex/unusual diagnoses
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:120,
+        messages:[{role:'user', content:
+          'Sos un psiquiatra con 20 años de experiencia en hospital público argentino y conoces el CIE-10 de memoria. ' +
+          'Dado el diagnóstico clínico: "' + diagRaw + '", ' +
+          'respondé ÚNICAMENTE con el código CIE-10 más preciso y su descripción oficial. ' +
+          'Formato exacto: "F99.9 Nombre del diagnóstico". ' +
+          'Si contiene TCL = Trastorno Límite Personalidad = F60.31. ' +
+          'Si contiene C4 = Excitación psicomotriz = F20.9. ' +
+          'No des explicaciones, solo código y nombre.'
+        }]
+      })
+    });
+    if(resp.ok) {
+      const data = await resp.json();
+      const text = (data.content[0]?.text||'').trim().split('\n')[0];
+      if(text.match(/^[A-Z]\d+/)) return text;
+    }
+  } catch(e) { console.log('API fallback failed:', e); }
+  return diagRaw; // absolute fallback: keep original
+}
+
 
 // ── PROCESS IMPORTATION ──
 async function procesarImportacion(patients, filename) {
