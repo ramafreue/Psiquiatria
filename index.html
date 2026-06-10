@@ -983,6 +983,18 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
       <div class="form-row full">
         <div class="field">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:var(--rojo)">
+            <input type="checkbox" id="e-fuga" style="width:18px;height:18px;accent-color:var(--rojo);cursor:pointer" onchange="toggleFugaEdit()">
+            ⚠ Externación por fuga
+          </label>
+          <div id="e-fuga-hint" style="display:none;font-size:12px;color:var(--rojo);margin-top:4px">
+            Debe completarse la Fecha de Egreso para registrar la externación por fuga.
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row full">
+        <div class="field">
           <label>Diagnóstico (CIE-10)</label>
           <div class="diag-container no-selected" id="e-cie10-container">
             <div class="diag-search-row">
@@ -1844,9 +1856,15 @@ function diasInternacion(ingreso, egreso) {
 // 'internado'   = sin fecha egreso (o egreso > hoy) y no consultorio
 // 'alta'        = con fecha egreso <= hoy y no consultorio
 function tipoPaciente(reg) {
+  // Si tiene fecha de ingreso Y fecha de egreso -> ALTA, sin importar ubicación
+  if (reg.fecha_ingreso && reg.fecha_egreso) {
+    if (reg.externacion_fuga) return 'fuga';
+    return 'alta';
+  }
   if (reg.ubicacion === 'CONSULTORIOS') return 'consultorio';
   if (reg.ubicacion === 'INTERCONSULTA') return 'interconsulta';
   if (!reg.fecha_egreso || reg.fecha_egreso > hoy()) return 'internado';
+  if (reg.externacion_fuga) return 'fuga';
   return 'alta';
 }
 
@@ -2106,6 +2124,10 @@ function renderCard(reg) {
     statusBadge=`<span class="badge badge-violeta">✓ Consultorio</span>`;
   } else if(tipo==='interconsulta'){
     statusBadge=`<span class="badge" style="background:#fff7ed;color:#c2410c;border:1.5px solid #fdba74">✓ Interconsulta</span>`;
+  } else if(tipo==='fuga'){
+    const dias=diasInternacion(reg.fecha_ingreso,reg.fecha_egreso);
+    statusBadge=`<span class="badge" style="background:#fee2e2;color:#991b1b;border:1.5px solid #fca5a5;font-weight:700">⚠ Externación por Fuga</span>`;
+    if(dias!==null) statusBadge+=` <span class="badge badge-naranja">⏱ ${dias} día${dias!==1?'s':''} internado</span>`;
   }
 
   return `
@@ -2478,6 +2500,8 @@ window.abrirEdicion = (id) => {
   document.getElementById('e-ubicacion').value=reg.ubicacion||'';
   document.getElementById('e-ubicacion_otro').value=reg.ubicacion_otro||'';
   document.getElementById('e-otro-wrap').style.display=reg.ubicacion==='OTRO'?'grid':'none';
+  document.getElementById('e-fuga').checked = reg.externacion_fuga || false;
+  toggleFugaEdit();
   diagSetValue('e-cie10', reg.diagnostico_cie10||'');
   diagSetValue('e-cie11', reg.diagnostico_cie11||'');
   if(currentUser && currentUser.email === 'solealbanycaballero@gmail.com') {
@@ -2518,6 +2542,8 @@ window.cerrarModal = () => {
   setOficio('no','e-');
   setBarrioValEdit('');
   document.getElementById('e-barrio-otro-wrap').style.display='none';
+  document.getElementById('e-fuga').checked=false;
+  document.getElementById('e-fuga-hint').style.display='none';
   ['e-cie10','e-cie11'].forEach(p=>{ diagSelected[p]=[]; diagRender(p); const inp=document.getElementById(p+'-search'); if(inp) inp.value=''; });
   // reset evol edit fields
   ['e-evol_general','e-evol_presentacion','e-evol_actitud','e-evol_conciencia','e-evol_orientacion',
@@ -2531,8 +2557,25 @@ window.cerrarModal = () => {
   if(ebody) ebody.classList.remove('open');
 };
 
+window.toggleFugaEdit = () => {
+  const chk = document.getElementById('e-fuga');
+  const hint = document.getElementById('e-fuga-hint');
+  if(chk.checked){
+    hint.style.display='block';
+  } else {
+    hint.style.display='none';
+  }
+};
+
 window.guardarEdicion = async () => {
   if(!editandoId) return;
+  const fugaChecked = document.getElementById('e-fuga').checked;
+  const fechaEgresoVal = document.getElementById('e-fecha_egreso').value;
+  if(fugaChecked && !fechaEgresoVal){
+    document.getElementById('e-fuga-hint').style.display='block';
+    showToast('Debe completar la Fecha de Egreso para Externación por Fuga','err');
+    return;
+  }
   const ubicVal=document.getElementById('e-ubicacion').value;
   try {
     await updateDoc(doc(db,'registros',editandoId),{
@@ -2571,6 +2614,7 @@ window.guardarEdicion = async () => {
       evol_habitos:document.getElementById('e-evol_habitos').value.trim(),
       tratamiento:document.getElementById('e-tratamiento').value.trim(),
       pendientes:document.getElementById('e-pendientes').value.trim(),
+      externacion_fuga: fugaChecked,
     });
     cerrarModal(); showToast('✓ Cambios guardados','ok');
   } catch(e){ showToast('Error al guardar','err'); }
@@ -3368,7 +3412,7 @@ function buildPaseGuardiaPDF(fecha, pacientes) {
 
   function drawTableHeader(y) {
     const H=12;
-    const hdrs=[['DATOS DEL','PACIENTE'],['DIAGNÓSTICO','(CIE-10)'],['TRATAMIENTO',''],['PENDIENTES','']];
+    const hdrs=[['DATOS DEL','PACIENTE'],['DIAGNÓSTICO','(CIE-10)'],['TRATAMIENTO',''],['PENDIENTES /','OBSERVACIONES']];
     let x=ML;
     sf('bold',7.5); doc.setTextColor(...WHITE);
     cols.forEach((w,i)=>{
@@ -3582,7 +3626,7 @@ function showInstallBanner() {
   const banner = document.createElement('div');
   banner.id = 'pwa-banner';
   banner.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a3a6b;color:white;padding:12px 20px;border-radius:12px;font-family:"DM Sans",sans-serif;font-size:13px;z-index:9998;display:flex;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,.3);max-width:320px;width:90%';
-  banner.innerHTML = '<span style="font-size:22px">📱</span><div style="flex:1"><strong>Instalar como app</strong><br><span style="opacity:.8;font-size:12px">Accedé desde tu pantalla de inicio</span></div><button onclick="installPWA()" style="background:#c9993a;border:none;color:white;padding:8px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;white-space:nowrap">Instalar</button><button onclick="document.getElementById('pwa-banner').remove()" style="background:none;border:none;color:rgba(255,255,255,.6);font-size:20px;cursor:pointer;padding:0 4px">✕</button>';
+  banner.innerHTML = '<span style="font-size:22px">📱</span><div style="flex:1"><strong>Instalar como app</strong><br><span style="opacity:.8;font-size:12px">Accedé desde tu pantalla de inicio</span></div><button onclick="installPWA()" style="background:#c9993a;border:none;color:white;padding:8px 14px;border-radius:8px;font-family:&quot;DM Sans&quot;,sans-serif;font-weight:600;cursor:pointer;white-space:nowrap">Instalar</button><button onclick="document.getElementById(&apos;pwa-banner&apos;).remove()" style="background:none;border:none;color:rgba(255,255,255,.6);font-size:20px;cursor:pointer;padding:0 4px">✕</button>';
   document.body.appendChild(banner);
 }
 
