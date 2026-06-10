@@ -2501,6 +2501,7 @@ window.abrirEdicion = (id) => {
   document.getElementById('e-ubicacion_otro').value=reg.ubicacion_otro||'';
   document.getElementById('e-otro-wrap').style.display=reg.ubicacion==='OTRO'?'grid':'none';
   document.getElementById('e-fuga').checked = reg.externacion_fuga || false;
+  document.getElementById('e-fecha_egreso').onchange = toggleFugaEdit;
   toggleFugaEdit();
   diagSetValue('e-cie10', reg.diagnostico_cie10||'');
   diagSetValue('e-cie11', reg.diagnostico_cie11||'');
@@ -2560,7 +2561,8 @@ window.cerrarModal = () => {
 window.toggleFugaEdit = () => {
   const chk = document.getElementById('e-fuga');
   const hint = document.getElementById('e-fuga-hint');
-  if(chk.checked){
+  const egreso = document.getElementById('e-fecha_egreso').value;
+  if(chk.checked && !egreso){
     hint.style.display='block';
   } else {
     hint.style.display='none';
