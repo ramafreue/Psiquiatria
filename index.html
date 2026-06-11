@@ -631,6 +631,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
               <option value="">— Seleccionar —</option>
               <option value="EMERGENCIA">EMERGENCIA</option>
               <option value="INTERNACION">INTERNACION</option>
+              <option value="UTI">UTI</option>
               <option value="CONSULTORIOS">CONSULTORIOS</option>
               <option value="INTERCONSULTA">INTERCONSULTA</option>
               <option value="OTRO">OTRO</option>
@@ -958,6 +959,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <option value="">— Seleccionar —</option>
             <option value="EMERGENCIA">EMERGENCIA</option>
             <option value="INTERNACION">INTERNACION</option>
+            <option value="UTI">UTI</option>
             <option value="CONSULTORIOS">CONSULTORIOS</option>
             <option value="INTERCONSULTA">INTERCONSULTA</option>
             <option value="OTRO">OTRO</option>
@@ -2350,8 +2352,10 @@ window.generarEstadisticas = () => {
   const altas=enRango.filter(r=>tipoPaciente(r)==='alta');
   const consultorios=enRango.filter(r=>tipoPaciente(r)==='consultorio');
 
+  // UTI no forma parte del cálculo de promedio de días de internación
+  const altasParaProm = altas.filter(r=>r.ubicacion!=='UTI');
   let promDias=0;
-  if(altas.length>0){ const tot=altas.reduce((a,r)=>a+(diasInternacion(r.fecha_ingreso,r.fecha_egreso)||0),0); promDias=(tot/altas.length).toFixed(1); }
+  if(altasParaProm.length>0){ const tot=altasParaProm.reduce((a,r)=>a+(diasInternacion(r.fecha_ingreso,r.fecha_egreso)||0),0); promDias=(tot/altasParaProm.length).toFixed(1); }
 
   // ── Flujo mensual ingresos vs altas ──
   const mesFlujoDatos={};
@@ -2367,7 +2371,7 @@ window.generarEstadisticas = () => {
 
   // ── Promedio días por diagnóstico CIE-10 ──
   const diagDias={};
-  altas.forEach(r=>{
+  altasParaProm.forEach(r=>{
     const d=diasInternacion(r.fecha_ingreso,r.fecha_egreso);
     if(d===null) return;
     const raw=(r.diagnostico_cie10||r.diagnostico||'').split(' | ')[0];
@@ -2420,7 +2424,7 @@ window.generarEstadisticas = () => {
   document.getElementById('est-contenido').innerHTML=
     '<div class="est-kpi">'
     +'<div class="kpi-card"><div class="kpi-num">'+(internados.length+altas.length)+'</div><div class="kpi-label">Internaciones en período</div></div>'
-    +'<div class="kpi-card"><div class="kpi-num">'+(altas.length>0?promDias+'d':'--')+'</div><div class="kpi-label">Prom. días internación</div></div>'
+    +'<div class="kpi-card"><div class="kpi-num">'+(altasParaProm.length>0?promDias+'d':'--')+'</div><div class="kpi-label">Prom. días internación</div></div>'
     +'<div class="kpi-card"><div class="kpi-num">'+internados.length+'</div><div class="kpi-label">Aún internados</div></div>'
     +'<div class="kpi-card"><div class="kpi-num">'+tasaR+'%</div><div class="kpi-label">Tasa reinternación</div></div>'
     +'</div>'
