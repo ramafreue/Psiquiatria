@@ -588,15 +588,20 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <div class="field"><label>Barrio</label>
             <select id="direccion" onchange="toggleBarrioOtro()">
               <option value="">— Seleccionar barrio —</option>
+              <option value="Agustoni">Agustoni</option>
               <option value="Barrio Salas">Barrio Salas</option>
+              <option value="Del Viso">Del Viso</option>
               <option value="Fátima">Fátima</option>
               <option value="Irizar">Irizar</option>
+              <option value="La Lomita">La Lomita</option>
               <option value="La Lonja">La Lonja</option>
               <option value="Luis Lagomarsino">Luis Lagomarsino</option>
               <option value="Manantiales">Manantiales</option>
               <option value="Manuel Alberti">Manuel Alberti</option>
               <option value="Manzanares">Manzanares</option>
               <option value="Manzone">Manzone</option>
+              <option value="Meisner">Meisner</option>
+              <option value="Pilar Centro">Pilar Centro</option>
               <option value="Pilarica">Pilarica</option>
               <option value="San Alejo">San Alejo</option>
               <option value="San Cayetano">San Cayetano</option>
@@ -604,17 +609,12 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
               <option value="Toro">Toro</option>
               <option value="Tres Barrios">Tres Barrios</option>
               <option value="Tribarrial">Tribarrial</option>
-              <option value="Meisner">Meisner</option>
-              <option value="Villa Rosa">Villa Rosa</option>
-              <option value="Pilar Centro">Pilar Centro</option>
-              <option value="Zelaya">Zelaya</option>
-              <option value="Agustoni">Agustoni</option>
-              <option value="Del Viso">Del Viso</option>
-              <option value="La Lomita">La Lomita</option>
               <option value="Villa Astolfi">Villa Astolfi</option>
               <option value="Villa del Carmen">Villa del Carmen</option>
               <option value="Villa Luján">Villa Luján</option>
+              <option value="Villa Rosa">Villa Rosa</option>
               <option value="Villa Verde">Villa Verde</option>
+              <option value="Zelaya">Zelaya</option>
               <option value="OTRO">OTRO</option>
             </select>
           </div>
@@ -921,15 +921,20 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       <div class="form-row full"><div class="field"><label>Barrio</label>
           <select id="e-direccion" onchange="toggleBarrioOtroEdit()">
             <option value="">— Seleccionar barrio —</option>
+            <option value="Agustoni">Agustoni</option>
             <option value="Barrio Salas">Barrio Salas</option>
+            <option value="Del Viso">Del Viso</option>
             <option value="Fátima">Fátima</option>
             <option value="Irizar">Irizar</option>
+            <option value="La Lomita">La Lomita</option>
             <option value="La Lonja">La Lonja</option>
             <option value="Luis Lagomarsino">Luis Lagomarsino</option>
             <option value="Manantiales">Manantiales</option>
             <option value="Manuel Alberti">Manuel Alberti</option>
             <option value="Manzanares">Manzanares</option>
             <option value="Manzone">Manzone</option>
+            <option value="Meisner">Meisner</option>
+            <option value="Pilar Centro">Pilar Centro</option>
             <option value="Pilarica">Pilarica</option>
             <option value="San Alejo">San Alejo</option>
             <option value="San Cayetano">San Cayetano</option>
@@ -937,17 +942,12 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <option value="Toro">Toro</option>
             <option value="Tres Barrios">Tres Barrios</option>
             <option value="Tribarrial">Tribarrial</option>
-            <option value="Meisner">Meisner</option>
-            <option value="Villa Rosa">Villa Rosa</option>
-            <option value="Pilar Centro">Pilar Centro</option>
-            <option value="Zelaya">Zelaya</option>
-            <option value="Agustoni">Agustoni</option>
-            <option value="Del Viso">Del Viso</option>
-            <option value="La Lomita">La Lomita</option>
             <option value="Villa Astolfi">Villa Astolfi</option>
             <option value="Villa del Carmen">Villa del Carmen</option>
             <option value="Villa Luján">Villa Luján</option>
+            <option value="Villa Rosa">Villa Rosa</option>
             <option value="Villa Verde">Villa Verde</option>
+            <option value="Zelaya">Zelaya</option>
             <option value="OTRO">OTRO</option>
           </select>
         </div>
@@ -2280,15 +2280,7 @@ function renderLista(lista, containerId, emptyMsg='No se encontraron registros')
 // ── INTERNADOS ──
 function cargarInternados() {
   const internados=todosRegistros.filter(r=>tipoPaciente(r)==='internado');
-  const altas=todosRegistros.filter(r=>tipoPaciente(r)==='alta');
-  const consultorios=todosRegistros.filter(r=>tipoPaciente(r)==='consultorio');
-  const interconsultas=todosRegistros.filter(r=>tipoPaciente(r)==='interconsulta');
-  document.getElementById('internados-stats').innerHTML=`
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-num">${internados.length}</div><div class="stat-label">Internados</div></div>
-    <div class="stat-card"><div class="stat-num">${altas.length}</div><div class="stat-label">Con alta</div></div>
-    <div class="stat-card"><div class="stat-num">${consultorios.length + interconsultas.length}</div><div class="stat-label">Consulta/Interc.</div></div>
-  </div>`;
+  document.getElementById('internados-stats').innerHTML='';
   renderLista(internados,'internados-lista','No hay pacientes internados actualmente');
 }
 
