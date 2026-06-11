@@ -1809,7 +1809,7 @@ async function procesarImportacion(patients, filename) {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, setDoc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBg0v--VTJC4jALAnx1jxsSK7VuKzcOoAU",
@@ -1993,7 +1993,7 @@ onAuthStateChanged(auth, user => {
 
 // Expose Firebase functions for importer
 window._fbDB = db;
-window._fbImport = { collection, addDoc, serverTimestamp };
+window._fbImport = { collection, addDoc, serverTimestamp, doc, setDoc, getDoc, getDocs, db };
 
 function suscribirRegistros() {
   if(unsubscribe) unsubscribe();
@@ -3311,21 +3311,43 @@ window.generarEstadisticasMes = () => {
 // ================================================================
 // PASE DE GUARDIA
 // ================================================================
-const GUARDIA_STORE_KEY = 'pase_guardia_historico_v1';
+// Pases de guardia se guardan en Firestore (coleccion 'pases_guardia', doc id = fecha YYYY-MM-DD)
+// para que sean consultables por cualquier medico desde cualquier dispositivo.
+let _guardiaHistoricoCache = null;
 
-function getGuardiaHistorico() {
-  try { return JSON.parse(localStorage.getItem(GUARDIA_STORE_KEY)) || {}; }
-  catch(e) { return {}; }
+async function getGuardiaHistorico() {
+  try {
+    const { collection: fbCol, getDocs, db } = window._fbImport;
+    const snap = await getDocs(fbCol(db, 'pases_guardia'));
+    const hist = {};
+    snap.forEach(docSnap => { hist[docSnap.id] = docSnap.data(); });
+    _guardiaHistoricoCache = hist;
+    return hist;
+  } catch(e) {
+    console.error('Error cargando historico de pases:', e);
+    return _guardiaHistoricoCache || {};
+  }
 }
-function saveGuardiaHistorico(fecha, pdfDataUrl) {
-  const hist = getGuardiaHistorico();
-  hist[fecha] = { fecha, savedAt: new Date().toISOString(), pdfDataUrl };
-  localStorage.setItem(GUARDIA_STORE_KEY, JSON.stringify(hist));
+async function saveGuardiaHistorico(fecha, pdfDataUrl) {
+  try {
+    const { doc: fbDoc, setDoc, db } = window._fbImport;
+    const autor = (window.currentUser && (window.currentUser.displayName || window.currentUser.email)) || 'Desconocido';
+    await setDoc(fbDoc(db, 'pases_guardia', fecha), {
+      fecha,
+      savedAt: new Date().toISOString(),
+      pdfDataUrl,
+      autorNombre: autor
+    });
+  } catch(e) {
+    console.error('Error guardando pase en Firestore:', e);
+    showToast('Error al guardar el pase en la base compartida','err');
+  }
 }
 
-function cargarGuardia() {
+async function cargarGuardia() {
   const fechaHoy = hoy();
-  const hist = getGuardiaHistorico();
+  document.getElementById('panel-guardia').innerHTML = '<div class="card"><p style="text-align:center;color:var(--muted);padding:20px">Cargando...</p></div>';
+  const hist = await getGuardiaHistorico();
   const fechasHist = Object.keys(hist).sort().reverse();
 
   const pacientesGuardia = todosRegistros.filter(r => {
@@ -3334,7 +3356,7 @@ function cargarGuardia() {
   });
 
   const histOptions = fechasHist.length
-    ? fechasHist.map(f => `<option value="${f}">${formatFecha(f)}</option>`).join('')
+    ? fechasHist.map(f => `<option value="${f}">${formatFecha(f)}${hist[f].autorNombre?' — '+hist[f].autorNombre:''}</option>`).join('')
     : '<option value="">Sin pases anteriores</option>';
 
   document.getElementById('panel-guardia').innerHTML = `
@@ -3343,11 +3365,12 @@ function cargarGuardia() {
       <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-bottom:8px">
         <div>
           <label style="font-size:11px;font-weight:600;color:var(--azul);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Fecha del pase</label>
-          <input type="date" id="guardia-fecha" value="${fechaHoy}" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;background:#fafbff;outline:none">
+          <input type="date" id="guardia-fecha" value="${fechaHoy}" readonly style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;background:#eef2f7;outline:none;color:var(--muted);cursor:not-allowed">
         </div>
         <button onclick="generarPaseGuardia()" style="background:var(--azul);color:white;border:none;border-radius:8px;padding:11px 18px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap">Generar PDF</button>
       </div>
       <p style="font-size:12px;color:var(--muted)">Incluye <strong>${pacientesGuardia.length}</strong> paciente${pacientesGuardia.length!==1?'s':''} internados (excluye altas y consultorios)</p>
+      <p style="font-size:11px;color:var(--muted);margin-top:4px;font-style:italic">El pase siempre refleja el estado actual de internación a la fecha de hoy. Para pases de fechas anteriores, consultá los guardados abajo.</p>
     </div>
     <div class="card">
       <div class="card-title" style="font-size:14px">📋 Consultar pases anteriores</div>
@@ -3365,7 +3388,7 @@ function cargarGuardia() {
     </div>`;
 }
 
-window.generarPaseGuardia = () => {
+window.generarPaseGuardia = async () => {
   const fecha = document.getElementById('guardia-fecha')?.value || hoy();
   const pacientes = todosRegistros.filter(r => {
     const t = tipoPaciente(r);
@@ -3378,16 +3401,16 @@ window.generarPaseGuardia = () => {
   const pdfDataUrl = doc.output('datauristring');
   const filename = 'Pase_Guardia_' + fecha + '.pdf';
 
-  // Save to local history
-  saveGuardiaHistorico(fecha, pdfDataUrl);
-  cargarGuardia();
+  // Save to shared history (Firestore)
+  await saveGuardiaHistorico(fecha, pdfDataUrl);
+  await cargarGuardia();
   mostrarModalExportar(pdfDataUrl, filename, fecha);
 };
 
-window.descargarGuardiaHistorico = () => {
+window.descargarGuardiaHistorico = async () => {
   const sel = document.getElementById('guardia-hist-select')?.value;
   if(!sel) { showToast('Seleccioná una fecha'); return; }
-  const hist = getGuardiaHistorico();
+  const hist = await getGuardiaHistorico();
   const entry = hist[sel];
   if(!entry || !entry.pdfDataUrl) { showToast('No se encontró el PDF','err'); return; }
   mostrarModalExportar(entry.pdfDataUrl, 'Pase_Guardia_' + sel + '.pdf', sel);
