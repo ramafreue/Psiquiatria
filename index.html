@@ -2559,13 +2559,18 @@ window.cerrarModal = () => {
 };
 
 window.toggleFugaEdit = () => {
-  const chk = document.getElementById('e-fuga');
-  const hint = document.getElementById('e-fuga-hint');
-  const egreso = document.getElementById('e-fecha_egreso').value;
-  if(chk.checked && !egreso){
-    hint.style.display='block';
-  } else {
-    hint.style.display='none';
+  try {
+    const chk = document.getElementById('e-fuga');
+    const hint = document.getElementById('e-fuga-hint');
+    const egresoEl = document.getElementById('e-fecha_egreso');
+    const egreso = egresoEl ? egresoEl.value : '';
+    if(chk && chk.checked && !egreso){
+      if(hint) hint.style.display='block';
+    } else {
+      if(hint) hint.style.display='none';
+    }
+  } catch(err) {
+    console.error('toggleFugaEdit error:', err);
   }
 };
 
