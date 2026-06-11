@@ -1769,6 +1769,52 @@ async function procesarImportacion(patients, filename) {
     }
   }
   
+  // ── ALTAS AUTOMÁTICAS ──
+  // Pacientes que estaban INTERNADO/INTERCONSULTA en la base pero NO aparecen
+  // en el archivo subido (de EMERGENCIA/INTERNACION) se consideran dados de alta.
+  // Se les coloca fecha_egreso = día anterior a hoy (editable luego).
+  status.textContent = 'Verificando altas automáticas...';
+  const altasAuto = [];
+  try {
+    const dnisArchivo = new Set(
+      patients.map(p => (p.dni||'').replace(/\D/g,'')).filter(Boolean)
+    );
+    // Fecha de egreso sugerida = día anterior al día de la importación
+    const fechaHoyDate = new Date(todayStr+'T00:00:00');
+    fechaHoyDate.setDate(fechaHoyDate.getDate()-1);
+    const fechaEgresoAuto = fechaHoyDate.getFullYear()+'-'+
+      String(fechaHoyDate.getMonth()+1).padStart(2,'0')+'-'+
+      String(fechaHoyDate.getDate()).padStart(2,'0');
+
+    const candidatos = (window.todosRegistros||[]).filter(r => {
+      const t = window.tipoPaciente(r);
+      if(t!=='internado' && t!=='interconsulta') return false;
+      if(r.ubicacion!=='EMERGENCIA' && r.ubicacion!=='INTERNACION') return false;
+      const dni = (r.dni||'').replace(/\D/g,'');
+      if(!dni) return false;
+      return !dnisArchivo.has(dni);
+    });
+
+    if(candidatos.length){
+      const fbDoc = window._fbImport.doc;
+      const fbUpdate = window._fbImport.setDoc ? null : null;
+      for(const reg of candidatos){
+        try {
+          await window._fbImport.setDoc(
+            fbDoc(window._fbDB,'registros',reg.id),
+            { fecha_egreso: fechaEgresoAuto },
+            { merge: true }
+          );
+          altasAuto.push({ reg, fecha: fechaEgresoAuto });
+        } catch(e){
+          console.error('Error dando de alta automática a', reg.apellido, e);
+        }
+      }
+    }
+  } catch(e) {
+    console.error('Error en altas automáticas:', e);
+  }
+
   bar.style.width = '100%';
   status.textContent = 'Completado.';
   
@@ -1790,6 +1836,27 @@ async function procesarImportacion(patients, filename) {
     </div>`;
   }).join('');
   
+  // ── ALTAS AUTOMÁTICAS HTML ──
+  const altasHtml = altasAuto.length
+    ? altasAuto.map(a => `<div class="import-result-item">
+        <span style="font-weight:700;font-size:15px;color:var(--success)">✓</span>
+        <div style="flex:1">
+          <strong>${a.reg.apellido}, ${a.reg.nombre}</strong> <span style="color:var(--muted);font-size:12px">DNI ${a.reg.dni||'—'}</span>
+          <div style="font-size:12px;color:var(--muted)">Dado de alta automáticamente — Fecha de egreso: ${formatFecha(a.fecha)} <span style="opacity:.7">(editable desde el registro)</span></div>
+        </div>
+      </div>`).join('')
+    : '';
+
+  const altasSectionHtml = altasAuto.length ? `
+    <div class="card" style="margin-top:14px">
+      <div class="card-title">🏥 Altas automáticas detectadas (${altasAuto.length})</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">
+        Estos pacientes estaban internados y no figuran en el archivo importado, por lo que se asume que fueron dados de alta.
+        La fecha de egreso se completó automáticamente con el día anterior a esta importación. Podés editarla desde "Editar registro" si corresponde otra fecha.
+      </p>
+      <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">${altasHtml}</div>
+    </div>` : '';
+
   document.getElementById('import-results').innerHTML = `
     <div class="card">
       <div class="card-title">📋 Resultado de importación — ${filename}</div>
@@ -1802,7 +1869,7 @@ async function procesarImportacion(patients, filename) {
       <button onclick="cargarImportar()" style="margin-top:14px;width:100%;padding:11px;background:var(--azul-light);color:var(--azul);border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer">
         📥 Importar otro archivo
       </button>
-    </div>`;
+    </div>${altasSectionHtml}`;
 }
 
 </script>
@@ -1869,6 +1936,7 @@ function tipoPaciente(reg) {
   if (reg.externacion_fuga) return 'fuga';
   return 'alta';
 }
+window.tipoPaciente = tipoPaciente;
 
 function getUbicacionDisplay(reg) {
   if (!reg.ubicacion) return '';
