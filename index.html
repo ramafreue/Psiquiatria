@@ -1791,53 +1791,60 @@ async function procesarImportacion(patients, filename) {
   const todayStr = hoy(); // local date using global helper
   
   const results = [];
-  const existingDNIs = {};
-  (window.todosRegistros||[]).forEach(r => { if(r.dni) existingDNIs[r.dni.replace(/\D/g,'')] = r; });
-  
+  // Mapear DNI -> lista de registros existentes con ese DNI (puede haber más de uno: altas previas)
+  const existingByDNI = {};
+  (window.todosRegistros||[]).forEach(r => {
+    if(!r.dni) return;
+    const key = r.dni.replace(/\D/g,'');
+    if(!existingByDNI[key]) existingByDNI[key] = [];
+    existingByDNI[key].push(r);
+  });
+
   let procesados = 0;
-  
+  let esReingreso = false;
+
   for(const p of patients) {
     procesados++;
     bar.style.width = Math.round(40 + (procesados/patients.length)*55) + '%';
     status.textContent = `Procesando ${procesados}/${patients.length}: ${p.apellido}, ${p.nombre}...`;
-    
-    const existing = existingDNIs[p.dni];
+
+    const registrosExistentes = existingByDNI[p.dni] || [];
+    // ¿Tiene algún registro ACTIVO (internado/interconsulta, sin alta)?
+    const activo = registrosExistentes.find(r => {
+      const t = window.tipoPaciente(r);
+      return t === 'internado' || t === 'interconsulta';
+    });
+    // ¿Tiene algún registro de ALTA previa (alta o fuga)?
+    const tieneAltaPrevia = registrosExistentes.some(r => {
+      const t = window.tipoPaciente(r);
+      return t === 'alta' || t === 'fuga';
+    });
+
     let accion = '';
     let observacion = '';
-    
+    esReingreso = false;
+
     // ── VALIDATION LOGIC ──
-    if(existing) {
-      const fechaIngreso = p.fechaIngreso || todayStr;
-      if(fechaIngreso < todayStr) {
-        // Fecha ingreso menor a todayStr
-        if(p.reinternacion === 'SI') {
-          accion = 'importar';
-          observacion = 'Paciente Ingresado Correctamente (Reinternación)';
-        } else {
-          accion = 'skip';
-          observacion = 'Paciente Ya Ingresado';
-        }
-      } else if(fechaIngreso === todayStr) {
-        if(p.reinternacion === 'SI') {
-          accion = 'importar';
-          observacion = 'Paciente Ingresado Correctamente (Reinternación)';
-        } else {
-          accion = 'skip';
-          observacion = 'Revisar Registro';
-        }
-      } else {
-        // Fecha futura
-        accion = 'importar';
-        observacion = 'Paciente Ingresado Correctamente';
-      }
+    if(activo) {
+      // El paciente ya figura como internado activo en la base -> RE-ESCRIBIR sus datos
+      // (corrige importaciones previas con datos mal cargados: apellido, nombre, DNI,
+      // edad, fecha de ingreso, diagnóstico, barrio, etc.)
+      accion = 'actualizar';
+      observacion = 'Datos actualizados (registro existente)';
+    } else if(tieneAltaPrevia) {
+      // El paciente tuvo una internación anterior con alta -> esto es un REINGRESO
+      accion = 'importar';
+      esReingreso = true;
+      observacion = 'Paciente Ingresado Correctamente (Reingreso)';
     } else {
+      // Paciente completamente nuevo en la base
       accion = 'importar';
       observacion = 'Paciente Ingresado Correctamente';
     }
     
     // ── MAP DIAGNOSIS ──
     let diagCIE10 = '';
-    if(p.diagRaw && accion === 'importar') {
+    if(p.diagRaw && (accion === 'importar' || accion === 'actualizar')) {
       diagCIE10 = await mapDiagToCIE10(p.diagRaw);
     }
     
@@ -1869,7 +1876,7 @@ async function procesarImportacion(patients, filename) {
           direccion: p.barrio || 'OTRO',
           direccion_otro: (p.barrio==='OTRO' && p.observaciones) ? p.observaciones : '',
           importado: true,
-          reinternacion: p.reinternacion === 'SI',
+          reinternacion: esReingreso,
           autorUid: user ? user.uid : '',
           autorNombre: user ? (user.displayName || user.email) : 'Importación',
           creadoEn: fbTS()
@@ -1877,6 +1884,27 @@ async function procesarImportacion(patients, filename) {
         results.push({ p, accion:'ok', msg: observacion, diag: diagCIE10 });
       } catch(e) {
         results.push({ p, accion:'err', msg: 'Error al guardar: '+e.message });
+      }
+    } else if(accion === 'actualizar') {
+      try {
+        const fbDoc = window._fbImport.doc;
+        const fbSet = window._fbImport.setDoc;
+        await fbSet(fbDoc(window._fbDB, 'registros', activo.id), {
+          apellido: p.apellido,
+          nombre: p.nombre,
+          dni: p.dni,
+          edad: p.edad,
+          fecha_ingreso: p.fechaIngreso || activo.fecha_ingreso || '',
+          oficio: p.oficio === 'SI' ? ('SI|'+(p.oficioFecha||activo.fecha||'')) : (activo.oficio||'NO'),
+          diagnostico_cie10: diagCIE10 || activo.diagnostico_cie10 || '',
+          diagnostico: diagCIE10 || activo.diagnostico || '',
+          direccion: p.barrio || activo.direccion || 'OTRO',
+          direccion_otro: (p.barrio==='OTRO' && p.observaciones) ? p.observaciones : (activo.direccion_otro||''),
+          importado: true
+        }, { merge: true });
+        results.push({ p, accion:'ok', msg: observacion, diag: diagCIE10 });
+      } catch(e) {
+        results.push({ p, accion:'err', msg: 'Error al actualizar: '+e.message });
       }
     } else {
       results.push({ p, accion:'skip', msg: observacion });
@@ -2493,14 +2521,19 @@ window.generarEstadisticas = () => {
   const diagN=diagKeys.map(k=>diagDias[k].n);
 
   // ── Reinternaciones ──
+  // Un paciente cuenta como "reinternado" si:
+  //  a) tiene más de un registro con fecha_ingreso dentro del período seleccionado, o
+  //  b) algún registro suyo en el período está marcado explícitamente como reinternacion=true
+  //     (esto cubre el caso de que el alta anterior haya sido fuera del rango seleccionado)
   const pacMap={};
   internAltas.forEach(r=>{
     const key=(r.dni||'').replace(/\D/g,'')||(r.apellido+'_'+r.nombre);
     if(!key) return;
-    if(!pacMap[key]) pacMap[key]={nombre:(r.apellido||'')+', '+(r.nombre||''),n:0,diag:r.diagnostico_cie10||r.diagnostico||'--'};
+    if(!pacMap[key]) pacMap[key]={nombre:(r.apellido||'')+', '+(r.nombre||''),n:0,diag:r.diagnostico_cie10||r.diagnostico||'--',marcado:false};
     pacMap[key].n++;
+    if(r.reinternacion) pacMap[key].marcado=true;
   });
-  const reinternados=Object.values(pacMap).filter(p=>p.n>1).sort((a,b)=>b.n-a.n);
+  const reinternados=Object.values(pacMap).filter(p=>p.n>1||p.marcado).sort((a,b)=>(b.n-a.n));
   const totalPac=Object.keys(pacMap).length;
   const tasaR=totalPac>0?((reinternados.length/totalPac)*100).toFixed(1):0;
 
