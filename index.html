@@ -1349,29 +1349,143 @@ function parseCSV(text) {
 // Row 2 (idx 2): headers - NOMBRE Y APELLIDO | REINTERNACION | DNI | EDAD | FECHA DE INGRESO...
 // Row 3 (idx 3): sub-headers - OFICIO | INVOLUNTARIO | VOLUNTARIO | OBSERVACION | INTERNACION | DERIVACION
 // Data rows: col3 (DNI) is numeric
+// ── BARRIO MATCHING ──
+// Lista de barrios disponibles en el formulario (debe coincidir con los <option> del select de Barrio)
+const BARRIOS_DISPONIBLES = [
+  'Agustoni','Barrio Salas','Del Viso','Fátima','Irizar','La Lomita','La Lonja',
+  'Luis Lagomarsino','Manantiales','Manuel Alberti','Manzanares','Manzone',
+  'Meisner','Pilar Centro','Pilarica','San Alejo','San Cayetano','San Francisco',
+  'Toro','Tres Barrios','Tribarrial','Villa Astolfi','Villa del Carmen',
+  'Villa Luján','Villa Rosa','Villa Verde'
+];
+
+function normBarrio(s) {
+  return String(s||'').toUpperCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/^B[°ºo.]?\s+/,'')   // quitar prefijo "B°", "B°.", "BO " etc
+    .replace(/^BARRIO\s+/,'')      // quitar prefijo "BARRIO "
+    .replace(/[^A-Z0-9\s]/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
+function matchBarrio(observacion) {
+  if(!observacion) return 'OTRO';
+  const obsN = normBarrio(observacion);
+  if(!obsN) return 'OTRO';
+  // 1. Coincidencia exacta
+  for(const b of BARRIOS_DISPONIBLES) {
+    if(normBarrio(b) === obsN) return b;
+  }
+  // 2. La observación contiene el nombre del barrio, o viceversa
+  for(const b of BARRIOS_DISPONIBLES) {
+    const bN = normBarrio(b);
+    if(obsN.includes(bN) || bN.includes(obsN)) return b;
+  }
+  // 3. Coincidencia parcial por palabras (al menos una palabra significativa en común)
+  const obsWords = obsN.split(' ').filter(w=>w.length>=4);
+  for(const b of BARRIOS_DISPONIBLES) {
+    const bWords = normBarrio(b).split(' ').filter(w=>w.length>=4);
+    if(obsWords.some(w=>bWords.includes(w))) return b;
+  }
+  return 'OTRO';
+}
+
+// ── DETECTAR MAPA DE COLUMNAS POR ENCABEZADOS ──
+// Busca en las primeras filas del archivo las celdas que coinciden con los
+// encabezados conocidos (NOMBRE Y APELLIDO, DNI, EDAD, OFICIO, etc.) y
+// devuelve un objeto con el índice de columna de cada uno, sin asumir
+// posiciones fijas (las columnas pueden variar entre archivos).
+function detectColumnMap(rows) {
+  const map = {};
+  const norm = s => String(s||'').toUpperCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^A-Z0-9\s]/g,'').replace(/\s+/g,' ').trim();
+
+  // Escanear las primeras 6 filas buscando encabezados conocidos
+  const HEADER_ROWS = Math.min(6, rows.length);
+  for(let r=0; r<HEADER_ROWS; r++){
+    const row = rows[r];
+    if(!row) continue;
+    for(let c=0; c<row.length; c++){
+      const val = norm(row[c]);
+      if(!val) continue;
+      switch(val){
+        case 'NOMBRE Y APELLIDO': case 'NOMBRE APELLIDO': case 'APELLIDO Y NOMBRE':
+        case 'PACIENTE': case 'NOMBRE':
+          if(map.nombre===undefined) map.nombre=c; break;
+        case 'DNI':
+          if(map.dni===undefined) map.dni=c; break;
+        case 'EDAD':
+          if(map.edad===undefined) map.edad=c; break;
+        case 'OFICIO':
+          if(map.oficio===undefined) map.oficio=c; break;
+        case 'INVOLUNTARIO':
+          if(map.involuntario===undefined) map.involuntario=c; break;
+        case 'VOLUNTARIO':
+          if(map.voluntario===undefined) map.voluntario=c; break;
+        case 'OBSERVACION':
+          if(map.estObservacion===undefined) map.estObservacion=c; break;
+        case 'INTERNACION':
+          if(map.estInternacion===undefined) map.estInternacion=c; break;
+        case 'DERIVACION':
+          if(map.estDerivacion===undefined) map.estDerivacion=c; break;
+        case 'DIAGNOSTICO':
+          if(map.diagnostico===undefined) map.diagnostico=c; break;
+        case 'OBRA SOCIAL': case 'COBERTURA': case 'SIN COBERTURA':
+          if(map.obraSocial===undefined) map.obraSocial=c; break;
+        case 'OBSERVACIONES': case 'OBSERVACION ': case 'BARRIO':
+          // OBSERVACIONES suele estar en la fila de título (fila 1), distinta
+          // de OBSERVACION (sin S, marcador de estado en fila 4)
+          if(map.observaciones===undefined) map.observaciones=c; break;
+        case 'FECHA DE INGRESO': case 'FECHA INGRESO':
+          if(map.fechaIngresoCol===undefined) map.fechaIngresoCol=c; break;
+      }
+    }
+  }
+
+  // Fallbacks por si algún encabezado no se encontró (usar posiciones típicas)
+  if(map.nombre===undefined) map.nombre=0;
+  if(map.dni===undefined) map.dni=2;
+  if(map.edad===undefined) map.edad=3;
+  if(map.oficio===undefined) map.oficio=4;
+  if(map.involuntario===undefined) map.involuntario=5;
+  if(map.voluntario===undefined) map.voluntario=6;
+  if(map.estObservacion===undefined) map.estObservacion=7;
+  if(map.estInternacion===undefined) map.estInternacion=8;
+  if(map.estDerivacion===undefined) map.estDerivacion=9;
+  if(map.diagnostico===undefined) map.diagnostico=10;
+  if(map.observaciones===undefined) map.observaciones=13;
+
+  return map;
+}
+
 function extractPatientsFromRows(rows) {
+  const colMap = detectColumnMap(rows);
   const patients = [];
-  
+
   for(let i=0; i<rows.length; i++) {
     const row = rows[i];
     if(!row || row.length < 4) continue;
-    
-    const col0 = row[0] ? String(row[0]).trim() : '';
-    const col3 = row[3]; // DNI
-    
-    // Skip header rows, section headers, empty rows
-    if(!col0 || !col3) continue;
-    
-    // DNI must be numeric-ish
-    const dniRaw = String(col3).trim().replace(/\D/g,'');
-    if(dniRaw.length < 6 || dniRaw.length > 10) continue;
-    
-    // Skip if col0 looks like a section header (no DNI)
-    if(isNaN(parseInt(dniRaw))) continue;
-    
-    // Parse name: APELLIDO NOMBRE -> "Apellido, Nombre"
-    const nombreCompleto = col0.replace(/\(.*?\)/g,'').trim(); // remove (UTI03) etc
-    const partesNombre = nombreCompleto.split(/\s+/);
+
+    const colNombre = row[colMap.nombre] ? String(row[colMap.nombre]).trim() : '';
+
+    // Saltar filas vacías o que son títulos de sección (en color verde en el Excel original,
+    // p.ej. "UTI", "SECTOR A (SALUD MENTAL)", "CLINICA MEDICA")
+    if(!colNombre) continue;
+    const SECTION_TITLES = /^(UTI|SECTOR|CLINICA MEDICA|CLÍNICA MEDICA|EMERGENCIA|INTERNADOS)/i;
+    if(SECTION_TITLES.test(colNombre.trim())) continue;
+
+    // ── DNI ──
+    const colDni = row[colMap.dni];
+    if(!colDni) continue;
+    const dniRaw = String(colDni).trim().replace(/\D/g,'');
+    if(dniRaw.length < 6 || dniRaw.length > 10) continue; // descarta "NN", vacíos, etc.
+
+    // Parse name: "APELLIDO NOMBRE" -> apellido = primera palabra, nombre = resto
+    // Normalizar comas sueltas (ej: "MORENO , CINTIA GABRIELA" -> "MORENO CINTIA GABRIELA")
+    const nombreCompleto = colNombre.replace(/\(.*?\)/g,'').replace(/,/g,' ').trim().replace(/\s+/g,' ');
+    const partesNombre = nombreCompleto.split(' ');
     let apellido = '', nombre = '';
     if(partesNombre.length >= 2) {
       apellido = partesNombre[0];
@@ -1379,60 +1493,49 @@ function extractPatientsFromRows(rows) {
     } else {
       apellido = nombreCompleto;
     }
-    // Capitalize
-    apellido = apellido.charAt(0)+apellido.slice(1).toLowerCase();
-    nombre = nombre ? nombre.charAt(0)+nombre.slice(1).toLowerCase() : '';
-    
-    const reinternacion = row[2] ? String(row[2]).trim().toUpperCase() : 'NO';
-    const edad = row[4] ? String(row[4]).trim() : '';
-    
-    // Dates: col5=OFICIO, col6=INVOLUNTARIO, col7=VOLUNTARIO
-    const fechaOficio      = parseDate(row[5]);
-    const fechaInvoluntario= parseDate(row[6]);
-    const fechaVoluntario  = parseDate(row[7]);
-    
-    // State markers: col8=OBSERVACION, col9=INTERNACION, col10=DERIVACION
-    const esObservacion  = row[8]  && String(row[8]).trim().toUpperCase()==='X';
-    const esInternacion  = row[9]  && String(row[9]).trim().toUpperCase()==='X';
-    const esDerivacion   = row[10] && String(row[10]).trim().toUpperCase()==='X';
-    
-    // Determine ubicacion and fechaIngreso
-    let ubicacion = 'INTERNACION';
+    // Capitalizar (Title Case simple, respeta acentos)
+    const cap = s => s.split(' ').map(w => w ? w.charAt(0).toUpperCase()+w.slice(1).toLowerCase() : w).join(' ');
+    apellido = cap(apellido);
+    nombre = nombre ? cap(nombre) : '';
+
+    // ── EDAD ──
+    const edadVal = row[colMap.edad];
+    const edad = edadVal !== null && edadVal !== undefined ? String(edadVal).trim() : '';
+
+    const reinternacion = 'NO'; // no hay columna de reinternación en este formato
+
+    // ── FECHAS DE INGRESO (OFICIO / INVOLUNTARIO / VOLUNTARIO) ──
+    const fechaOficio      = parseDate(row[colMap.oficio]);
+    const fechaInvoluntario= parseDate(row[colMap.involuntario]);
+    const fechaVoluntario  = parseDate(row[colMap.voluntario]);
+
     let fechaIngreso = '';
     let oficio = 'NO';
     let oficioFecha = '';
-    
+
     if(fechaOficio) {
-      // Col 5 = OFICIO column has a date -> internacion por oficio judicial
-      ubicacion = 'INTERNACION';
       fechaIngreso = fechaOficio;
       oficio = 'SI';
       oficioFecha = fechaOficio;
-    } else if(fechaInvoluntario && !esObservacion && !esInternacion && !esDerivacion) {
-      // Has involuntary date but no X markers -> try to infer from context
-      ubicacion = 'INTERNACION';
-      fechaIngreso = fechaInvoluntario;
-    } else if(esObservacion) {
-      ubicacion = 'EMERGENCIA';
-      fechaIngreso = fechaInvoluntario || fechaVoluntario || '';
-    } else if(esInternacion) {
-      ubicacion = 'INTERNACION';
-      fechaIngreso = fechaInvoluntario || fechaVoluntario || '';
-    } else if(esDerivacion) {
-      ubicacion = 'OTRO';
-      fechaIngreso = fechaInvoluntario || fechaVoluntario || '';
     } else {
-      // Fallback: use any date found
-      fechaIngreso = fechaInvoluntario || fechaVoluntario || fechaOficio || '';
+      fechaIngreso = fechaInvoluntario || fechaVoluntario || '';
     }
-    
-    const diagRaw = row[11] ? String(row[11]).trim() : '';
-    const observaciones = row[14] ? String(row[14]).trim() : '';
-    
+
+    // ── DIAGNÓSTICO ──
+    const diagVal = row[colMap.diagnostico];
+    const diagFinal = diagVal ? String(diagVal).trim() : '';
+
+    // ── OBSERVACIONES / BARRIO ──
+    const obsVal = row[colMap.observaciones];
+    const observacionRaw = obsVal ? String(obsVal).trim() : '';
+    const barrioMatch = matchBarrio(observacionRaw);
+
     patients.push({
       apellido, nombre, dni: dniRaw, edad,
-      fechaIngreso, ubicacion, oficio, oficioFecha,
-      diagRaw, reinternacion, observaciones,
+      fechaIngreso, oficio, oficioFecha,
+      diagRaw: diagFinal, reinternacion,
+      observaciones: observacionRaw,
+      barrio: barrioMatch,
       rawRow: i
     });
   }
@@ -1754,8 +1857,8 @@ async function procesarImportacion(patients, filename) {
           fecha: fechaHoyStr,
           fecha_ingreso: p.fechaIngreso || '',
           fecha_egreso: '',
-          ubicacion: p.ubicacion,
-          ubicacion_otro: p.ubicacion === 'OTRO' ? 'Derivación' : '',
+          ubicacion: '',
+          ubicacion_otro: '',
           oficio: p.oficio === 'SI' ? ('SI|'+(p.oficioFecha||fechaHoyStr)) : 'NO',
           diagnostico_cie10: diagCIE10,
           diagnostico_cie11: '',
@@ -1763,7 +1866,8 @@ async function procesarImportacion(patients, filename) {
           tratamiento: '',
           pendientes: '',
           antecedentes: '',
-          direccion: '',
+          direccion: p.barrio || 'OTRO',
+          direccion_otro: (p.barrio==='OTRO' && p.observaciones) ? p.observaciones : '',
           importado: true,
           reinternacion: p.reinternacion === 'SI',
           autorUid: user ? user.uid : '',
@@ -1799,7 +1903,8 @@ async function procesarImportacion(patients, filename) {
     const candidatos = (window.todosRegistros||[]).filter(r => {
       const t = window.tipoPaciente(r);
       if(t!=='internado' && t!=='interconsulta') return false;
-      if(r.ubicacion!=='EMERGENCIA' && r.ubicacion!=='INTERNACION') return false;
+      // Excluir explícitamente CONSULTORIOS / OTRO de las altas automáticas
+      if(r.ubicacion==='CONSULTORIOS' || r.ubicacion==='OTRO') return false;
       const dni = (r.dni||'').replace(/\D/g,'');
       if(!dni) return false;
       return !dnisArchivo.has(dni);
